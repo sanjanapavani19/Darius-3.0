@@ -106,6 +106,7 @@ Public Class Form1
 
     Public Sub ChangeExposure()
 
+
         Camera.exp = Val(Textbox_exposure.Text)
         Camera.ExposureChanged = True
         Setting.Sett("EXPOSURE", Camera.exp)
