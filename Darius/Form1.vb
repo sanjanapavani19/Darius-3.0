@@ -25,12 +25,12 @@ Public Class Form1
 
         Preview = New PreviewStructure
         Imagetype = ImagetypeEnum.Brightfield
-        Camera = New XimeaColor
+        Camera = New XimeaXIq
 
 
         If Camera.status Then
             Textbox_exposure.Text = Camera.exp
-            AutoFocus = New FocusStructure(0.3, 20, 1)
+            AutoFocus = New FocusStructure(0.4, 10, 1)
 
             Display = New ImageDisplay(Camera.Dim_X, Camera.Dim_Y, 2)
 
@@ -39,6 +39,7 @@ Public Class Form1
         stage = New Zaber(5, Setting.Gett("FOVX"), Setting.Gett("FOVX") * Camera.Dim_Y / Camera.Dim_X)
         stage.correct = True
 
+
         TextBoxGain.Text = Setting.Gett("Gain")
         Textbox_exposure.Text = Setting.Gett("exposure")
 
@@ -46,23 +47,25 @@ Public Class Form1
         If Camera.status Then
             CollagenImage = New StackImage(Camera.Dim_X, Camera.Dim_Y, 4, Imaging.PixelFormat.Format32bppArgb)
             ReDim Concatenate(Camera.Dim_X, Camera.Dim_Y, 5)
-            ArrangeControls(10)
+
             Camera.Flatfield(0)
             'Camera.SetFlatField("ff.tif")
             GoLive()
+            LEDcontroller = New Relay
+            LEDcontroller.SetRelays(1, True)
+            LEDcontroller.SetRelays(2, False)
+
+            Tracking = New TrackingStructure(PictureBox_Preview)
+            ArrangeControls(10)
+
         End If
-
-        LEDcontroller = New Relay
-        LEDcontroller.SetRelays(1, True)
-        LEDcontroller.SetRelays(2, False)
-
-
-        Tracking = New TrackingStructure(PictureBox_Preview)
+        'comes down to focus
+        stage.Move_r(stage.Zport, AutoFocus.Range / 2)
     End Sub
 
 
     Sub ArrangeControls(d As Integer)
-        Dim scale As Single = 0.5
+        Dim scale As Single = 0.85
 
 
 
@@ -79,13 +82,12 @@ Public Class Form1
         TabControl1.Height = Display.BmpPreview.width * (0.1 + scale)
 
 
-        PictureBox_Phasor.Left = TabControl1.Left + TabControl1.Width + d
-        PictureBox_Phasor.Top = TabControl1.Top
-        HScrollBar_PhasorPanels.Left = PictureBox_Phasor.Left
-        HScrollBar_PhasorPanels.Top = PictureBox_Phasor.Top + PictureBox_Phasor.Height + d
+        PictureBox_Preview.Left = TabControl1.Left + TabControl1.Width + d
+        PictureBox_Preview.Top = TabControl1.Top
 
-        GroupBox3.Left = PictureBox_Phasor.Left
-        GroupBox3.Top = HScrollBar_PhasorPanels.Top + HScrollBar_PhasorPanels.Height + d
+
+        GroupBox3.Left = PictureBox_Preview.Left
+        GroupBox3.Top = PictureBox_Preview.Top + PictureBox_Preview.Height + d
         TabControl_Settings.Top = GroupBox3.Top + GroupBox3.Height + d
         TabControl_Settings.Left = GroupBox3.Left
         TextBoxGain.Text = Setting.Gett("Gain")
@@ -143,7 +145,7 @@ Public Class Form1
             End If
 
             If Imagetype = ImagetypeEnum.Fluorescence Then
-                Display.Preview(Camera.frame, False)
+                Display.Preview(Camera.frame, True)
                 PictureBox1.Image = Display.BmpPreview.bmp
             End If
 
@@ -282,12 +284,6 @@ Public Class Form1
     End Sub
 
 
-    Private Sub HScrollBar_PhasorPanels_Scroll(sender As Object, e As ScrollEventArgs) Handles HScrollBar_PhasorPanels.Scroll
-        panel = HScrollBar_PhasorPanels.Value
-    End Sub
-
-
-
 
     Private Sub Button_Save_Click(sender As Object, e As EventArgs)
         If SaveFileDialog1.ShowDialog() = DialogResult.Cancel Then Exit Sub
@@ -321,7 +317,7 @@ Public Class Form1
             '  Camera.setGain(0)
             ' TextBoxGain.Text = Setting.Gett("Gain")
 
-            'Textbox_exposure.Text = 0.01
+            'Textbox_exposure.Text = get
             LEDcontroller.SetRelays(2, False)
             LEDcontroller.SetRelays(1, True)
             Button_adjustBrightness.PerformClick()
@@ -363,13 +359,13 @@ Public Class Form1
 
 
 
-    Private Sub PictureBox0_MouseDown(sender As Object, e As MouseEventArgs) Handles PictureBox0.MouseDown
+    Private Sub PictureBox0_MouseDown(sender As Object, e As MouseEventArgs) Handles PictureBox0.MouseDown, PictureBox1.MouseDown
         stage.xp = e.X
         stage.yp = e.Y
 
     End Sub
 
-    Private Sub PictureBox0_MouseUp(sender As Object, e As MouseEventArgs) Handles PictureBox0.MouseUp
+    Private Sub PictureBox0_MouseUp(sender As Object, e As MouseEventArgs) Handles PictureBox0.MouseUp, PictureBox1.MouseUp
 
         Dim Z As Integer
         If Display.zoom Then Z = Display.sampeling Else Z = 1
@@ -381,13 +377,13 @@ Public Class Form1
 
     Public Function DoAutoFocus(position As Integer)
         stage.GoZero(position)
+
         Dim WasLive As Boolean
         If Camera.busy Then ExitLive() : WasLive = True
 
         Dim focus As Single
         AutoFocus.Initialize()
         focus = AutoFocus.Analyze()
-
         AutoFocus.Release()
 
         'if camera is stopped because  of this sub then it resumes the live.
@@ -397,7 +393,7 @@ Public Class Form1
     End Function
 
     Private Sub Button4_Click(sender As Object, e As EventArgs) Handles Button4.Click
-        DoAutoFocus(1)
+        DoAutoFocus(0)
     End Sub
 
 
@@ -447,10 +443,11 @@ Public Class Form1
         Dim bmp(X * Y - 1) As Bitmap
         ProgressBar_Mosaic.Maximum = X * Y
         direction = 1
-
+        Tracking.ROI.IsMade = False
+        ReDim FocusMap(X, Y)
         If Tracking.ROI.IsMade Then
 
-            ReDim FocusMap(X, Y)
+
             Dim A, B, C, D As Single
             Dim X0, X1, X2, X3 As Single
             Dim Y0, Y1, Y2, Y3 As Single
@@ -458,20 +455,20 @@ Public Class Form1
 
 
             Tracking.MovetoDots(0)
-            DoAutoFocus(2)
+            DoAutoFocus(0)
             Z1 = stage.Z / stage.ZMMtoSteps
             X1 = stage.X / stage.MMtoSteps
             Y1 = stage.Y / stage.MMtoSteps
 
             Tracking.MovetoDots(1)
-            DoAutoFocus(2)
+            DoAutoFocus(0)
             Z2 = stage.Z / stage.ZMMtoSteps
             X2 = stage.X / stage.MMtoSteps
             Y2 = stage.Y / stage.MMtoSteps
 
 
             Tracking.MovetoDots(2)
-            DoAutoFocus(2)
+            DoAutoFocus(0)
             Z3 = stage.Z / stage.ZMMtoSteps
             X3 = stage.X / stage.MMtoSteps
             Y3 = stage.Y / stage.MMtoSteps
@@ -501,13 +498,10 @@ Public Class Form1
 
 
         End If
-
-
-
-
-
+        Preview.Bmp = New Bitmap(256, 256, Imaging.PixelFormat.Format24bppRgb)
+        Tracking.UpdateBmp(Preview.Bmp)
         Dim Outputfile As New BinaryFileStructure(SaveFileDialog1.FileName, FileMode.Append)
-
+        Dim FocusmapFile As System.IO.StreamWriter = New StreamWriter("C:\temp\focusmap.text")
         Camera.SetDataMode(Colortype.Grey)
 
 
@@ -567,6 +561,7 @@ Public Class Form1
 
         Dim loop_x, loop_y As Integer
 
+        Dim Fx, Fy As Integer
 
         For loop_y = 1 To Y
 
@@ -576,6 +571,8 @@ Public Class Form1
                 ' stage.Move_A(stage.Zport, FocusMap(X, loop_y))
                 filen = filen + X + direction
                 direction = direction * -1
+                Fy += 1
+                If direction < 0 Then Fx = X - 1 Else Fx = 0
             End If
 
             For loop_x = 1 To X
@@ -583,21 +580,42 @@ Public Class Form1
                 If loop_x > 1 Then
                     stage.Move_r(stage.Xport, -AdjustedStepX * direction)
                 End If
+
+
                 ProgressBar_Mosaic.Increment(1)
-                LEDcontroller.SetRelays(1, True)
+                'LEDcontroller.SetRelays(1, True)
+                FocusMap(loop_x - 1, loop_y - 1) = DoAutoFocus(0)
                 Camera.capture()
-                LEDcontroller.SetRelays(1, False)
+                '  LEDcontroller.SetRelays(1, False)
                 Display.ApplyColorGain(Camera.frame, Camera.Dim_X, Camera.Dim_Y)
                 Outputfile.write(Camera.frame, framelength)
 
                 'If Camera.exp < 0.1 Then Threading.Thread.Sleep(100)
-                LEDcontroller.SetRelays(2, True)
-                Camera.capture()
-                LEDcontroller.SetRelays(2, False)
-                Outputfile.write(Camera.frame, framelength)
+                ' LEDcontroller.SetRelays(2, True)
+                'Camera.capture()
+                'LEDcontroller.SetRelays(2, False)
+                'Outputfile.write(Camera.frame, framelength)
                 Application.DoEvents()
+
+                If direction < 0 Then
+                    Fx -= 1
+                Else
+                    Fx += 1
+                End If
+
+
             Next
         Next
+
+        Dim Outputstring As String
+        For j = 0 To Y - 1
+            Outputstring = ""
+            For i = 0 To X - 1
+                If i < X - 1 Then Outputstring += FocusMap(i, j).ToString + "," Else Outputstring += FocusMap(i, j).ToString
+            Next
+            FocusmapFile.WriteLine(Outputstring)
+        Next
+        FocusmapFile.Close()
 
 
         LEDcontroller.SetRelays(1, True)
@@ -651,7 +669,7 @@ Public Class Form1
     Private Sub Button8_Click(sender As Object, e As EventArgs) Handles Button8.Click
         For i = 0 To 2
             Tracking.MovetoDots(i)
-            DoAutoFocus(2)
+            DoAutoFocus(0)
             '  MsgBox(stage.GetPosition(stage.Zport))
         Next
     End Sub
@@ -661,7 +679,7 @@ Public Class Form1
 
 
     Private Sub Button10_Click(sender As Object, e As EventArgs) Handles Button10.Click
-        DoAutoFocus(2)
+        DoAutoFocus(0)
     End Sub
 
 
@@ -798,8 +816,14 @@ Public Class Form1
 
     End Sub
 
-    Private Sub Button_Acquire_fLUORESCENT_Click(sender As Object, e As EventArgs) Handles Button_Acquire_fLUORESCENT.Click
+    Private Sub Button_Acquire_fLUORESCENT_Click(sender As Object, e As EventArgs)
         Acquire()
+    End Sub
+
+    Private Sub Button6_Click(sender As Object, e As EventArgs) Handles Button6.Click
+        stage.Move_A(stage.Zport, 0)
+        MsgBox("Load the sample and hit OK when you are done.")
+        stage.GoZero(1)
     End Sub
 End Class
 

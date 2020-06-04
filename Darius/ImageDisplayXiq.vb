@@ -3,7 +3,7 @@ Imports AForge.Imaging
 
 
 
-Public Class ImageDisplay
+Public Class ImageDisplayXiq
 
     Dim Bayer As AForge.Imaging.Filters.BayerFilter
     Dim W, H As Integer

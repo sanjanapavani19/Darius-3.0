@@ -18,7 +18,18 @@ Public Enum ImagetypeEnum
     Fluorescence
 End Enum
 
+Public Structure ByteImage
+    Dim data As Byte()
+    Dim Width As Integer
+    Dim Height As Integer
+    Dim Size As Integer
+    Dim Sampling As Byte
+    Dim sum As Integer
+    Dim bmp8bit As Bitmap
 
+    ' when the width is not a whole multiple of the steps  this is needed
+    Dim AdjustedWidth, AdjustedHeight As Integer
+End Structure
 Module SharedResources
     Public Setting As New SettingStructure("Settings.xml")
     Public Camera As XimeaColor

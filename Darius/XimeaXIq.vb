@@ -1,7 +1,7 @@
 ﻿Imports xiApi.NET
 
 Imports System.Windows
-Public Class XimeaColor
+Public Class XimeaXIq
     Private cam As New xiCam
 
     Public readoutnoise As Single
@@ -50,7 +50,7 @@ Public Class XimeaColor
             cam.SetParam(PRM.HORIZONTAL_FLIP, 1)
 
 
-            cam.SetParam(PRM.SENSOR_TAPS, 4)
+            'cam.SetParam(PRM.SENSOR_TAPS, 4)
 
             gain = Setting.Gett("Gain")
 

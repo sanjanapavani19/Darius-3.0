@@ -62,7 +62,7 @@ Public Class Zaber
         'SetSpeed(Yport, sp)
         'SetSpeed(Zport, sp)
 
-        Go_home()
+        Home()
 
         Xcorrection = Setting.Gett("XCORRECTION")
         YCorrection = Setting.Gett("YCORRECTION")
@@ -82,29 +82,13 @@ Public Class Zaber
         FovY = fov_y
     End Sub
 
-    Public Sub Go_home()
+    Public Sub Home()
 
 
         Dim moveAxis3 = New BinaryCommand(Zport, 1, 0)
         com.Write(moveAxis3)
         com.read()
 
-        ' set a position for starting the focusing 
-        ' For 10X Objective
-        'moveAxis3 = New BinaryCommand(Zport, 20, 16.7 * ZMMtoSteps)
-        ' For 20X Objective
-
-
-        moveAxis3 = New BinaryCommand(Zport, 20, Setting.Gett("ZOFFSET") * ZMMtoSteps)
-        com.Write(moveAxis3)
-        posReply = com.read()
-        Z = posReply.Data
-
-
-
-        'stores the position 
-        com.write(New BinaryCommand(Zport, 16, 0))
-        com.read
 
 
 
@@ -138,6 +122,18 @@ Public Class Zaber
         com.Write(moveAxis2)
         posReply = com.read()
         Y = posReply.Data
+
+        ' Comes down after the XY are hommed.
+        moveAxis3 = New BinaryCommand(Zport, 20, Setting.Gett("ZOFFSET") * ZMMtoSteps)
+        com.Write(moveAxis3)
+        posReply = com.read()
+        Z = posReply.Data
+
+
+
+        'stores the position 
+        com.write(New BinaryCommand(Zport, 16, 0))
+        com.read
 
 
 
@@ -244,7 +240,7 @@ Public Class Zaber
 
             Case Yport
 
-                Dim moveAxis1 = New BinaryCommand(Yport, 21, -position * MMtoSteps)
+                Dim moveAxis1 = New BinaryCommand(Yport, 21, position * MMtoSteps)
                 com.Write(moveAxis1)
                 posReply = com.read()
                 Y = posReply.Data
