@@ -11,7 +11,7 @@ Public Class XimeaColor
     Public status As Boolean
     Public FFsetup As Boolean
     Public Wbinned, Hbinned As Integer
-
+    Public Type As String
     Public busy As Boolean
     Public gain As Single
     Public exp As Single
@@ -46,8 +46,8 @@ Public Class XimeaColor
             '    cam.SetParam(PRM.TRG_SELECTOR, 1)
             'cam.SetParam(PRM.ACQ_TIMING_MODE, ACQ_TIMING_MODE.FRAME_RATE)
             cam.SetParam(PRM.TRG_SOURCE, TRG_SOURCE.SOFTWARE)
-            cam.SetParam(PRM.VERTICAL_FLIP, 1)
-            cam.SetParam(PRM.HORIZONTAL_FLIP, 1)
+            '  cam.SetParam(PRM.VERTICAL_FLIP, 1)
+            ' cam.SetParam(PRM.HORIZONTAL_FLIP, 1)
 
 
             cam.SetParam(PRM.SENSOR_TAPS, 4)
@@ -83,14 +83,14 @@ Public Class XimeaColor
 
     Public Sub SetBinning(yes As Boolean, size As Integer)
         If yes Then
-            '        cam.SetParam(PRM.DOWNSAMPLING, size)
+            cam.SetParam(PRM.DOWNSAMPLING, size)
             Wbinned = cam.GetParamInt(PRM.WIDTH)
             Hbinned = cam.GetParamInt(PRM.HEIGHT)
 
             BmpRef = New Bitmap(Wbinned, Hbinned, Imaging.PixelFormat.Format24bppRgb)
             ReDim frame(Wbinned * Hbinned)
         Else
-            '      cam.SetParam(PRM.DOWNSAMPLING, 1)
+            cam.SetParam(PRM.DOWNSAMPLING, 1)
             Dim_X = cam.GetParamInt(PRM.WIDTH)
             Dim_Y = cam.GetParamInt(PRM.HEIGHT)
             BmpRef = New Bitmap(Dim_X, Dim_Y, Imaging.PixelFormat.Format24bppRgb)

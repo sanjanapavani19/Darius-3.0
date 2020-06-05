@@ -1,4 +1,9 @@
 ﻿
+Public Enum CameraType
+    CCD
+    CMOS
+End Enum
+
 
 Public Enum Colortype
     RGB

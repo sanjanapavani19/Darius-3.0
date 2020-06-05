@@ -51,8 +51,8 @@ Public Class Zaber
         FovY = FovYin
 
         Zport = 1
-        Xport = 3
-        Yport = 2
+        Xport = 2
+        Yport = 3
         Allport = 4
 
 
@@ -89,41 +89,6 @@ Public Class Zaber
         com.Write(moveAxis3)
         com.read()
 
-
-
-
-
-        Dim moveAxis1 = New BinaryCommand(Xport, 1, 0)
-        com.Write(moveAxis1)
-        com.read()
-
-        'X Offsset
-        'moveAxis1 = New BinaryCommand(Xport, 47, 0 * MMtoSteps)
-        'com.Write(moveAxis1)
-        'posReply = com.read()
-
-
-
-        moveAxis1 = New BinaryCommand(Xport, 20, XRange / 2)
-        com.Write(moveAxis1)
-        posReply = com.read()
-        X = posReply.Data
-
-        Dim moveAxis2 = New BinaryCommand(Yport, 1, 0)
-        com.Write(moveAxis2)
-        com.read()
-
-        'Y Offset
-        'moveAxis2 = New BinaryCommand(Yport, 47, 0 * MMtoSteps)
-        'com.Write(moveAxis2)
-        'posReply = com.read()
-
-        moveAxis2 = New BinaryCommand(Yport, 20, YRange / 2)
-        com.Write(moveAxis2)
-        posReply = com.read()
-        Y = posReply.Data
-
-        ' Comes down after the XY are hommed.
         moveAxis3 = New BinaryCommand(Zport, 20, Setting.Gett("ZOFFSET") * ZMMtoSteps)
         com.Write(moveAxis3)
         posReply = com.read()
@@ -137,12 +102,32 @@ Public Class Zaber
 
 
 
+        Dim moveAxis1 = New BinaryCommand(Xport, 1, 0)
+        com.Write(moveAxis1)
+        com.read()
+        moveAxis1 = New BinaryCommand(Xport, 20, XRange / 2)
+        com.Write(moveAxis1)
+        posReply = com.read()
+        X = posReply.Data
+
+
+
+        Dim moveAxis2 = New BinaryCommand(Yport, 1, 0)
+        com.Write(moveAxis2)
+        com.read()
+        moveAxis2 = New BinaryCommand(Yport, 20, YRange / 2)
+        com.Write(moveAxis2)
+        posReply = com.read()
+        Y = posReply.Data
+
+
+
 
     End Sub
     Public Sub StorePosition()
         com.write(New BinaryCommand(Zport, 16, 0))
         posReply = com.read
-        Setting.Sett("Zoffset", posReply.Data)
+        'Setting.Sett("Zoffset", posReply.Data)
     End Sub
 
     Public Sub Go_Middle()
@@ -250,7 +235,7 @@ Public Class Zaber
             Case Xport
 
 
-                Dim moveAxis2 = New BinaryCommand(Xport, 21, position * MMtoSteps)
+                Dim moveAxis2 = New BinaryCommand(Xport, 21, -position * MMtoSteps)
                 com.Write(moveAxis2)
                 posReply = com.read()
                 X = posReply.Data

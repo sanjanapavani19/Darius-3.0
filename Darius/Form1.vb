@@ -25,12 +25,12 @@ Public Class Form1
 
         Preview = New PreviewStructure
         Imagetype = ImagetypeEnum.Brightfield
-        Camera = New XimeaXIq
+        Camera = New XimeaColor
 
 
         If Camera.status Then
             Textbox_exposure.Text = Camera.exp
-            AutoFocus = New FocusStructure(0.4, 10, 1)
+            AutoFocus = New FocusStructure(0.4, 20, 4)
 
             Display = New ImageDisplay(Camera.Dim_X, Camera.Dim_Y, 2)
 
@@ -65,7 +65,7 @@ Public Class Form1
 
 
     Sub ArrangeControls(d As Integer)
-        Dim scale As Single = 0.85
+        Dim scale As Single = 0.65
 
 
 
@@ -310,6 +310,7 @@ Public Class Form1
     Private Sub TabControl1_SelectedIndexChanged(sender As Object, e As EventArgs) _
          Handles TabControl1.SelectedIndexChanged
         If Not Camera.busy Then Exit Sub
+        CheckBox1.Checked = True
         If TabControl1.SelectedIndex = 0 Then
 
             'ExitLive()
@@ -376,7 +377,7 @@ Public Class Form1
     End Sub
 
     Public Function DoAutoFocus(position As Integer)
-        stage.GoZero(position)
+        stage.GoZero(1)
 
         Dim WasLive As Boolean
         If Camera.busy Then ExitLive() : WasLive = True
@@ -393,7 +394,7 @@ Public Class Form1
     End Function
 
     Private Sub Button4_Click(sender As Object, e As EventArgs) Handles Button4.Click
-        DoAutoFocus(0)
+        DoAutoFocus(1)
     End Sub
 
 
@@ -718,6 +719,8 @@ Public Class Form1
         stage.Move_r(stage.Zport, -AutoFocus.Range / 2)
         Dim ZZ As Single = stage.GetPosition(stage.Zport)
         Setting.Sett("ZOFFSET", ZZ)
+        stage.StorePosition()
+
         stage.Move_r(stage.Zport, AutoFocus.Range / 2)
     End Sub
 
@@ -824,6 +827,42 @@ Public Class Form1
         stage.Move_A(stage.Zport, 0)
         MsgBox("Load the sample and hit OK when you are done.")
         stage.GoZero(1)
+    End Sub
+
+    Private Sub Button7_Click(sender As Object, e As EventArgs) Handles Button7.Click
+        stage.GoZero(1)
+    End Sub
+
+    Private Sub CheckBox1_CheckedChanged(sender As Object, e As EventArgs) Handles CheckBox1.CheckedChanged
+
+        Try
+            If CheckBox1.Checked Then
+                If Imagetype = ImagetypeEnum.Brightfield Then
+
+                    LEDcontroller.SetRelays(2, False)
+                    LEDcontroller.SetRelays(1, True)
+                Else
+
+                    LEDcontroller.SetRelays(1, False)
+                    LEDcontroller.SetRelays(2, True)
+                End If
+
+            Else
+                LEDcontroller.SetRelays(1, False)
+                LEDcontroller.SetRelays(2, False)
+
+            End If
+        Catch ex As Exception
+
+        End Try
+
+
+
+
+
+
+
+
     End Sub
 End Class
 

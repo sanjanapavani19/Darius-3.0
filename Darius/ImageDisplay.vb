@@ -55,7 +55,7 @@ Public Class ImageDisplay
 
         Bayer = New Filters.BayerFilter
         Dim Pattern(1, 1) As Integer
-        Pattern = {{RGB.G, RGB.R}, {RGB.B, RGB.G}}
+        Pattern = {{RGB.R, RGB.G}, {RGB.G, RGB.B}}
         Bayer.BayerPattern = Pattern
 
         zoom = False
@@ -111,10 +111,10 @@ Public Class ImageDisplay
             'reading RGRG line
             i1 = Offset : i2 = Offset + rawImageIn.Width - 2
             For i = i1 To i2 Step 2
-                R = rawImageIn.data(i) * GainG
+                R = rawImageIn.data(i) * GainR
                 If R > 255 Then R = 255
 
-                G = rawImageIn.data(i + 1) * GainR
+                G = rawImageIn.data(i + 1) * GainG
                 If G > 255 Then G = 255
 
                 rawImageIn.data(i) = R
@@ -126,10 +126,10 @@ Public Class ImageDisplay
             'reading GBGB line
             For i = i1 To i2 Step 2
 
-                G = rawImageIn.data(i) * GainB
+                G = rawImageIn.data(i) * GainG
                 If G > 255 Then G = 255
 
-                B = rawImageIn.data(i + 1) * GainG
+                B = rawImageIn.data(i + 1) * GainB
                 If B > 255 Then B = 255
 
                 rawImageIn.data(i) = G
@@ -156,10 +156,10 @@ Public Class ImageDisplay
             'reading RGRG line
             i1 = Offset : i2 = Offset + width - 2
             For i = i1 To i2 Step 2
-                R = rawImageIn(i) * GainG
+                R = rawImageIn(i) * GainR
                 If R > 255 Then R = 255
 
-                G = rawImageIn(i + 1) * GainR
+                G = rawImageIn(i + 1) * GainG
                 If G > 255 Then G = 255
 
                 rawImageIn(i) = R
@@ -171,10 +171,10 @@ Public Class ImageDisplay
             'reading GBGB line
             For i = i1 To i2 Step 2
 
-                G = rawImageIn(i) * GainB
+                G = rawImageIn(i) * GainG
                 If G > 255 Then G = 255
 
-                B = rawImageIn(i + 1) * GainG
+                B = rawImageIn(i + 1) * GainB
                 If B > 255 Then B = 255
 
                 rawImageIn(i) = G
@@ -274,10 +274,10 @@ Public Class ImageDisplay
             'reading RGRG line
             i1 = Offset : i2 = Offset + rawImageOut.AdjustedWidth - Steps
             For i = i1 To i2 Step Steps
-                R = rawImageIn.data(i) * GainG
+                R = rawImageIn.data(i) * GainR
                 If R > 255 Then R = 255
 
-                G = rawImageIn.data(i + 1) * GainR
+                G = rawImageIn.data(i + 1) * GainG
                 If G > 255 Then G = 255
 
                 rawImageOut.data(p) = R
@@ -289,10 +289,10 @@ Public Class ImageDisplay
             'reading GBGB line
             For i = i1 To i2 Step Steps
 
-                G = rawImageIn.data(i) * GainB
+                G = rawImageIn.data(i) * GainG
                 If G > 255 Then G = 255
 
-                B = rawImageIn.data(i + 1) * GainG
+                B = rawImageIn.data(i + 1) * GainB
                 If B > 255 Then B = 255
 
                 rawImageOut.data(p) = G
@@ -314,8 +314,8 @@ Public Class ImageDisplay
         Dim length As Integer = rawImageIn.Width * rawImageOut.AdjustedHeight
         ReDim rawImageOut.data(rawImageOut.Size - 1)
         'This is the  intial offset. It goes to the top left corner of the image
-
-        Dim Offset = rawImageIn.Width * (rawImageIn.Height - rawImageOut.Height) / 2 + (rawImageIn.Width - rawImageOut.Width) / 2
+        Dim Offset As Integer = rawImageIn.Width * (rawImageIn.Height - rawImageOut.Height) / 2 + (rawImageIn.Width - rawImageOut.Width) / 2 + rawImageIn.Width
+        'Dim Offset = rawImageIn.Width * (rawImageIn.Height - rawImageOut.Height) / 2 + (rawImageIn.Width - rawImageOut.Width) / 2
         For j = 0 To rawImageOut.Height - 1
             For i = Offset To Offset + rawImageOut.Width - 1
                 rawImageOut.data(p) = rawImageIn.data(i)
