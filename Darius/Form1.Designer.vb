@@ -229,7 +229,7 @@ Partial Class Form1
         '
         Me.RadioButton_zoom_out.Appearance = System.Windows.Forms.Appearance.Button
         Me.RadioButton_zoom_out.Font = New System.Drawing.Font("Microsoft Sans Serif", 21.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.RadioButton_zoom_out.Location = New System.Drawing.Point(1255, 13)
+        Me.RadioButton_zoom_out.Location = New System.Drawing.Point(1255, 26)
         Me.RadioButton_zoom_out.Name = "RadioButton_zoom_out"
         Me.RadioButton_zoom_out.Size = New System.Drawing.Size(43, 43)
         Me.RadioButton_zoom_out.TabIndex = 110
@@ -242,7 +242,7 @@ Partial Class Form1
         Me.RadioButton_zoom_in.Appearance = System.Windows.Forms.Appearance.Button
         Me.RadioButton_zoom_in.AutoSize = True
         Me.RadioButton_zoom_in.Font = New System.Drawing.Font("Microsoft Sans Serif", 21.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.RadioButton_zoom_in.Location = New System.Drawing.Point(1208, 13)
+        Me.RadioButton_zoom_in.Location = New System.Drawing.Point(1208, 26)
         Me.RadioButton_zoom_in.Name = "RadioButton_zoom_in"
         Me.RadioButton_zoom_in.Size = New System.Drawing.Size(43, 43)
         Me.RadioButton_zoom_in.TabIndex = 109
@@ -787,7 +787,7 @@ Partial Class Form1
         '
         'ProgressBar_Mosaic
         '
-        Me.ProgressBar_Mosaic.Location = New System.Drawing.Point(782, 16)
+        Me.ProgressBar_Mosaic.Location = New System.Drawing.Point(782, 28)
         Me.ProgressBar_Mosaic.Name = "ProgressBar_Mosaic"
         Me.ProgressBar_Mosaic.Size = New System.Drawing.Size(420, 40)
         Me.ProgressBar_Mosaic.TabIndex = 126
@@ -854,7 +854,7 @@ Partial Class Form1
         '
         'Button1
         '
-        Me.Button1.Location = New System.Drawing.Point(1309, 13)
+        Me.Button1.Location = New System.Drawing.Point(1309, 26)
         Me.Button1.Name = "Button1"
         Me.Button1.Size = New System.Drawing.Size(100, 43)
         Me.Button1.TabIndex = 130
@@ -917,7 +917,7 @@ Partial Class Form1
         Me.GroupBox1.Controls.Add(Me.RadioButton1)
         Me.GroupBox1.Controls.Add(Me.RadioButton2)
         Me.GroupBox1.Controls.Add(Me.RadioButton3)
-        Me.GroupBox1.Location = New System.Drawing.Point(537, 12)
+        Me.GroupBox1.Location = New System.Drawing.Point(537, 26)
         Me.GroupBox1.Name = "GroupBox1"
         Me.GroupBox1.Size = New System.Drawing.Size(239, 40)
         Me.GroupBox1.TabIndex = 135
@@ -926,7 +926,7 @@ Partial Class Form1
         '
         'Button6
         '
-        Me.Button6.Location = New System.Drawing.Point(1415, 13)
+        Me.Button6.Location = New System.Drawing.Point(1415, 26)
         Me.Button6.Name = "Button6"
         Me.Button6.Size = New System.Drawing.Size(100, 43)
         Me.Button6.TabIndex = 137

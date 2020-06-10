@@ -172,6 +172,7 @@
     <Compile Include="StackImage.vb" />
     <Compile Include="TrackingStructure.vb" />
     <Compile Include="XimeaColor.vb" />
+    <Compile Include="XimeaCropped.vb" />
     <Compile Include="XimeaXIq.vb" />
     <Compile Include="Zaber.vb" />
   </ItemGroup>

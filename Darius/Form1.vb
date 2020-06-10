@@ -30,7 +30,7 @@ Public Class Form1
 
         If Camera.status Then
             Textbox_exposure.Text = Camera.exp
-            AutoFocus = New FocusStructure(0.4, 20, 4)
+            AutoFocus = New FocusStructure(0.4, 10, 4)
 
             Display = New ImageDisplay(Camera.Dim_X, Camera.Dim_Y, 2)
 
@@ -111,7 +111,16 @@ Public Class Form1
 
         Camera.exp = Val(Textbox_exposure.Text)
         Camera.ExposureChanged = True
+
+        Select Case Imagetype
+            Case ImagetypeEnum.Brightfield
+                Setting.Sett("EXPOSUREB", Camera.exp)
+            Case ImagetypeEnum.Fluorescence
+                Setting.Sett("EXPOSUREF", Camera.exp)
+        End Select
         Setting.Sett("EXPOSURE", Camera.exp)
+
+
 
         'Do Until Camera.ExposureChanged = False
 
@@ -322,7 +331,8 @@ Public Class Form1
             LEDcontroller.SetRelays(2, False)
             LEDcontroller.SetRelays(1, True)
             Button_adjustBrightness.PerformClick()
-            'ChangeExposure()
+            Textbox_exposure.Text = Setting.Gett("Exposureb")
+            ChangeExposure()
             'GoLive()
 
         End If
@@ -336,7 +346,8 @@ Public Class Form1
             LEDcontroller.SetRelays(2, True)
             Button_adjustBrightness.PerformClick()
             'Camera.setGain(30)
-            'ChangeExposure()
+            Textbox_exposure.Text = Setting.Gett("Exposuref")
+            ChangeExposure()
 
             'TextBoxGain.Text = Setting.Gett("Gain")
             'GoLive()
@@ -506,7 +517,7 @@ Public Class Form1
         Camera.SetDataMode(Colortype.Grey)
 
 
-        Camera.capture()
+        Camera.Capture()
 
         'Dim Resize As New ResizeBilinear(Camera.Dim_X * 2, Camera.Dim_Y * 2)
         'Resize.Apply(Camera.BmpRef)
@@ -586,7 +597,7 @@ Public Class Form1
                 ProgressBar_Mosaic.Increment(1)
                 'LEDcontroller.SetRelays(1, True)
                 FocusMap(loop_x - 1, loop_y - 1) = DoAutoFocus(0)
-                Camera.capture()
+                Camera.Capture()
                 '  LEDcontroller.SetRelays(1, False)
                 Display.ApplyColorGain(Camera.frame, Camera.Dim_X, Camera.Dim_Y)
                 Outputfile.write(Camera.frame, framelength)
@@ -794,7 +805,7 @@ Public Class Form1
         If Camera.busy Then ExitLive() : WasLive = True
         ' Camera.SetDataMode(Colortype.Grey)
         If Camera.FFsetup Then Camera.Flatfield(0)
-        Camera.capture()
+        Camera.Capture()
         SaveSinglePageTiff("ff.tif", Camera.frame, Camera.Dim_X, Camera.Dim_Y)
         Camera.SetFlatField("ff.tif")
 
@@ -807,17 +818,6 @@ Public Class Form1
 
     End Sub
 
-    Private Sub PictureBox0_Click(sender As Object, e As EventArgs) Handles PictureBox0.Click
-
-    End Sub
-
-    Private Sub PictureBox0_MouseWheel(sender As Object, e As MouseEventArgs) Handles PictureBox0.MouseWheel
-
-    End Sub
-
-    Private Sub TextBox1_TextChanged(sender As Object, e As EventArgs) Handles TextBox1.TextChanged
-
-    End Sub
 
     Private Sub Button_Acquire_fLUORESCENT_Click(sender As Object, e As EventArgs)
         Acquire()

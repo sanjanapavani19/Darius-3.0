@@ -52,7 +52,8 @@ Public Class FocusStructure
         Dim CM(Nimg - 1) As Single
         Dim CmXMax As Single
         For zz = 0 To Nimg - 1
-            Camera.capture_binned(BinnedImage(zz))
+            Camera.Capture(BinnedImage(zz))
+
             If zz < (Nimg - 1) Then stage.Move_r(stage.Zport, (Range) / Nimg) ' The lastimage should be acquired with no movement afterwards
             CM(zz) = FT.FindCenterOfMass(BinnedImage(zz))
             Form1.Chart1.Series(1).Points.AddXY(Int((zz * Range / Nimg) * 1000), CM(zz))
@@ -75,7 +76,7 @@ Public Class FocusStructure
         Srange = Int(Srange / Nimg * stage.ZMMtoSteps) * Nimg / stage.ZMMtoSteps
 
         For zz = 0 To Nimg - 1
-            Camera.capture_binned(BinnedImage(zz))
+            Camera.Capture(BinnedImage(zz))
             If zz < (Nimg - 1) Then  stage.Move_r(stage.Zport, Srange / Nimg)
             CM(zz) = FT.FindCenterOfMass(BinnedImage(zz))
             Form1.Chart1.Series(1).Points.AddXY(zz, CM(zz))

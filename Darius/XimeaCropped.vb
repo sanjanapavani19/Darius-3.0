@@ -1,7 +1,7 @@
 ﻿Imports xiApi.NET
 
 Imports System.Windows
-Public Class XimeaColor
+Public Class XimeaCropped
     Private cam As New xiCam
 
     Public readoutnoise As Single
@@ -23,7 +23,9 @@ Public Class XimeaColor
 
     Private timeout As Integer
 
+    Dim frameRAW As Byte()
     Public frame As Byte()
+
     Public TRG_MODE As Integer
     Public ExposureChanged As Boolean
     Public Dostop As Boolean
@@ -45,7 +47,7 @@ Public Class XimeaColor
             cam.SetParam(PRM.IMAGE_DATA_FORMAT, IMG_FORMAT.RAW8)
 
             '    cam.SetParam(PRM.TRG_SELECTOR, 1)
-            'cam.SetParam(PRM.ACQ_TIMING_MODE, ACQ_TIMING_MODE.FRAME_RATE)
+            'cam.SetParam(PRM.ACQ_TIMING_MODE, ACQ_TIMING_MODE.frameRAW_RATE)
             cam.SetParam(PRM.TRG_SOURCE, TRG_SOURCE.SOFTWARE)
             '  cam.SetParam(PRM.VERTICAL_FLIP, 1)
             ' cam.SetParam(PRM.HORIZONTAL_FLIP, 1)
@@ -60,7 +62,7 @@ Public Class XimeaColor
             setGammaY(1)
             setGammaC(0)
 
-            exp = Setting.Gett("exposureb")
+            exp = Setting.Gett("exposure")
             SetExposure(exp, True)
             SetBinning(False, 1)
 
@@ -76,28 +78,22 @@ Public Class XimeaColor
 
 
     End Sub
-    Public Sub SetROI(X As Integer, Y As Integer, Width As Integer, Height As Integer)
 
-
-        cam.SetParam(PRM.WIDTH, Width)
-        cam.SetParam(PRM.HEIGHT, Height)
-        cam.SetParam(PRM.OFFSET_X, X)
-        cam.SetParam(PRM.OFFSET_Y, Y)
-
-    End Sub
     Public Sub SetBinning(yes As Boolean, size As Integer)
         If yes Then
             cam.SetParam(PRM.DOWNSAMPLING, size)
-            Wbinned = cam.GetParamInt(PRM.WIDTH)
-            Hbinned = cam.GetParamInt(PRM.HEIGHT)
+            Wbinned = cam.GetParamInt(PRM.WIDTH) / 2
+            Hbinned = cam.GetParamInt(PRM.HEIGHT) / 2
 
             BmpRef = New Bitmap(Wbinned, Hbinned, Imaging.PixelFormat.Format24bppRgb)
+            ReDim frameRAW(Wbinned * Hbinned * 4)
             ReDim frame(Wbinned * Hbinned)
         Else
             cam.SetParam(PRM.DOWNSAMPLING, 1)
-            Dim_X = cam.GetParamInt(PRM.WIDTH)
-            Dim_Y = cam.GetParamInt(PRM.HEIGHT)
-            BmpRef = New Bitmap(Dim_X, Dim_Y, Imaging.PixelFormat.Format24bppRgb)
+            Dim_X = cam.GetParamInt(PRM.WIDTH) / 2
+            Dim_Y = cam.GetParamInt(PRM.HEIGHT) / 2
+            BmpRef = New Bitmap(Dim_X * 2, Dim_Y * 2, Imaging.PixelFormat.Format24bppRgb)
+            ReDim frameRAW(Dim_X * Dim_Y * 4)
             ReDim frame(Dim_X * Dim_Y)
         End If
     End Sub
@@ -112,11 +108,39 @@ Public Class XimeaColor
     Public Sub Capture()
         Try
             cam.SetParam(PRM.TRG_SOFTWARE, 1)
-            cam.GetImageByteArray(frame, timeout)
+            cam.GetImageByteArray(frameRAW, timeout)
+
+            Dim frame2D(Dim_X * 2 - 1, Dim_Y * 2 - 1) As Single
+            Dim p As Integer
+            Dim y1, y2, x1, x2 As Integer
+            y1 = 0 : y2 = Dim_Y * 2 - 1
+            x1 = 0 : x2 = Dim_X * 2 - 1
+
+            For j = y1 To y2
+                For i = x1 To x2
+                    frame2D(i, j) = frameRAW(p)
+                    p += 1
+                Next
+            Next
+
+            p = 0
+
+            y1 = 0 : y2 = Dim_Y - 1
+            x1 = 0 : x2 = Dim_X - 1
+
+            For j = y1 To y2
+                For i = x1 To x2
+                    frame(p) = frame2D(i, j)
+                    p += 1
+                Next
+            Next
+
 
         Catch ex As Exception
 
         End Try
+
+
 
     End Sub
 
@@ -132,15 +156,37 @@ Public Class XimeaColor
     Public Sub Flatfield(value As Integer)
         cam.SetParam(PRM.FFC, value)
     End Sub
-    Public Sub Capture(ByRef framein)
-        Try
-            cam.SetParam(PRM.TRG_SOFTWARE, 1)
-            cam.GetImageByteArray(framein, timeout)
+    Public Sub Capture(ByRef frame() As Byte)
 
-        Catch ex As Exception
+        cam.SetParam(PRM.TRG_SOFTWARE, 1)
+        cam.GetImageByteArray(frameRAW, timeout)
 
-        End Try
+        Dim frame2D(Dim_X * 2 - 1, Dim_Y * 2 - 1) As Byte
+        Dim p As Integer
+        Dim y1, y2, x1, x2 As Integer
+        y1 = 0 : y2 = Dim_Y * 2 - 1
+        x1 = 0 : x2 = Dim_X * 2 - 1
 
+        For j = y1 To y2
+            For i = x1 To x2
+                frame2D(i, j) = frameRAW(p)
+                p += 1
+            Next
+        Next
+
+        p = 0
+
+        y1 = 0 : y2 = Dim_Y - 1
+        x1 = 0 : x2 = Dim_X - 1
+
+        For j = y1 To y2
+            For i = x1 To x2
+                frame(p) = frame2D(i, j)
+                p += 1
+            Next
+        Next
+
+        p = 0
     End Sub
 
 

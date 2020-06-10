@@ -305,7 +305,7 @@ Public Class ImageDisplay
     End Sub
 
 
-    Private Sub ZoomImage(rawImageIn As ByteImage, ByRef rawImageOut As ByteImage)
+    Public Sub ZoomImage(rawImageIn As ByteImage, ByRef rawImageOut As ByteImage)
         'This is for resampling the image with different Sampling index
         Dim p, i As Integer
 
