@@ -69,8 +69,8 @@ Public Class Zaber
 
         status = True
 
-        sp = Setting.Gett("SPEED1X")
-        SetSpeed(Allport, sp, 0)
+        'sp = Setting.Gett("SPEED1X")
+        'SetSpeed(Allport, sp, 0)
 
     End Sub
     Public Sub close(ByVal port As String)

@@ -93,13 +93,11 @@ Partial Class Form1
         Me.Pbar = New System.Windows.Forms.ProgressBar()
         Me.TextBoxY = New System.Windows.Forms.TextBox()
         Me.TextBoxX = New System.Windows.Forms.TextBox()
-        Me.Button8 = New System.Windows.Forms.Button()
         Me.StatusStrip1 = New System.Windows.Forms.StatusStrip()
         Me.ToolStripStatusLabel1 = New System.Windows.Forms.ToolStripStatusLabel()
         Me.ToolStripStatusLabel2 = New System.Windows.Forms.ToolStripStatusLabel()
         Me.ToolStripStatusLabel3 = New System.Windows.Forms.ToolStripStatusLabel()
         Me.Button1 = New System.Windows.Forms.Button()
-        Me.Button2 = New System.Windows.Forms.Button()
         Me.Label4 = New System.Windows.Forms.Label()
         Me.RadioButton3 = New System.Windows.Forms.RadioButton()
         Me.RadioButton2 = New System.Windows.Forms.RadioButton()
@@ -107,6 +105,8 @@ Partial Class Form1
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
         Me.Button6 = New System.Windows.Forms.Button()
         Me.CheckBox1 = New System.Windows.Forms.CheckBox()
+        Me.ListBox1 = New System.Windows.Forms.ListBox()
+        Me.Button2 = New System.Windows.Forms.Button()
         Me.ToolStrip1.SuspendLayout()
         Me.GroupBox3.SuspendLayout()
         Me.TabControl_Settings.SuspendLayout()
@@ -839,15 +839,6 @@ Partial Class Form1
         Me.TextBoxX.Text = "3"
         Me.TextBoxX.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
-        'Button8
-        '
-        Me.Button8.Location = New System.Drawing.Point(1737, 422)
-        Me.Button8.Name = "Button8"
-        Me.Button8.Size = New System.Drawing.Size(75, 23)
-        Me.Button8.TabIndex = 128
-        Me.Button8.Text = "Button8"
-        Me.Button8.UseVisualStyleBackColor = True
-        '
         'StatusStrip1
         '
         Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripStatusLabel1, Me.ToolStripStatusLabel2, Me.ToolStripStatusLabel3})
@@ -883,15 +874,6 @@ Partial Class Form1
         Me.Button1.TabIndex = 130
         Me.Button1.Text = "Clear"
         Me.Button1.UseVisualStyleBackColor = True
-        '
-        'Button2
-        '
-        Me.Button2.Location = New System.Drawing.Point(1721, 212)
-        Me.Button2.Name = "Button2"
-        Me.Button2.Size = New System.Drawing.Size(75, 23)
-        Me.Button2.TabIndex = 134
-        Me.Button2.Text = "Button2"
-        Me.Button2.UseVisualStyleBackColor = True
         '
         'Label4
         '
@@ -968,20 +950,38 @@ Partial Class Form1
         Me.CheckBox1.Text = "LED"
         Me.CheckBox1.UseVisualStyleBackColor = True
         '
+        'ListBox1
+        '
+        Me.ListBox1.FormattingEnabled = True
+        Me.ListBox1.Location = New System.Drawing.Point(1663, 101)
+        Me.ListBox1.Name = "ListBox1"
+        Me.ListBox1.Size = New System.Drawing.Size(176, 251)
+        Me.ListBox1.TabIndex = 139
+        '
+        'Button2
+        '
+        Me.Button2.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Button2.Location = New System.Drawing.Point(1704, 358)
+        Me.Button2.Name = "Button2"
+        Me.Button2.Size = New System.Drawing.Size(176, 81)
+        Me.Button2.TabIndex = 140
+        Me.Button2.Text = "The very obvious button to open in GIMP"
+        Me.Button2.UseVisualStyleBackColor = True
+        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1851, 1061)
+        Me.Controls.Add(Me.Button2)
+        Me.Controls.Add(Me.ListBox1)
         Me.Controls.Add(Me.CheckBox1)
         Me.Controls.Add(Me.Button6)
         Me.Controls.Add(Me.Button_Brightfield_Acquire)
         Me.Controls.Add(Me.Label4)
         Me.Controls.Add(Me.GroupBox1)
-        Me.Controls.Add(Me.Button2)
         Me.Controls.Add(Me.Button1)
         Me.Controls.Add(Me.StatusStrip1)
-        Me.Controls.Add(Me.Button8)
         Me.Controls.Add(Me.TextBoxY)
         Me.Controls.Add(Me.TextBoxX)
         Me.Controls.Add(Me.Pbar)
@@ -1079,7 +1079,6 @@ Partial Class Form1
     Friend WithEvents Pbar As ProgressBar
     Friend WithEvents TextBoxY As TextBox
     Friend WithEvents TextBoxX As TextBox
-    Friend WithEvents Button8 As Button
     Friend WithEvents Button9 As Button
     Friend WithEvents Button10 As Button
     Friend WithEvents TextBox4 As TextBox
@@ -1091,7 +1090,6 @@ Partial Class Form1
     Friend WithEvents ToolStripStatusLabel3 As ToolStripStatusLabel
     Friend WithEvents Button5 As Button
     Friend WithEvents Button1 As Button
-    Friend WithEvents Button2 As Button
     Friend WithEvents Label4 As Label
     Friend WithEvents Button3 As Button
     Friend WithEvents Button11 As Button
@@ -1104,4 +1102,6 @@ Partial Class Form1
     Friend WithEvents CheckBox1 As CheckBox
     Friend WithEvents Label6 As Label
     Friend WithEvents Label5 As Label
+    Friend WithEvents ListBox1 As ListBox
+    Friend WithEvents Button2 As Button
 End Class

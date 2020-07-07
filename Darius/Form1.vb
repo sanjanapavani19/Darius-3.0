@@ -20,6 +20,8 @@ Public Class Form1
     Dim LinearUnmixing As LinearUnmixingStructure
     Dim FocusMap(,) As Single
     Dim panel As Integer
+    Dim Filenames() As String
+    Dim fileN As Integer
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
@@ -95,7 +97,7 @@ Public Class Form1
         TextBox_GainB.Text = Setting.Gett("GainB")
         TextBox_GainG.Text = Setting.Gett("GainG")
         TextBox_GainR.Text = Setting.Gett("GainR")
-
+        ListBox1.Left = PictureBox_Preview.Width + PictureBox_Preview.Left + d
     End Sub
 
 
@@ -364,10 +366,21 @@ Public Class Form1
         If SaveFileDialog1.ShowDialog() = DialogResult.Cancel Then Exit Sub
 
         If Imagetype = ImagetypeEnum.Brightfield Then
-            Display.MakeFullsizeImage.Save(SaveFileDialog1.FileName + "_WD+.jpg")
+            Display.MakeFullsizeImage.Save(SaveFileDialog1.FileName + "_WD.jpg")
+            ReDim Preserve Filenames(fileN)
+            Filenames(fileN) = SaveFileDialog1.FileName + "_WD.jpg"
+            fileN += 1
+            ListBox1.Items.Add(Path.GetFileName(SaveFileDialog1.FileName + "_WD.jpg"))
         ElseIf Imagetype = ImagetypeEnum.Fluorescence Then
             Display.MakeFullsizeImage.Save(SaveFileDialog1.FileName + "_FiBi.jpg")
+            ReDim Preserve Filenames(fileN)
+            Filenames(fileN) = SaveFileDialog1.FileName + "_FiBi.jpg"
+            fileN += 1
+            ListBox1.Items.Add(Path.GetFileName(SaveFileDialog1.FileName + "_FiBi.jpg"))
         End If
+
+
+
     End Sub
 
 
@@ -441,8 +454,10 @@ Public Class Form1
     Private Sub Button_Scan_Click(sender As Object, e As EventArgs) Handles Button_Scan.Click
         If SaveFileDialog1.ShowDialog = DialogResult.Cancel Then Exit Sub
         FastScan(TextBoxX.Text, TextBoxY.Text, 0.1, SaveFileDialog1.FileName)
-
-
+        ListBox1.Items.Add(Path.GetFileName(SaveFileDialog1.FileName))
+        ReDim Preserve Filenames(fileN)
+        Filenames(fileN) = SaveFileDialog1.FileName
+        fileN += 1
     End Sub
 
     Public Sub FastScan(X As Integer, y As Integer, overlap As Single, Address As String)
@@ -775,25 +790,6 @@ Public Class Form1
 
 
 
-
-
-
-    Private Sub Button_Refresh_Click(sender As Object, e As EventArgs)
-
-    End Sub
-
-    Private Sub Button8_Click(sender As Object, e As EventArgs) Handles Button8.Click
-        For i = 0 To 2
-            Tracking.MovetoDots(i)
-            DoAutoFocus(0)
-            '  MsgBox(stage.GetPosition(stage.Zport))
-        Next
-    End Sub
-
-
-
-
-
     Private Sub Button10_Click(sender As Object, e As EventArgs) Handles Button10.Click
         DoAutoFocus(0)
     End Sub
@@ -854,43 +850,7 @@ Public Class Form1
 
 
 
-    Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
 
-
-
-        Dim Grey As New Grayscale(0.2126, 0.7152, 0.0722)
-        Dim image As New Bitmap(Tracking.bmp.bmp.Width, Tracking.bmp.bmp.Height)
-        image = Grey.Apply(Tracking.bmp.bmp)
-
-        Dim INV As New Invert
-        INV.ApplyInPlace(image)
-
-        Dim th As New Threshold(20)
-        th.ApplyInPlace(image)
-
-        ' locating objects
-        Dim blobCounter As New AForge.Imaging.BlobCounter
-
-        blobCounter.FilterBlobs = True
-        blobCounter.MinHeight = 50
-        blobCounter.MinWidth = 50
-
-        blobCounter.ProcessImage(image)
-
-        Dim blobs As Blob() = blobCounter.GetObjectsInformation()
-        Dim i As Integer = 0
-        Dim R(blobs.GetUpperBound(0)) As Rectangle
-        For Each blob In blobs
-            Dim g As Graphics = Graphics.FromImage(Tracking.bmp.bmp)
-            g.DrawRectangle(New Pen(Brushes.Blue, 0.5), blob.Rectangle)
-            R(i) = blob.Rectangle
-            i += 1
-        Next
-
-        MsgBox("Items found :" + i.ToString)
-        PictureBox_Preview.Image = Tracking.bmp.bmp
-
-    End Sub
 
     Private Sub RadioButton_zoom_out_CheckedChanged(sender As Object, e As EventArgs) Handles RadioButton_zoom_out.CheckedChanged
 
@@ -968,5 +928,18 @@ Public Class Form1
 
 
     End Sub
+
+    Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
+
+
+        Try
+            Process.Start("C:\Program Files\GIMP 2\bin\gimp-2.10.exe ", Chr(34) + Filenames(ListBox1.SelectedIndex) + Chr(34))
+        Catch
+            MsgBox("No image file is found", MsgBoxStyle.Critical)
+        End Try
+
+
+    End Sub
+
 End Class
 
