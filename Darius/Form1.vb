@@ -3,6 +3,7 @@ Imports System.IO
 Imports AForge.Imaging.Filters
 Imports Microsoft.VisualBasic.Devices
 Imports AForge.Imaging
+Imports System.Threading
 
 Public Class Form1
 
@@ -143,18 +144,18 @@ Public Class Form1
         Do
             Camera.busy = True
             If Camera.Dostop Then Exit Do
-            Camera.capture()
+            Camera.Capture()
             Application.DoEvents()
             If Camera.ExposureChanged Then Camera.SetExposure() : Camera.ExposureChanged = False
 
 
             If Imagetype = ImagetypeEnum.Brightfield Then
-                Display.Preview(Camera.frame, True)
+                Display.Preview(Camera.Bytes, True)
                 PictureBox0.Image = Display.BmpPreview.bmp
             End If
 
             If Imagetype = ImagetypeEnum.Fluorescence Then
-                Display.Preview(Camera.frame, True)
+                Display.Preview(Camera.Bytes, True)
                 PictureBox1.Image = Display.BmpPreview.bmp
             End If
 
@@ -438,8 +439,112 @@ Public Class Form1
 
 
     Private Sub Button_Scan_Click(sender As Object, e As EventArgs) Handles Button_Scan.Click
+        If SaveFileDialog1.ShowDialog = DialogResult.Cancel Then Exit Sub
+        FastScan(TextBoxX.Text, TextBoxY.Text, 0.1, SaveFileDialog1.FileName)
 
 
+    End Sub
+
+    Public Sub FastScan(X As Integer, y As Integer, overlap As Single, Address As String)
+        If Camera.busy Then ExitLive()
+
+
+        Camera.SetDataMode(Colortype.RGB)
+        'Camera.SetPolicyToSafe()
+        Dim TravelX, TravelY As Single
+        Dim Filen As Integer = 1
+        Dim direction As Integer = 1
+
+        ' Creating overlap to enhance the stitching with ICE
+        Dim AdjustedStepX As Single = stage.FovX * (1 - overlap)
+        Dim AdjustedStepY As Single = stage.FovY * (1 - overlap)
+
+        Pbar.Visible = True
+        Pbar.Maximum = X * y
+
+        Dim Pattern(X * y - 1) As Integer
+        Dim FrameIndex As Integer = 0
+
+        Dim Axis As String = ""
+        Dim watch As New Stopwatch
+
+
+        Dim Tiles As New TileStructure(X, y, Camera.Dim_X, Camera.Dim_Y, 1, Address, 100)
+
+        ' Dim BytesExport(Camera.Bytes.GetUpperBound(0)) As Byte
+        For loop_y = 1 To y
+            For loop_x = 1 To X
+                Pbar.Increment(1)
+
+                Camera.Capture_Threaded()
+                Thread.Sleep(Camera.exp * 1200)
+
+
+                'Moves while it generates the preview and others.
+                If loop_x < X Then
+
+                    stage.Move_r(stage.Xport, -AdjustedStepX * direction) : Axis = "X"
+
+                    TravelX += AdjustedStepX * direction
+                Else
+                    If loop_y < y Then
+                        stage.Move_r(stage.Yport, AdjustedStepY) : Axis = "y"
+                        TravelY += AdjustedStepY
+                    End If
+                End If
+
+                Do Until Camera.ready
+
+                Loop
+                Do Until Tiles.Ready
+
+                Loop
+
+                If direction > 0 Then
+                    Tiles.SaveTile(loop_x - 1, loop_y - 1, Camera.Bytes)
+                Else
+                    Tiles.SaveTile(X - loop_x, loop_y - 1, Camera.Bytes)
+                End If
+
+                'byteToBitmap(Camera.Bytes, Display.Bmp)
+                'Array.Copy(Camera.GetBytes, BytesExport, BytesExport.GetLength(0))
+
+
+                'Display.Bmp.Save("C:\temp\" + Filen.ToString + "RGB.bmp")
+                If Axis = "X" Then
+                    Filen += direction
+                    FrameIndex += 1
+                Else
+                    Filen += X
+                    direction = direction * -1
+
+                End If
+
+
+                Application.DoEvents()
+
+            Next
+
+        Next
+
+        stage.Move_r(stage.Xport, -TravelX)
+        stage.Move_r(stage.Yport, -TravelY)
+        Do Until Tiles.Ready
+
+        Loop
+        Tiles.Close()
+        'MakeMontage(X, Y, Bmp, True)
+
+        Pbar.Value = 0
+        'Camera.SetPolicyToUNSafe()
+        Camera.SetDataMode(Colortype.Grey)
+        GoLive()
+
+
+
+    End Sub
+
+    Public Sub SciScan()
         If SaveFileDialog1.ShowDialog = DialogResult.Cancel Then Exit Sub
 
         ExitLive()
@@ -453,7 +558,7 @@ Public Class Form1
         AdjustedStepX = stage.FovX
         AdjustedStepY = stage.FovY
         Dim bmp(X * Y - 1) As Bitmap
-        ProgressBar_Mosaic.Maximum = X * Y
+        Pbar.Maximum = X * Y
         direction = 1
         Tracking.ROI.IsMade = False
         ReDim FocusMap(X, Y)
@@ -594,13 +699,13 @@ Public Class Form1
                 End If
 
 
-                ProgressBar_Mosaic.Increment(1)
+                Pbar.Increment(1)
                 'LEDcontroller.SetRelays(1, True)
                 FocusMap(loop_x - 1, loop_y - 1) = DoAutoFocus(0)
                 Camera.Capture()
                 '  LEDcontroller.SetRelays(1, False)
-                Display.ApplyColorGain(Camera.frame, Camera.Dim_X, Camera.Dim_Y)
-                Outputfile.write(Camera.frame, framelength)
+                Display.ApplyColorGain(Camera.Bytes, Camera.Dim_X, Camera.Dim_Y)
+                Outputfile.write(Camera.Bytes, framelength)
 
                 'If Camera.exp < 0.1 Then Threading.Thread.Sleep(100)
                 ' LEDcontroller.SetRelays(2, True)
@@ -636,14 +741,13 @@ Public Class Form1
         'stage.Move_A(stage.Xport, 0)
         'stage.Move_A(stage.Yport, 0)
 
-        ProgressBar_Mosaic.Value = 0
+        Pbar.Value = 0
         'MakeMontage(bmp, X, Y)
         Outputfile.CLOSE()
         GoLive()
         Button_Scan.Enabled = False
         TextBoxX.Text = 0
         TextBoxY.Text = 0
-
     End Sub
 
     Public Sub MakeMontage(bmp() As Bitmap, x As Integer, y As Integer)
@@ -655,17 +759,17 @@ Public Class Form1
         Dim gr As Graphics = Graphics.FromImage(BmpMontage)
         Dim i As Integer
 
-        ProgressBar_Mosaic.Value = 0
+        Pbar.Value = 0
         Application.DoEvents()
         For loop_y = 0 To y - 1
             For loop_x = 0 To x - 1
                 gr.DrawImage(bmp(i), loop_x * width, loop_y * height, width, height)
-                ProgressBar_Mosaic.Increment(1)
+                Pbar.Increment(1)
                 Application.DoEvents()
                 i = i + 1
             Next
         Next
-        ProgressBar_Mosaic.Value = 0
+        Pbar.Value = 0
         BmpMontage.Save("d:\1.png")
     End Sub
 
@@ -806,7 +910,7 @@ Public Class Form1
         ' Camera.SetDataMode(Colortype.Grey)
         If Camera.FFsetup Then Camera.Flatfield(0)
         Camera.Capture()
-        SaveSinglePageTiff("ff.tif", Camera.frame, Camera.Dim_X, Camera.Dim_Y)
+        SaveSinglePageTiff("ff.tif", Camera.Bytes, Camera.Dim_X, Camera.Dim_Y)
         Camera.SetFlatField("ff.tif")
 
         If WasLive Then GoLive()

@@ -23,11 +23,11 @@ Partial Class Form1
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Form1))
-        Dim ChartArea1 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
-        Dim Legend1 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
-        Dim Series1 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
-        Dim Series2 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
-        Dim Series3 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
+        Dim ChartArea2 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
+        Dim Legend2 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
+        Dim Series4 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
+        Dim Series5 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
+        Dim Series6 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
         Me.ToolStrip1 = New System.Windows.Forms.ToolStrip()
         Me.ToolStripLabel1 = New System.Windows.Forms.ToolStripLabel()
         Me.Textbox_exposure = New System.Windows.Forms.ToolStripTextBox()
@@ -41,13 +41,9 @@ Partial Class Form1
         Me.RadioButton_zoom_out = New System.Windows.Forms.RadioButton()
         Me.RadioButton_zoom_in = New System.Windows.Forms.RadioButton()
         Me.TabControl_Settings = New System.Windows.Forms.TabControl()
-        Me.TabPage12 = New System.Windows.Forms.TabPage()
-        Me.Label_html_dir = New System.Windows.Forms.Label()
-        Me.CheckBox_no_html = New System.Windows.Forms.CheckBox()
-        Me.CheckBox_incognito = New System.Windows.Forms.CheckBox()
-        Me.Button_experiment = New System.Windows.Forms.Button()
-        Me.Button_OpenHtml = New System.Windows.Forms.Button()
         Me.TabPage13 = New System.Windows.Forms.TabPage()
+        Me.Label6 = New System.Windows.Forms.Label()
+        Me.Label5 = New System.Windows.Forms.Label()
         Me.Button7 = New System.Windows.Forms.Button()
         Me.Button5 = New System.Windows.Forms.Button()
         Me.TextBox4 = New System.Windows.Forms.TextBox()
@@ -76,6 +72,12 @@ Partial Class Form1
         Me.Label13 = New System.Windows.Forms.Label()
         Me.Label14 = New System.Windows.Forms.Label()
         Me.Label17 = New System.Windows.Forms.Label()
+        Me.TabPage12 = New System.Windows.Forms.TabPage()
+        Me.Label_html_dir = New System.Windows.Forms.Label()
+        Me.CheckBox_no_html = New System.Windows.Forms.CheckBox()
+        Me.CheckBox_incognito = New System.Windows.Forms.CheckBox()
+        Me.Button_experiment = New System.Windows.Forms.Button()
+        Me.Button_OpenHtml = New System.Windows.Forms.Button()
         Me.TabControl1 = New System.Windows.Forms.TabControl()
         Me.TabPage3 = New System.Windows.Forms.TabPage()
         Me.PictureBox0 = New System.Windows.Forms.PictureBox()
@@ -88,7 +90,7 @@ Partial Class Form1
         Me.Button4 = New System.Windows.Forms.Button()
         Me.PictureBox_Preview = New System.Windows.Forms.PictureBox()
         Me.Button_Scan = New System.Windows.Forms.Button()
-        Me.ProgressBar_Mosaic = New System.Windows.Forms.ProgressBar()
+        Me.Pbar = New System.Windows.Forms.ProgressBar()
         Me.TextBoxY = New System.Windows.Forms.TextBox()
         Me.TextBoxX = New System.Windows.Forms.TextBox()
         Me.Button8 = New System.Windows.Forms.Button()
@@ -108,9 +110,9 @@ Partial Class Form1
         Me.ToolStrip1.SuspendLayout()
         Me.GroupBox3.SuspendLayout()
         Me.TabControl_Settings.SuspendLayout()
-        Me.TabPage12.SuspendLayout()
         Me.TabPage13.SuspendLayout()
         Me.TabPage1.SuspendLayout()
+        Me.TabPage12.SuspendLayout()
         Me.TabControl1.SuspendLayout()
         Me.TabPage3.SuspendLayout()
         CType(Me.PictureBox0, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -252,85 +254,20 @@ Partial Class Form1
         'TabControl_Settings
         '
         Me.TabControl_Settings.Appearance = System.Windows.Forms.TabAppearance.FlatButtons
-        Me.TabControl_Settings.Controls.Add(Me.TabPage12)
         Me.TabControl_Settings.Controls.Add(Me.TabPage13)
         Me.TabControl_Settings.Controls.Add(Me.TabPage1)
+        Me.TabControl_Settings.Controls.Add(Me.TabPage12)
         Me.TabControl_Settings.Location = New System.Drawing.Point(1257, 809)
         Me.TabControl_Settings.Name = "TabControl_Settings"
         Me.TabControl_Settings.SelectedIndex = 0
         Me.TabControl_Settings.Size = New System.Drawing.Size(449, 255)
         Me.TabControl_Settings.TabIndex = 111
         '
-        'TabPage12
-        '
-        Me.TabPage12.BackColor = System.Drawing.Color.WhiteSmoke
-        Me.TabPage12.Controls.Add(Me.Label_html_dir)
-        Me.TabPage12.Controls.Add(Me.CheckBox_no_html)
-        Me.TabPage12.Controls.Add(Me.CheckBox_incognito)
-        Me.TabPage12.Controls.Add(Me.Button_experiment)
-        Me.TabPage12.Controls.Add(Me.Button_OpenHtml)
-        Me.TabPage12.Location = New System.Drawing.Point(4, 25)
-        Me.TabPage12.Name = "TabPage12"
-        Me.TabPage12.Size = New System.Drawing.Size(441, 226)
-        Me.TabPage12.TabIndex = 2
-        Me.TabPage12.Text = "HTML"
-        '
-        'Label_html_dir
-        '
-        Me.Label_html_dir.AutoSize = True
-        Me.Label_html_dir.Location = New System.Drawing.Point(16, 80)
-        Me.Label_html_dir.Name = "Label_html_dir"
-        Me.Label_html_dir.Size = New System.Drawing.Size(75, 13)
-        Me.Label_html_dir.TabIndex = 36
-        Me.Label_html_dir.Text = "HTML Folder :"
-        '
-        'CheckBox_no_html
-        '
-        Me.CheckBox_no_html.AutoSize = True
-        Me.CheckBox_no_html.Location = New System.Drawing.Point(19, 128)
-        Me.CheckBox_no_html.Name = "CheckBox_no_html"
-        Me.CheckBox_no_html.Size = New System.Drawing.Size(121, 17)
-        Me.CheckBox_no_html.TabIndex = 35
-        Me.CheckBox_no_html.Text = "Don't write to HTML"
-        Me.CheckBox_no_html.UseVisualStyleBackColor = True
-        '
-        'CheckBox_incognito
-        '
-        Me.CheckBox_incognito.AutoSize = True
-        Me.CheckBox_incognito.Location = New System.Drawing.Point(19, 104)
-        Me.CheckBox_incognito.Name = "CheckBox_incognito"
-        Me.CheckBox_incognito.Size = New System.Drawing.Size(129, 17)
-        Me.CheckBox_incognito.TabIndex = 34
-        Me.CheckBox_incognito.Text = "Get hide from Richard"
-        Me.CheckBox_incognito.UseVisualStyleBackColor = True
-        '
-        'Button_experiment
-        '
-        Me.Button_experiment.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom
-        Me.Button_experiment.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.Button_experiment.ForeColor = System.Drawing.SystemColors.Control
-        Me.Button_experiment.Location = New System.Drawing.Point(7, 22)
-        Me.Button_experiment.Margin = New System.Windows.Forms.Padding(0)
-        Me.Button_experiment.Name = "Button_experiment"
-        Me.Button_experiment.Size = New System.Drawing.Size(30, 30)
-        Me.Button_experiment.TabIndex = 45
-        Me.Button_experiment.UseVisualStyleBackColor = True
-        '
-        'Button_OpenHtml
-        '
-        Me.Button_OpenHtml.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom
-        Me.Button_OpenHtml.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.Button_OpenHtml.ForeColor = System.Drawing.SystemColors.Control
-        Me.Button_OpenHtml.Location = New System.Drawing.Point(50, 22)
-        Me.Button_OpenHtml.Margin = New System.Windows.Forms.Padding(0)
-        Me.Button_OpenHtml.Name = "Button_OpenHtml"
-        Me.Button_OpenHtml.Size = New System.Drawing.Size(30, 30)
-        Me.Button_OpenHtml.TabIndex = 48
-        Me.Button_OpenHtml.UseVisualStyleBackColor = True
-        '
         'TabPage13
         '
         Me.TabPage13.BackColor = System.Drawing.Color.WhiteSmoke
+        Me.TabPage13.Controls.Add(Me.Label6)
+        Me.TabPage13.Controls.Add(Me.Label5)
         Me.TabPage13.Controls.Add(Me.Button7)
         Me.TabPage13.Controls.Add(Me.Button5)
         Me.TabPage13.Controls.Add(Me.TextBox4)
@@ -350,6 +287,24 @@ Partial Class Form1
         Me.TabPage13.TabIndex = 3
         Me.TabPage13.Text = "Stage"
         '
+        'Label6
+        '
+        Me.Label6.AutoSize = True
+        Me.Label6.Location = New System.Drawing.Point(194, 19)
+        Me.Label6.Name = "Label6"
+        Me.Label6.Size = New System.Drawing.Size(48, 13)
+        Me.Label6.TabIndex = 49
+        Me.Label6.Text = "Absolute"
+        '
+        'Label5
+        '
+        Me.Label5.AutoSize = True
+        Me.Label5.Location = New System.Drawing.Point(82, 19)
+        Me.Label5.Name = "Label5"
+        Me.Label5.Size = New System.Drawing.Size(46, 13)
+        Me.Label5.TabIndex = 48
+        Me.Label5.Text = "Relative"
+        '
         'Button7
         '
         Me.Button7.Location = New System.Drawing.Point(288, 116)
@@ -367,6 +322,7 @@ Partial Class Form1
         Me.Button5.TabIndex = 46
         Me.Button5.Text = "Predictive focus  off"
         Me.Button5.UseVisualStyleBackColor = True
+        Me.Button5.Visible = False
         '
         'TextBox4
         '
@@ -412,6 +368,7 @@ Partial Class Form1
         Me.Button10.TabIndex = 39
         Me.Button10.Text = "AutoFocus"
         Me.Button10.UseVisualStyleBackColor = True
+        Me.Button10.Visible = False
         '
         'Button9
         '
@@ -661,6 +618,73 @@ Partial Class Form1
         Me.Label17.TabIndex = 38
         Me.Label17.Text = "Gain R"
         '
+        'TabPage12
+        '
+        Me.TabPage12.BackColor = System.Drawing.Color.WhiteSmoke
+        Me.TabPage12.Controls.Add(Me.Label_html_dir)
+        Me.TabPage12.Controls.Add(Me.CheckBox_no_html)
+        Me.TabPage12.Controls.Add(Me.CheckBox_incognito)
+        Me.TabPage12.Controls.Add(Me.Button_experiment)
+        Me.TabPage12.Controls.Add(Me.Button_OpenHtml)
+        Me.TabPage12.Location = New System.Drawing.Point(4, 25)
+        Me.TabPage12.Name = "TabPage12"
+        Me.TabPage12.Size = New System.Drawing.Size(441, 226)
+        Me.TabPage12.TabIndex = 2
+        Me.TabPage12.Text = "HTML"
+        '
+        'Label_html_dir
+        '
+        Me.Label_html_dir.AutoSize = True
+        Me.Label_html_dir.Location = New System.Drawing.Point(16, 80)
+        Me.Label_html_dir.Name = "Label_html_dir"
+        Me.Label_html_dir.Size = New System.Drawing.Size(75, 13)
+        Me.Label_html_dir.TabIndex = 36
+        Me.Label_html_dir.Text = "HTML Folder :"
+        '
+        'CheckBox_no_html
+        '
+        Me.CheckBox_no_html.AutoSize = True
+        Me.CheckBox_no_html.Location = New System.Drawing.Point(19, 128)
+        Me.CheckBox_no_html.Name = "CheckBox_no_html"
+        Me.CheckBox_no_html.Size = New System.Drawing.Size(121, 17)
+        Me.CheckBox_no_html.TabIndex = 35
+        Me.CheckBox_no_html.Text = "Don't write to HTML"
+        Me.CheckBox_no_html.UseVisualStyleBackColor = True
+        '
+        'CheckBox_incognito
+        '
+        Me.CheckBox_incognito.AutoSize = True
+        Me.CheckBox_incognito.Location = New System.Drawing.Point(19, 104)
+        Me.CheckBox_incognito.Name = "CheckBox_incognito"
+        Me.CheckBox_incognito.Size = New System.Drawing.Size(129, 17)
+        Me.CheckBox_incognito.TabIndex = 34
+        Me.CheckBox_incognito.Text = "Get hide from Richard"
+        Me.CheckBox_incognito.UseVisualStyleBackColor = True
+        '
+        'Button_experiment
+        '
+        Me.Button_experiment.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom
+        Me.Button_experiment.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.Button_experiment.ForeColor = System.Drawing.SystemColors.Control
+        Me.Button_experiment.Location = New System.Drawing.Point(7, 22)
+        Me.Button_experiment.Margin = New System.Windows.Forms.Padding(0)
+        Me.Button_experiment.Name = "Button_experiment"
+        Me.Button_experiment.Size = New System.Drawing.Size(30, 30)
+        Me.Button_experiment.TabIndex = 45
+        Me.Button_experiment.UseVisualStyleBackColor = True
+        '
+        'Button_OpenHtml
+        '
+        Me.Button_OpenHtml.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom
+        Me.Button_OpenHtml.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.Button_OpenHtml.ForeColor = System.Drawing.SystemColors.Control
+        Me.Button_OpenHtml.Location = New System.Drawing.Point(50, 22)
+        Me.Button_OpenHtml.Margin = New System.Windows.Forms.Padding(0)
+        Me.Button_OpenHtml.Name = "Button_OpenHtml"
+        Me.Button_OpenHtml.Size = New System.Drawing.Size(30, 30)
+        Me.Button_OpenHtml.TabIndex = 48
+        Me.Button_OpenHtml.UseVisualStyleBackColor = True
+        '
         'TabControl1
         '
         Me.TabControl1.Controls.Add(Me.TabPage3)
@@ -726,32 +750,32 @@ Partial Class Form1
         'Chart1
         '
         Me.Chart1.BackColor = System.Drawing.Color.Transparent
-        ChartArea1.AxisX.MajorGrid.Enabled = False
-        ChartArea1.AxisX.MajorTickMark.Enabled = False
-        ChartArea1.AxisY.MajorGrid.Enabled = False
-        ChartArea1.BackColor = System.Drawing.Color.Transparent
-        ChartArea1.Name = "ChartArea1"
-        Me.Chart1.ChartAreas.Add(ChartArea1)
-        Legend1.Name = "Legend1"
-        Me.Chart1.Legends.Add(Legend1)
+        ChartArea2.AxisX.MajorGrid.Enabled = False
+        ChartArea2.AxisX.MajorTickMark.Enabled = False
+        ChartArea2.AxisY.MajorGrid.Enabled = False
+        ChartArea2.BackColor = System.Drawing.Color.Transparent
+        ChartArea2.Name = "ChartArea1"
+        Me.Chart1.ChartAreas.Add(ChartArea2)
+        Legend2.Name = "Legend1"
+        Me.Chart1.Legends.Add(Legend2)
         Me.Chart1.Location = New System.Drawing.Point(1458, 630)
         Me.Chart1.Name = "Chart1"
-        Series1.ChartArea = "ChartArea1"
-        Series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Area
-        Series1.IsVisibleInLegend = False
-        Series1.Legend = "Legend1"
-        Series1.Name = "Series1"
-        Series2.ChartArea = "ChartArea1"
-        Series2.IsVisibleInLegend = False
-        Series2.Legend = "Legend1"
-        Series2.Name = "Series2"
-        Series3.ChartArea = "ChartArea1"
-        Series3.IsVisibleInLegend = False
-        Series3.Legend = "Legend1"
-        Series3.Name = "Series3"
-        Me.Chart1.Series.Add(Series1)
-        Me.Chart1.Series.Add(Series2)
-        Me.Chart1.Series.Add(Series3)
+        Series4.ChartArea = "ChartArea1"
+        Series4.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Area
+        Series4.IsVisibleInLegend = False
+        Series4.Legend = "Legend1"
+        Series4.Name = "Series1"
+        Series5.ChartArea = "ChartArea1"
+        Series5.IsVisibleInLegend = False
+        Series5.Legend = "Legend1"
+        Series5.Name = "Series2"
+        Series6.ChartArea = "ChartArea1"
+        Series6.IsVisibleInLegend = False
+        Series6.Legend = "Legend1"
+        Series6.Name = "Series3"
+        Me.Chart1.Series.Add(Series4)
+        Me.Chart1.Series.Add(Series5)
+        Me.Chart1.Series.Add(Series6)
         Me.Chart1.Size = New System.Drawing.Size(317, 122)
         Me.Chart1.TabIndex = 120
         Me.Chart1.Text = "Chart1"
@@ -777,7 +801,6 @@ Partial Class Form1
         '
         'Button_Scan
         '
-        Me.Button_Scan.Enabled = False
         Me.Button_Scan.Location = New System.Drawing.Point(386, 31)
         Me.Button_Scan.Name = "Button_Scan"
         Me.Button_Scan.Size = New System.Drawing.Size(75, 35)
@@ -785,12 +808,12 @@ Partial Class Form1
         Me.Button_Scan.Text = "Scan"
         Me.Button_Scan.UseVisualStyleBackColor = True
         '
-        'ProgressBar_Mosaic
+        'Pbar
         '
-        Me.ProgressBar_Mosaic.Location = New System.Drawing.Point(782, 28)
-        Me.ProgressBar_Mosaic.Name = "ProgressBar_Mosaic"
-        Me.ProgressBar_Mosaic.Size = New System.Drawing.Size(420, 40)
-        Me.ProgressBar_Mosaic.TabIndex = 126
+        Me.Pbar.Location = New System.Drawing.Point(782, 28)
+        Me.Pbar.Name = "Pbar"
+        Me.Pbar.Size = New System.Drawing.Size(420, 40)
+        Me.Pbar.TabIndex = 126
         '
         'TextBoxY
         '
@@ -961,7 +984,7 @@ Partial Class Form1
         Me.Controls.Add(Me.Button8)
         Me.Controls.Add(Me.TextBoxY)
         Me.Controls.Add(Me.TextBoxX)
-        Me.Controls.Add(Me.ProgressBar_Mosaic)
+        Me.Controls.Add(Me.Pbar)
         Me.Controls.Add(Me.Button_Scan)
         Me.Controls.Add(Me.PictureBox_Preview)
         Me.Controls.Add(Me.Button4)
@@ -981,12 +1004,12 @@ Partial Class Form1
         Me.ToolStrip1.PerformLayout()
         Me.GroupBox3.ResumeLayout(False)
         Me.TabControl_Settings.ResumeLayout(False)
-        Me.TabPage12.ResumeLayout(False)
-        Me.TabPage12.PerformLayout()
         Me.TabPage13.ResumeLayout(False)
         Me.TabPage13.PerformLayout()
         Me.TabPage1.ResumeLayout(False)
         Me.TabPage1.PerformLayout()
+        Me.TabPage12.ResumeLayout(False)
+        Me.TabPage12.PerformLayout()
         Me.TabControl1.ResumeLayout(False)
         Me.TabPage3.ResumeLayout(False)
         CType(Me.PictureBox0, System.ComponentModel.ISupportInitialize).EndInit()
@@ -1053,7 +1076,7 @@ Partial Class Form1
     Friend WithEvents Button4 As Button
     Friend WithEvents PictureBox_Preview As PictureBox
     Friend WithEvents Button_Scan As Button
-    Friend WithEvents ProgressBar_Mosaic As ProgressBar
+    Friend WithEvents Pbar As ProgressBar
     Friend WithEvents TextBoxY As TextBox
     Friend WithEvents TextBoxX As TextBox
     Friend WithEvents Button8 As Button
@@ -1079,4 +1102,6 @@ Partial Class Form1
     Friend WithEvents Button6 As Button
     Friend WithEvents Button7 As Button
     Friend WithEvents CheckBox1 As CheckBox
+    Friend WithEvents Label6 As Label
+    Friend WithEvents Label5 As Label
 End Class

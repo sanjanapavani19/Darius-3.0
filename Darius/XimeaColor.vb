@@ -13,6 +13,7 @@ Public Class XimeaColor
     Public Wbinned, Hbinned As Integer
     Public Type As String
     Public busy As Boolean
+    Public ready As Boolean
     Public gain As Single
     Public exp As Single
 
@@ -23,7 +24,7 @@ Public Class XimeaColor
 
     Private timeout As Integer
 
-    Public frame As Byte()
+    Public Bytes As Byte()
     Public TRG_MODE As Integer
     Public ExposureChanged As Boolean
     Public Dostop As Boolean
@@ -56,7 +57,7 @@ Public Class XimeaColor
             gain = Setting.Gett("Gain")
 
             setGain(gain)
-            'SetColorGain(Setting.Gett("GainR"), Setting.Gett("GainG"), Setting.Gett("GainB"))
+            SetColorGain(Setting.Gett("GainR"), Setting.Gett("GainG"), Setting.Gett("GainB"))
             setGammaY(1)
             setGammaC(0)
 
@@ -85,6 +86,15 @@ Public Class XimeaColor
         cam.SetParam(PRM.OFFSET_Y, Y)
 
     End Sub
+
+    Public Sub SetColorGain(R As Integer, G As Integer, B As Integer)
+        cam.SetParam(PRM.WB_KB, B)
+        cam.SetParam(PRM.WB_KG, G)
+        cam.SetParam(PRM.WB_KR, R)
+        Setting.Sett("GainB", B)
+        Setting.Sett("GainG", G)
+        Setting.Sett("GainR", R)
+    End Sub
     Public Sub SetBinning(yes As Boolean, size As Integer)
         If yes Then
             cam.SetParam(PRM.DOWNSAMPLING, size)
@@ -92,32 +102,34 @@ Public Class XimeaColor
             Hbinned = cam.GetParamInt(PRM.HEIGHT)
 
             BmpRef = New Bitmap(Wbinned, Hbinned, Imaging.PixelFormat.Format24bppRgb)
-            ReDim frame(Wbinned * Hbinned)
+            ReDim Bytes(Wbinned * Hbinned - 1)
         Else
             cam.SetParam(PRM.DOWNSAMPLING, 1)
             Dim_X = cam.GetParamInt(PRM.WIDTH)
             Dim_Y = cam.GetParamInt(PRM.HEIGHT)
             BmpRef = New Bitmap(Dim_X, Dim_Y, Imaging.PixelFormat.Format24bppRgb)
-            ReDim frame(Dim_X * Dim_Y)
+            ReDim Bytes(Dim_X * Dim_Y - 1)
         End If
     End Sub
-    Public Sub Capture_Threaded()
-        Dim Thread1 As New System.Threading.Thread(AddressOf captureBmp)
-        Thread1.Start()
+    Public Sub SetPolicyToSafe()
+        cam.SetParam(PRM.BUFFER_POLICY, BUFF_POLICY.SAFE)
+    End Sub
 
+    Public Sub SetPolicyToUNSafe()
+        cam.SetParam(PRM.BUFFER_POLICY, BUFF_POLICY.UNSAFE)
+    End Sub
+    Public Sub Capture_Threaded()
+        Dim Thread1 As New System.Threading.Thread(AddressOf Capture)
+        Thread1.Start()
 
     End Sub
 
 
     Public Sub Capture()
-        Try
-            cam.SetParam(PRM.TRG_SOFTWARE, 1)
-            cam.GetImageByteArray(frame, timeout)
-
-        Catch ex As Exception
-
-        End Try
-
+        ready = False
+        cam.SetParam(PRM.TRG_SOFTWARE, 1)
+        cam.GetImageByteArray(Bytes, timeout)
+        ready = True
     End Sub
 
 
@@ -161,8 +173,12 @@ Public Class XimeaColor
         Select Case type
             Case Colortype.RGB
                 cam.SetParam(PRM.IMAGE_DATA_FORMAT, IMG_FORMAT.RGB24)
+
+                ReDim Bytes(Dim_X * Dim_Y * 3 - 1)
+
             Case Colortype.Grey
                 cam.SetParam(PRM.IMAGE_DATA_FORMAT, IMG_FORMAT.RAW8)
+                ReDim Bytes(Dim_X * Dim_Y - 1)
         End Select
 
     End Sub

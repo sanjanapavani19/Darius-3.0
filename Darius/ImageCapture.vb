@@ -1,0 +1,4 @@
+﻿Module ImageCapture
+
+
+End Module
