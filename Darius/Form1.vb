@@ -27,6 +27,10 @@ Public Class Form1
 
 
         Preview = New PreviewStructure
+        TextBox_PrevieEXp.Text = Setting.Gett("PREVIEWEXP")
+        TextBox_PreviewFocus.Text = Setting.Gett("PREVIEWFOCUS")
+
+
         Imagetype = ImagetypeEnum.Brightfield
         Camera = New XimeaColor
 
@@ -38,9 +42,9 @@ Public Class Form1
             Display = New ImageDisplay(Camera.Dim_X, Camera.Dim_Y, 2)
 
         End If
+        Stage = New ZaberNew(Setting.Gett("FOVX"), Setting.Gett("FOVX") * Camera.Dim_Y / Camera.Dim_X)
 
-        stage = New Zaber(5, Setting.Gett("FOVX"), Setting.Gett("FOVX") * Camera.Dim_Y / Camera.Dim_X)
-        stage.correct = True
+
 
 
         TextBoxGain.Text = Setting.Gett("Gain")
@@ -59,11 +63,12 @@ Public Class Form1
             LEDcontroller.SetRelays(2, False)
 
             Tracking = New TrackingStructure(PictureBox_Preview)
+            Tracking.Update()
             ArrangeControls(10)
 
         End If
         'comes down to focus
-        stage.Move_r(stage.Zport, AutoFocus.Range / 2)
+        Stage.MoveRelative(Stage.Zaxe, AutoFocus.Range / 2)
     End Sub
 
 
@@ -178,22 +183,22 @@ Public Class Form1
 
     Private Sub Button_right_Click(sender As Object, e As EventArgs) Handles Button_right.Click
         If Not Camera.busy Then GoLive()
-        stage.Move_r(stage.Xport, -stage.FovX)
+        Stage.MoveRelative(Stage.Xaxe, -Stage.FOVX)
     End Sub
 
     Private Sub Button_left_Click(sender As Object, e As EventArgs) Handles Button_left.Click
         If Not Camera.busy Then GoLive()
-        stage.Move_r(stage.Xport, stage.FovX)
+        Stage.MoveRelative(Stage.Xaxe, Stage.FOVX)
     End Sub
 
     Private Sub Button_top_Click(sender As Object, e As EventArgs) Handles Button_top.Click
         If Not Camera.busy Then GoLive()
-        stage.Move_r(stage.Yport, -stage.FovY)
+        Stage.MoveRelative(Stage.Yaxe, -Stage.FOVY)
     End Sub
 
     Private Sub Button_bottom_Click(sender As Object, e As EventArgs) Handles Button_bottom.Click
         If Not Camera.busy Then GoLive()
-        stage.Move_r(stage.Yport, stage.FovY)
+        Stage.MoveRelative(Stage.Yaxe, Stage.FOVY)
     End Sub
 
     Private Sub Button_adjustBrightness_Click(sender As Object, e As EventArgs) Handles Button_adjustBrightness.Click
@@ -209,9 +214,9 @@ Public Class Form1
 
         'If XYZ.name = "NewPort" Then
         If e.Delta > 0 Then
-            stage.Move_r(stage.Zport, speed * 0.001 * Math.Abs(e.Delta) / 120)
+            Stage.MoveRelative(Stage.Zaxe, speed * 0.001 * Math.Abs(e.Delta) / 120)
         Else
-            stage.Move_r(stage.Zport, speed * -0.001 * Math.Abs(e.Delta) / 120)
+            Stage.MoveRelative(Stage.Zaxe, speed * -0.001 * Math.Abs(e.Delta) / 120)
         End If
 
     End Sub
@@ -240,7 +245,7 @@ Public Class Form1
     Private Sub TextBox3_KeyDown(sender As Object, e As KeyEventArgs) Handles TextBox3.KeyDown
         If e.KeyCode = Keys.Return Then
 
-            stage.Move_r(stage.Zport, Val(TextBox3.Text))
+            Stage.MoveRelative(Stage.Zaxe, Val(TextBox3.Text))
         End If
     End Sub
 
@@ -386,8 +391,8 @@ Public Class Form1
 
 
     Private Sub PictureBox0_MouseDown(sender As Object, e As MouseEventArgs) Handles PictureBox0.MouseDown, PictureBox1.MouseDown
-        stage.xp = e.X
-        stage.yp = e.Y
+        Stage.xp = e.X
+        Stage.yp = e.Y
 
     End Sub
 
@@ -395,14 +400,14 @@ Public Class Form1
 
         Dim Z As Integer
         If Display.zoom Then Z = Display.sampeling Else Z = 1
-        stage.Move_r(stage.Xport, (e.X - stage.xp) * stage.FovX * (1 / Z) / PictureBox0.Width)
-        stage.Move_r(stage.Yport, -(e.Y - stage.yp) * stage.FovY * (1 / Z) / PictureBox0.Height)
+        Stage.MoveRelative(Stage.Xaxe, (e.X - Stage.xp) * Stage.FOVX * (1 / Z) / PictureBox0.Width)
+        Stage.MoveRelative(Stage.Yaxe, -(e.Y - Stage.yp) * Stage.FOVY * (1 / Z) / PictureBox0.Height)
 
 
     End Sub
 
     Public Function DoAutoFocus(position As Integer)
-        stage.GoZero(1)
+        Stage.GoZero(Stage.Zaxe, 1)
 
         Dim WasLive As Boolean
         If Camera.busy Then ExitLive() : WasLive = True
@@ -425,21 +430,21 @@ Public Class Form1
 
 
     Private Sub Button_Home_Click(sender As Object, e As EventArgs) Handles Button_Home.Click
-        stage.Go_Middle()
+        Stage.Go_Middle()
     End Sub
 
 
 
     Private Sub TextBox1_KeyDown(sender As Object, e As KeyEventArgs) Handles TextBox1.KeyDown
         If e.KeyCode = Keys.Return Then
-            stage.Move_r(stage.Xport, TextBox1.Text)
+            Stage.MoveRelative(Stage.Xaxe, TextBox1.Text)
         End If
 
     End Sub
 
     Private Sub TextBox2_KeyDown(sender As Object, e As KeyEventArgs) Handles TextBox2.KeyDown
         If e.KeyCode = Keys.Return Then
-            stage.Move_r(stage.Yport, TextBox2.Text)
+            Stage.MoveRelative(Stage.Yaxe, TextBox2.Text)
         End If
     End Sub
     Public Sub SetScan()
@@ -471,8 +476,8 @@ Public Class Form1
         Dim direction As Integer = 1
 
         ' Creating overlap to enhance the stitching with ICE
-        Dim AdjustedStepX As Single = stage.FovX * (1 - overlap)
-        Dim AdjustedStepY As Single = stage.FovY * (1 - overlap)
+        Dim AdjustedStepX As Single = Stage.FOVX * (1 - overlap)
+        Dim AdjustedStepY As Single = Stage.FOVY * (1 - overlap)
 
         Pbar.Visible = True
         Pbar.Maximum = X * y
@@ -498,12 +503,12 @@ Public Class Form1
                 'Moves while it generates the preview and others.
                 If loop_x < X Then
 
-                    stage.Move_r(stage.Xport, -AdjustedStepX * direction) : Axis = "X"
+                    Stage.MoveRelative(Stage.Xaxe, -AdjustedStepX * direction) : Axis = "X"
 
                     TravelX += AdjustedStepX * direction
                 Else
                     If loop_y < y Then
-                        stage.Move_r(stage.Yport, AdjustedStepY) : Axis = "y"
+                        Stage.MoveRelative(Stage.Yaxe, AdjustedStepY) : Axis = "y"
                         TravelY += AdjustedStepY
                     End If
                 End If
@@ -542,8 +547,8 @@ Public Class Form1
 
         Next
 
-        stage.Move_r(stage.Xport, -TravelX)
-        stage.Move_r(stage.Yport, -TravelY)
+        Stage.MoveRelative(Stage.Xaxe, -TravelX)
+        Stage.MoveRelative(Stage.Yaxe, -TravelY)
         Do Until Tiles.Ready
 
         Loop
@@ -570,8 +575,8 @@ Public Class Form1
         Dim filen As Integer
         Dim direction As Integer
         Dim AdjustedStepX, AdjustedStepY As Single
-        AdjustedStepX = stage.FovX
-        AdjustedStepY = stage.FovY
+        AdjustedStepX = Stage.FOVX
+        AdjustedStepY = Stage.FOVY
         Dim bmp(X * Y - 1) As Bitmap
         Pbar.Maximum = X * Y
         direction = 1
@@ -588,22 +593,22 @@ Public Class Form1
 
             Tracking.MovetoDots(0)
             DoAutoFocus(0)
-            Z1 = stage.Z / stage.ZMMtoSteps
-            X1 = stage.X / stage.MMtoSteps
-            Y1 = stage.Y / stage.MMtoSteps
+            Z1 = Stage.Z
+            X1 = Stage.X
+            Y1 = Stage.Y
 
             Tracking.MovetoDots(1)
             DoAutoFocus(0)
-            Z2 = stage.Z / stage.ZMMtoSteps
-            X2 = stage.X / stage.MMtoSteps
-            Y2 = stage.Y / stage.MMtoSteps
+            Z2 = Stage.Z
+            X2 = Stage.X
+            Y2 = Stage.Y
 
 
             Tracking.MovetoDots(2)
             DoAutoFocus(0)
-            Z3 = stage.Z / stage.ZMMtoSteps
-            X3 = stage.X / stage.MMtoSteps
-            Y3 = stage.Y / stage.MMtoSteps
+            Z3 = Stage.Z
+            X3 = Stage.X
+            Y3 = Stage.Y
 
 
 
@@ -613,8 +618,8 @@ Public Class Form1
             D = -(A * X1 + B * Y1 + C * Z1)
 
             Tracking.MovetoROIEdge()
-            X0 = stage.X / stage.MMtoSteps
-            Y0 = stage.Y / stage.MMtoSteps
+            X0 = Stage.X
+            Y0 = Stage.Y
 
             For j = 1 To Y
                 For i = 1 To X
@@ -698,9 +703,9 @@ Public Class Form1
         For loop_y = 1 To Y
 
             If loop_y > 1 Then
-                stage.Move_r(stage.Yport, AdjustedStepY)
+                Stage.MoveRelative(Stage.Yaxe, AdjustedStepY)
 
-                ' stage.Move_A(stage.Zport, FocusMap(X, loop_y))
+                ' stage.MoveAbsolute(stage.Zaxe, FocusMap(X, loop_y))
                 filen = filen + X + direction
                 direction = direction * -1
                 Fy += 1
@@ -708,9 +713,9 @@ Public Class Form1
             End If
 
             For loop_x = 1 To X
-                '  stage.Move_A(stage.Zport, FocusMap(loop_x, loop_y))
+                '  stage.MoveAbsolute(stage.Zaxe, FocusMap(loop_x, loop_y))
                 If loop_x > 1 Then
-                    stage.Move_r(stage.Xport, -AdjustedStepX * direction)
+                    Stage.MoveRelative(Stage.Xaxe, -AdjustedStepX * direction)
                 End If
 
 
@@ -753,8 +758,8 @@ Public Class Form1
         LEDcontroller.SetRelays(1, True)
         LEDcontroller.SetRelays(2, False)
 
-        'stage.Move_A(stage.Xport, 0)
-        'stage.Move_A(stage.Yport, 0)
+        'stage.MoveAbsolute(stage.Xaxe, 0)
+        'stage.MoveAbsolute(stage.Yaxe, 0)
 
         Pbar.Value = 0
         'MakeMontage(bmp, X, Y)
@@ -798,14 +803,14 @@ Public Class Form1
 
     Private Sub TextBox4_KeyDown(sender As Object, e As KeyEventArgs) Handles TextBox4.KeyDown
         If e.KeyCode = Keys.Return Then
-            stage.Move_A(stage.Xport, TextBox4.Text)
+            Stage.MoveAbsolute(Stage.Xaxe, TextBox4.Text)
         End If
     End Sub
 
 
     Private Sub TextBox5_KeyDown(sender As Object, e As KeyEventArgs) Handles TextBox5.KeyDown
         If e.KeyCode = Keys.Return Then
-            stage.Move_A(stage.Yport, TextBox5.Text)
+            Stage.MoveAbsolute(Stage.Yaxe, TextBox5.Text)
         End If
     End Sub
 
@@ -815,7 +820,7 @@ Public Class Form1
 
     Private Sub TextBox6_KeyDown(sender As Object, e As KeyEventArgs) Handles TextBox6.KeyDown
         If e.KeyCode = Keys.Return Then
-            stage.Move_A(stage.Zport, TextBox6.Text)
+            Stage.MoveAbsolute(Stage.Zaxe, TextBox6.Text)
         End If
     End Sub
 
@@ -827,19 +832,17 @@ Public Class Form1
 
 
     Private Sub Button9_Click(sender As Object, e As EventArgs) Handles Button9.Click
-        stage.Move_r(stage.Zport, -AutoFocus.Range / 2)
-        Dim ZZ As Single = stage.GetPosition(stage.Zport)
+        Stage.MoveRelative(Stage.Zaxe, -AutoFocus.Range / 2)
+        Dim ZZ As Single = Stage.GetPosition(Stage.Zaxe)
         Setting.Sett("ZOFFSET", ZZ)
-        stage.StorePosition()
-
-        stage.Move_r(stage.Zport, AutoFocus.Range / 2)
+        Stage.StorePosition(Stage.Zaxe, 1)
+        Stage.MoveRelative(Stage.Zaxe, AutoFocus.Range / 2)
+        ZZ = Stage.GetPosition(Stage.Zaxe)
+        Setting.Sett("Focus", ZZ)
+        Stage.StorePosition(Stage.Zaxe, 2)
     End Sub
 
-    Private Sub Button5_Click(sender As Object, e As EventArgs) Handles Button5.Click
-        stage.correct = False
 
-
-    End Sub
 
 
 
@@ -888,13 +891,27 @@ Public Class Form1
     End Sub
 
     Private Sub Button6_Click(sender As Object, e As EventArgs) Handles Button6.Click
-        stage.Move_A(stage.Zport, 0)
-        MsgBox("Load the sample and hit OK when you are done.")
-        stage.GoZero(1)
+
+        Stage.MoveAbsolute(Stage.Yaxe, 0)
+        Stage.MoveAbsolute(Stage.Xaxe, 12.5)
+        Stage.MoveAbsolute(Stage.Zaxe, 0)
+        MsgBox("Load the sample and then hit OK.")
+
+        Tracking.UpdateBmp(Preview.Capture(Val(TextBox_PrevieEXp.Text), Val(TextBox_PreviewFocus.Text)))
+
+        Stage.Go_Middle()
+        'stage.MoveAbsolute(stage.Zaxe, lastZ)
+
+        PictureBox_Preview.Image = Tracking.bmp.bmp
+
+        Slideloaded = True
+        Button_Scan.Enabled = True
+
+        Stage.GoToFocus()
     End Sub
 
     Private Sub Button7_Click(sender As Object, e As EventArgs) Handles Button7.Click
-        stage.GoZero(1)
+        Stage.GoZero(Stage.Zaxe, 1)
     End Sub
 
     Private Sub CheckBox1_CheckedChanged(sender As Object, e As EventArgs) Handles CheckBox1.CheckedChanged
@@ -941,5 +958,54 @@ Public Class Form1
 
     End Sub
 
+    Private Sub Button8_Click(sender As Object, e As EventArgs) Handles Button8.Click
+
+        Stage.MoveAbsolute(Stage.Yaxe, 0)
+        Stage.MoveAbsolute(Stage.Xaxe, 12.5)
+        Stage.MoveAbsolute(Stage.Zaxe, 0)
+
+    End Sub
+
+    Private Sub Button13_Click(sender As Object, e As EventArgs) Handles Button13.Click
+
+        stage.Go_Middle()
+        Stage.GoToFocus()
+    End Sub
+
+    Private Sub Button12_Click(sender As Object, e As EventArgs) Handles Button12.Click
+        Tracking.UpdateBmp(Preview.Capture(Val(TextBox_PrevieEXp.Text), Val(TextBox_PreviewFocus.Text)))
+        Preview.bmpf.Save("C:\temp\preview.jpg")
+        PictureBox_Preview.Image = Tracking.bmp.bmp
+
+    End Sub
+
+    Private Sub TextBox_PrevieEXp_TextChanged(sender As Object, e As EventArgs) Handles TextBox_PrevieEXp.TextChanged
+
+    End Sub
+
+    Private Sub TextBox_PrevieEXp_KeyDown(sender As Object, e As KeyEventArgs) Handles TextBox_PrevieEXp.KeyDown
+        If e.KeyCode = Keys.Return Then
+            Setting.Sett("PREVIEWEXP", TextBox_PrevieEXp.Text)
+        End If
+
+    End Sub
+    Private Sub TextBox_PreviewFocus_KeyDown(sender As Object, e As KeyEventArgs) Handles TextBox_PreviewFocus.KeyDown
+        If e.KeyCode = Keys.Return Then
+            Setting.Sett("PREVIEWFOCUS", TextBox_PreviewFocus.Text)
+        End If
+
+    End Sub
+
+    Private Sub PictureBox0_Click(sender As Object, e As EventArgs) Handles PictureBox0.Click
+
+    End Sub
+
+    Private Sub PictureBox0_KeyDown(sender As Object, e As KeyEventArgs) Handles PictureBox0.KeyDown
+
+    End Sub
+
+    Private Sub PictureBox0_KeyUp(sender As Object, e As KeyEventArgs) Handles PictureBox0.KeyUp
+
+    End Sub
 End Class
 

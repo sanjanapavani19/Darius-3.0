@@ -303,46 +303,47 @@ Public Class TrackingStructure
         Public Sub ReleaseCursur(sender As Object, e As MouseEventArgs)
             CursurClicked = False
 
-            stage.Move_A(stage.Xport, (X + e.X - Cursor.Width / 2) * Setting.Gett("Xrange") / Pbox.Width + Setting.Gett("xMin"))
-            stage.Move_A(stage.Yport, (Y + e.Y - Cursor.Height / 2) * Setting.Gett("Yrange") / Pbox.Height + Setting.Gett("yMin"))
+        Stage.MoveAbsolute(Stage.Xaxe, (X + e.X - Cursor.Width / 2) * Setting.Gett("Xrange") / Pbox.Width + Setting.Gett("xMin"))
+        Stage.MoveAbsolute(Stage.Yaxe, (Y + e.Y - Cursor.Height / 2) * Setting.Gett("Yrange") / Pbox.Height + Setting.Gett("yMin"))
 
-        End Sub
-        Private Sub Navigate(sender As Object, e As MouseEventArgs) Handles pb.MouseDoubleClick
-            stage.Move_A(stage.Xport, ConvertPixeltoCoordinateX(e.X))
-            stage.Move_A(stage.Yport, ConvertPixeltoCoordinateY(e.Y))
-        End Sub
-        Public Sub MovetoROIEdge()
-        stage.Move_A(stage.Xport, ConvertPixeltoCoordinateX(ROI.Rect.X + Cursor.Width / 2))
-        stage.Move_A(stage.Yport, ConvertPixeltoCoordinateY(ROI.Rect.Y + Cursor.Height / 2))
+    End Sub
+    Private Sub Navigate(sender As Object, e As MouseEventArgs) Handles pb.MouseDoubleClick
+        Stage.MoveAbsolute(Stage.Xaxe, ConvertPixeltoCoordinateX(e.X))
+        Stage.MoveAbsolute(Stage.Yaxe, ConvertPixeltoCoordinateY(e.Y))
+    End Sub
+    Public Sub MovetoROIEdge()
+        Stage.MoveAbsolute(Stage.Xaxe, ConvertPixeltoCoordinateX(ROI.Rect.X + Cursor.Width / 2))
+        Stage.MoveAbsolute(Stage.Yaxe, ConvertPixeltoCoordinateY(ROI.Rect.Y + Cursor.Height / 2))
     End Sub
 
 
     Public Sub MovetoDots(i As Integer)
-        stage.Move_A(stage.Xport, ConvertPixeltoCoordinateX(ROI.Dots(i).Rect.X + Cursor.Width / 2))
-        stage.Move_A(stage.Yport, ConvertPixeltoCoordinateY(ROI.Dots(i).Rect.Y + Cursor.Height / 2))
+        Stage.MoveAbsolute(Stage.Xaxe, ConvertPixeltoCoordinateX(ROI.Dots(i).Rect.X + Cursor.Width / 2))
+        Stage.MoveAbsolute(Stage.Yaxe, ConvertPixeltoCoordinateY(ROI.Dots(i).Rect.Y + Cursor.Height / 2))
     End Sub
 
 
     Public Sub Enable()
-            T.Enabled = True
-        End Sub
+        T.Enabled = True
+    End Sub
 
-        Public Sub Disable()
-            T.Enabled = False
-        End Sub
+    Public Sub Disable()
+        T.Enabled = False
+    End Sub
 
-        Public Sub Update()
+    Public Sub Update()
 
-            Cursor.Width = stage.FovX * Pbox.Width / Setting.Gett("Xrange")
-            Cursor.Height = Cursor.Width * stage.FovY / stage.FovX
+        Cursor.Width = Stage.FOVX * Pbox.Width / Setting.Gett("Xrange")
+        Cursor.Height = Cursor.Width * Stage.FOVY / Stage.FOVX
 
-            ' These are in mm
+        ' These are in mm
 
-            'XX = stage.GetPosition(stage.Xport)
-            'YY = stage.GetPosition(stage.Yport)
+        'XX = stage.GetPosition(stage.Xaxe)
+        'YY = stage.GetPosition(stage.Yaxe)
 
-            XX = stage.X / stage.MMtoSteps
-            YY = stage.Y / stage.MMtoSteps
+        XX = Stage.X
+        YY = Stage.Y
+        ZZ = Stage.Z
         '   ZZ = stage.GetPosition(stage.Zport)
 
         Form1.ToolStripStatusLabel1.Text = "X: " + XX.ToString

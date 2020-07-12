@@ -50,9 +50,9 @@ Public Class Zaber
         FovX = FovXin
         FovY = FovYin
 
-        Zport = 1
-        Xport = 2
-        Yport = 3
+        Zport = 3
+        Xport = 1
+        Yport = 2
         Allport = 4
 
 

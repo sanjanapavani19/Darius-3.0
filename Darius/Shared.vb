@@ -38,7 +38,7 @@ End Structure
 Module SharedResources
     Public Setting As New SettingStructure("Settings.xml")
     Public Camera As XimeaColor
-    Public stage As Zaber
+    Public Stage As ZaberNew
 
     Public rr(), gg(), bb() As Single
     Public clrs(20) As Color

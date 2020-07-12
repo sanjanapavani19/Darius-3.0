@@ -33,63 +33,63 @@ Public Class FocusStructure
         Camera.SetBinning(True, bin)
         ReDim BinnedImage(Nimg - 1)
         'To use only integer steps 
-        Range = Int(Range / Nimg * stage.ZMMtoSteps) * Nimg / stage.ZMMtoSteps
+        '      Range = Int(Range / Nimg * stage.ZMMtoSteps) * Nimg / stage.ZMMtoSteps
 
     End Sub
 
     Public Function Analyze() As Single
 
 
-        Form1.Chart1.Series(0).Points.Clear()
-        Form1.Chart1.Series(1).Points.Clear()
+        'Form1.Chart1.Series(0).Points.Clear()
+        'Form1.Chart1.Series(1).Points.Clear()
 
-        For n = 0 To Nimg - 1
-            ReDim BinnedImage(n)(Camera.Wbinned * Camera.Hbinned - 1)
-        Next
+        'For n = 0 To Nimg - 1
+        '    ReDim BinnedImage(n)(Camera.Wbinned * Camera.Hbinned - 1)
+        'Next
 
-        Dim Srange As Single = Range
+        'Dim Srange As Single = Range
 
-        Dim CM(Nimg - 1) As Single
-        Dim CmXMax As Single
-        For zz = 0 To Nimg - 1
-            Camera.Capture(BinnedImage(zz))
+        'Dim CM(Nimg - 1) As Single
+        'Dim CmXMax As Single
+        'For zz = 0 To Nimg - 1
+        '    Camera.Capture(BinnedImage(zz))
 
-            If zz < (Nimg - 1) Then stage.Move_r(stage.Zport, (Range) / Nimg) ' The lastimage should be acquired with no movement afterwards
-            CM(zz) = FT.FindCenterOfMass(BinnedImage(zz))
-            Form1.Chart1.Series(1).Points.AddXY(Int((zz * Range / Nimg) * 1000), CM(zz))
-            If CM(zz) = CM.Max Then CmXMax = zz
+        '    If zz < (Nimg - 1) Then Stage.MoveRelative(Stage.Zaxe, (Range) / Nimg) ' The lastimage should be acquired with no movement afterwards
+        '    CM(zz) = FT.FindCenterOfMass(BinnedImage(zz))
+        '    Form1.Chart1.Series(1).Points.AddXY(Int((zz * Range / Nimg) * 1000), CM(zz))
+        '    If CM(zz) = CM.Max Then CmXMax = zz
 
-        Next
-        'MsgBox("")
-        Application.DoEvents()
+        'Next
+        ''MsgBox("")
+        'Application.DoEvents()
 
-        ''finds center of mass of focus 
-        Dim focus As Single = (Nimg - CmXMax) * (Range / Nimg)
-        stage.Move_r(stage.Zport, -focus)
+        '''finds center of mass of focus 
+        'Dim focus As Single = (Nimg - CmXMax) * (Range / Nimg)
+        'Stage.MoveRelative(Stage.Zaxe, -focus)
 
-        Form1.Chart1.Series(0).Points.Clear()
-        Form1.Chart1.Series(1).Points.Clear()
+        'Form1.Chart1.Series(0).Points.Clear()
+        'Form1.Chart1.Series(1).Points.Clear()
 
-        ReDim CM(Nimg - 1)
+        'ReDim CM(Nimg - 1)
 
-        Srange = Range / Nimg * 2
-        Srange = Int(Srange / Nimg * stage.ZMMtoSteps) * Nimg / stage.ZMMtoSteps
+        'Srange = Range / Nimg * 2
+        'Srange = Int(Srange / Nimg * Stage.ZMMtoSteps) * Nimg / Stage.ZMMtoSteps
 
-        For zz = 0 To Nimg - 1
-            Camera.Capture(BinnedImage(zz))
-            If zz < (Nimg - 1) Then  stage.Move_r(stage.Zport, Srange / Nimg)
-            CM(zz) = FT.FindCenterOfMass(BinnedImage(zz))
-            Form1.Chart1.Series(1).Points.AddXY(zz, CM(zz))
-            If CM(zz) = CM.Max Then CmXMax = zz
-        Next
-
-
-        focus = (Nimg - CmXMax) * (Srange / Nimg)
-        stage.Move_r(stage.Zport, -focus)
+        'For zz = 0 To Nimg - 1
+        '    Camera.Capture(BinnedImage(zz))
+        '    If zz < (Nimg - 1) Then Stage.MoveRelative(Stage.Zport, Srange / Nimg)
+        '    CM(zz) = FT.FindCenterOfMass(BinnedImage(zz))
+        '    Form1.Chart1.Series(1).Points.AddXY(zz, CM(zz))
+        '    If CM(zz) = CM.Max Then CmXMax = zz
+        'Next
 
 
-        Z0 = stage.Z
-        Return focus
+        'focus = (Nimg - CmXMax) * (Srange / Nimg)
+        'Stage.MoveRelative(Stage.Zport, -focus)
+
+
+        'Z0 = stage.Z
+        'Return focus
     End Function
 
     Public Sub Release()
