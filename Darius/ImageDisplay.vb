@@ -99,6 +99,24 @@ Public Class ImageDisplay
 
     End Function
 
+    Public Function MakeFullsizeImage(bytes() As Byte) As Byte()
+
+        Array.Copy(bytes, OutputImage.data, rawImage.Size - 1)
+
+        ApplyColorGain(OutputImage)
+
+        byteToBitmap(OutputImage.data, OutputImage.bmp8bit)
+
+        '  Bayer.Apply(OutputImage.bmp8bit)
+
+        bmp = New FastBMP(Bayer.Apply(OutputImage.bmp8bit))
+
+        Return bmp.bytes
+
+
+    End Function
+
+
     Public Sub ApplyColorGain(ByRef rawImageIn As ByteImage)
         'This is for resampling the image with different Sampling index
         Dim i, j As Integer

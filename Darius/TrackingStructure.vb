@@ -13,7 +13,7 @@ Public Class TrackingStructure
         Public Class DotsStructure
             Public Rect As Rectangle
             Public selected As Boolean
-            Public pen As New Pen(Brushes.Green, 1)
+            Public pen As New Pen(Brushes.Yellow, 2)
             Public InitialX, InitialY As Integer
             Public IsMoved As Boolean
             Public Grabbed As Boolean
@@ -31,7 +31,7 @@ Public Class TrackingStructure
         Public IsMade As Boolean
         Public IsMoved As Boolean
         Public Dots(2) As DotsStructure
-        Public pen As New Pen(Brushes.Red, 1)
+        Public pen As New Pen(Brushes.Yellow, 2)
         Public InitialX, InitialY As Integer
         Public ClickX, ClickY, width, height As Integer
 
@@ -85,6 +85,7 @@ Public Class TrackingStructure
         End Sub
 
         Public Sub Refresh()
+            pen = New Pen(Brushes.Yellow, 2)
             Pbox.Refresh()
             Pbox.CreateGraphics.DrawRectangle(pen, Rect)
 
@@ -154,7 +155,7 @@ Public Class TrackingStructure
         Cursor.Width = stage.FovX * Pb.Width / Setting.Gett("Xrange")
         Cursor.Height = Cursor.Width * stage.FovY / stage.FovX
         Cursor.FlatStyle = FlatStyle.Flat
-        Cursor.ForeColor = Color.DarkBlue
+        Cursor.ForeColor = Color.Yellow
         Cursor.BackColor = Color.Transparent
 
         Pbox.Controls.Add(Cursor)
@@ -251,18 +252,18 @@ Public Class TrackingStructure
             Dim index As Integer = Scanned.GetLength(0)
 
             ReDim Preserve Scanned(index)
-            Scanned(index) = New Button With {
+        Scanned(index) = New Button With {
         .Width = Cursor.Width * W,
         .Left = ConvertCoordinatetoPixels(XX, YY).X - Cursor.Width / 2,
         .Height = Cursor.Height * H,
         .Top = ConvertCoordinatetoPixels(XX, YY).Y - Cursor.Height / 2,
         .FlatStyle = FlatStyle.Flat,
-        .ForeColor = Color.LawnGreen,
+        .ForeColor = Color.Yellow,
         .BackColor = Color.Transparent,
         .Tag = address
             }
 
-            AddHandler Scanned(index).Click, AddressOf ScannedClick
+        AddHandler Scanned(index).Click, AddressOf ScannedClick
             Pbox.Controls.Add(Scanned(index))
 
         End Sub

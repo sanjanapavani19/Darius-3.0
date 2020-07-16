@@ -50,10 +50,6 @@ Public Class TileStructure
         stride = bmpData.Stride
         tiff = Tiff.Open(address, "w")
         ReDim bytes(stride * bmpHeight - 1)
-        Ready = True
-    End Sub
-
-    Public Sub SaveTile(XX As Integer, YY As Integer, bytesin As Byte())
 
 
         page = 0
@@ -63,7 +59,7 @@ Public Class TileStructure
         ReDim Tile.bytes(X * Y * Tile.X * Tile.Y - 1)
         'Tile size shouldn't change 
         Tile.width = Int(bmpWidth / (16 * Tile.X * Scale)) * 16
-        Tile.height = Int(bmpheight / (16 * Tile.Y * Scale)) * 16
+        Tile.height = Int(bmpHeight / (16 * Tile.Y * Scale)) * 16
         Tile.numbers = Tile.X * Tile.Y * X * Y
 
         indexYoffset = (stride - Tile.width * 3) * Scale
@@ -71,6 +67,13 @@ Public Class TileStructure
 
         ReDim Tile.bytes(Tile.width * Tile.height * 3 - 1)
         SetTiff(page)
+
+        Ready = True
+    End Sub
+
+    Public Sub SaveTile(XX As Integer, YY As Integer, bytesin As Byte())
+
+
         Tile.index = YY * X * Tile.X * Tile.Y + XX * Tile.X
 
         Buffer.BlockCopy(bytesin, 0, bytes, 0, bytes.GetLength(0))
@@ -80,7 +83,7 @@ Public Class TileStructure
         Dim Thread1 As New System.Threading.Thread(AddressOf SaveTileThreded)
         Thread1.Start()
 
-        '   SaveTileThreded()
+        'SaveTileThreded()
 
     End Sub
 

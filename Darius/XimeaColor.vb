@@ -71,7 +71,7 @@ Public Class XimeaColor
 
             '------------------------------------------------------------
             cam.StartAcquisition()
-
+            SetROI(0, 0, 100, 100)
         End If
 
 
@@ -84,6 +84,7 @@ Public Class XimeaColor
         cam.SetParam(PRM.HEIGHT, Height)
         cam.SetParam(PRM.OFFSET_X, X)
         cam.SetParam(PRM.OFFSET_Y, Y)
+
 
     End Sub
 
@@ -127,15 +128,20 @@ Public Class XimeaColor
 
     Public Sub Capture()
         ready = False
-        cam.SetParam(PRM.TRG_SOFTWARE, 1)
-        cam.GetImageByteArray(Bytes, timeout)
+        Try
+            cam.SetParam(PRM.TRG_SOFTWARE, 1)
+            cam.GetImageByteArray(Bytes, timeout)
+        Catch ex As Exception
+
+        End Try
+
         ready = True
     End Sub
 
 
-    Public Sub SetFlatField(filename As String)
+    Public Sub SetFlatField(filename As String, bfilename As String)
         cam.SetParam(PRM.FFC_FLAT_FIELD_FILE_NAME, filename)
-        cam.SetParam(PRM.FFC_DARK_FIELD_FILE_NAME, "dark.tif")
+        cam.SetParam(PRM.FFC_DARK_FIELD_FILE_NAME, bfilename)
         cam.SetParam(PRM.FFC, 1)
         FFsetup = True
     End Sub
@@ -155,18 +161,15 @@ Public Class XimeaColor
 
     End Sub
 
-
+    'Public Sub CaptureXIMG()
+    '    Dim XIimage As xiApi.XI_IMG
+    '    cam.SetParam(PRM.TRG_SOFTWARE, 1)
+    '    cam.GetXI_IMG()
+    'End Sub
 
     Public Sub captureBmp()
-
-        Try
-            cam.SetParam(PRM.TRG_SOFTWARE, 1)
-            cam.GetBitmap(BmpRef, timeout)
-
-        Catch ex As Exception
-
-        End Try
-
+        cam.SetParam(PRM.TRG_SOFTWARE, 1)
+        cam.GetBitmap(BmpRef, timeout)
     End Sub
 
     Public Sub SetDataMode(type As Colortype)

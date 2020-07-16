@@ -37,7 +37,7 @@ Public Class Form1
 
         If Camera.status Then
             Textbox_exposure.Text = Camera.exp
-            AutoFocus = New FocusStructure(0.4, 10, 4)
+            AutoFocus = New FocusStructure(0.5, 5, 4)
 
             Display = New ImageDisplay(Camera.Dim_X, Camera.Dim_Y, 2)
 
@@ -407,7 +407,7 @@ Public Class Form1
     End Sub
 
     Public Function DoAutoFocus(position As Integer)
-        Stage.GoZero(Stage.Zaxe, 1)
+        'Stage.GoZero(Stage.Zaxe, 1)
 
         Dim WasLive As Boolean
         If Camera.busy Then ExitLive() : WasLive = True
@@ -458,7 +458,13 @@ Public Class Form1
 
     Private Sub Button_Scan_Click(sender As Object, e As EventArgs) Handles Button_Scan.Click
         If SaveFileDialog1.ShowDialog = DialogResult.Cancel Then Exit Sub
-        FastScan(TextBoxX.Text, TextBoxY.Text, 0.1, SaveFileDialog1.FileName)
+        Dim watch As Stopwatch
+        watch = New Stopwatch
+        watch.Start()
+        FastScan(TextBoxX.Text, TextBoxY.Text, 0.05, SaveFileDialog1.FileName)
+        watch.Stop()
+        MsgBox("Scanned in " + (watch.ElapsedMilliseconds / 1000).ToString + " s")
+
         ListBox1.Items.Add(Path.GetFileName(SaveFileDialog1.FileName))
         ReDim Preserve Filenames(fileN)
         Filenames(fileN) = SaveFileDialog1.FileName
@@ -470,6 +476,9 @@ Public Class Form1
 
 
         Camera.SetDataMode(Colortype.RGB)
+        'Camera.SetFlatField("ff.tif", "dark.tif")
+
+
         'Camera.SetPolicyToSafe()
         Dim TravelX, TravelY As Single
         Dim Filen As Integer = 1
@@ -490,7 +499,7 @@ Public Class Form1
 
 
         Dim Tiles As New TileStructure(X, y, Camera.Dim_X, Camera.Dim_Y, 1, Address, 100)
-
+        Dim ColorBytes(Camera.Dim_X * Camera.Dim_Y * 3 - 1)
         ' Dim BytesExport(Camera.Bytes.GetUpperBound(0)) As Byte
         For loop_y = 1 To y
             For loop_x = 1 To X
@@ -520,12 +529,20 @@ Public Class Form1
 
                 Loop
 
-                If direction > 0 Then
-                    Tiles.SaveTile(loop_x - 1, loop_y - 1, Camera.Bytes)
-                Else
-                    Tiles.SaveTile(X - loop_x, loop_y - 1, Camera.Bytes)
-                End If
 
+
+                'If direction > 0 Then
+                '    Tiles.SaveTile(loop_x - 1, loop_y - 1, Display.MakeFullsizeImage(Camera.Bytes))
+                'Else
+                '    Tiles.SaveTile(X - loop_x, loop_y - 1, Display.MakeFullsizeImage(Camera.Bytes))
+                'End If
+
+
+                If direction > 0 Then
+                    Tiles.SaveTile(loop_x - 1, loop_y - 1, (Camera.Bytes))
+                Else
+                    Tiles.SaveTile(X - loop_x, loop_y - 1, (Camera.Bytes))
+                End If
                 'byteToBitmap(Camera.Bytes, Display.Bmp)
                 'Array.Copy(Camera.GetBytes, BytesExport, BytesExport.GetLength(0))
 
@@ -547,7 +564,7 @@ Public Class Form1
 
         Next
 
-        Stage.MoveRelative(Stage.Xaxe, -TravelX)
+        Stage.MoveRelative(Stage.Xaxe, TravelX)
         Stage.MoveRelative(Stage.Yaxe, -TravelY)
         Do Until Tiles.Ready
 
@@ -870,18 +887,25 @@ Public Class Form1
     Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Button3.Click
         Dim WasLive As Boolean
         If Camera.busy Then ExitLive() : WasLive = True
-        ' Camera.SetDataMode(Colortype.Grey)
-        If Camera.FFsetup Then Camera.Flatfield(0)
+        Camera.Capture()
+        Camera.Flatfield(0)
+
+        CheckBox1.Checked = False
+        Thread.Sleep(500)
+        Camera.Capture()
+        SaveSinglePageTiff("dark.tif", Camera.Bytes, Camera.Dim_X, Camera.Dim_Y)
+        CheckBox1.Checked = True
+        Thread.Sleep(500)
         Camera.Capture()
         SaveSinglePageTiff("ff.tif", Camera.Bytes, Camera.Dim_X, Camera.Dim_Y)
-        Camera.SetFlatField("ff.tif")
-
+        Camera.SetFlatField("ff.tif", "dark.tif")
+        Camera.Flatfield(1)
         If WasLive Then GoLive()
     End Sub
 
     Private Sub Button11_Click(sender As Object, e As EventArgs) Handles Button11.Click
 
-        Camera.SetFlatField("ff.tif")
+        Camera.SetFlatField("ff.tif", "dark.tif")
 
     End Sub
 
@@ -1006,6 +1030,52 @@ Public Class Form1
 
     Private Sub PictureBox0_KeyUp(sender As Object, e As KeyEventArgs) Handles PictureBox0.KeyUp
 
+    End Sub
+
+    Private Sub TextBox7_TextChanged(sender As Object, e As EventArgs) Handles TextBox7.TextChanged
+
+    End Sub
+
+    Private Sub TextBox7_KeyDown(sender As Object, e As KeyEventArgs) Handles TextBox7.KeyDown
+        If e.KeyCode = Keys.Return Then
+            Stage.SetSpeed(Stage.Xaxe, TextBox7.Text)
+        End If
+    End Sub
+
+
+
+    Private Sub TextBox8_KeyDown(sender As Object, e As KeyEventArgs) Handles TextBox8.KeyDown
+        If e.KeyCode = Keys.Return Then
+            Stage.SetSpeed(Stage.Yaxe, TextBox8.Text)
+        End If
+    End Sub
+
+
+    Private Sub TextBox9_KeyDown(sender As Object, e As KeyEventArgs) Handles TextBox9.KeyDown
+        If e.KeyCode = Keys.Return Then
+            Stage.SetSpeed(Stage.Zaxe, TextBox9.Text)
+        End If
+    End Sub
+
+
+
+    Private Sub TextBox10_KeyDown(sender As Object, e As KeyEventArgs) Handles TextBox10.KeyDown
+        If e.KeyCode = Keys.Return Then
+            Stage.SetAcceleration(Stage.Xaxe, TextBox10.Text)
+        End If
+    End Sub
+
+    Private Sub TextBox11_KeyDown(sender As Object, e As KeyEventArgs) Handles TextBox11.KeyDown
+        If e.KeyCode = Keys.Return Then
+            Stage.SetAcceleration(Stage.Yaxe, TextBox11.Text)
+        End If
+    End Sub
+
+
+    Private Sub TextBox12_KeyDown(sender As Object, e As KeyEventArgs) Handles TextBox12.KeyDown
+        If e.KeyCode = Keys.Return Then
+            Stage.SetAcceleration(Stage.Zaxe, TextBox12.Text)
+        End If
     End Sub
 End Class
 

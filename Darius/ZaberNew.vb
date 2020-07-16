@@ -12,11 +12,11 @@ Public Class ZaberNew
     Public Xaxe, Yaxe, Zaxe As Device
 
     Public Sub New(FOVX As Single, FOVY As Single)
-        Dim com As Connection = Connection.OpenSerialPort("COM5")
+        Dim com As Connection = Connection.OpenSerialPort("COM7")
         Dim Devicelist = com.DetectDevices()
-        Xaxe = Devicelist(0)
+        Xaxe = Devicelist(2)
         Yaxe = Devicelist(1)
-        Zaxe = Devicelist(2)
+        Zaxe = Devicelist(0)
         Me.FOVX = FOVX
         Me.FOVY = FOVY
         Home()
@@ -35,9 +35,15 @@ Public Class ZaberNew
 
 
         GoToFocus()
-        SetSpeed(Xaxe, 36)
-        SetSpeed(Yaxe, 36)
-        SetSpeed(Zaxe, 36)
+        SetSpeed(Xaxe, 65)
+        SetSpeed(Yaxe, 65)
+        SetSpeed(Zaxe, 48)
+
+
+
+        SetAcceleration(Xaxe, 3000)
+        SetAcceleration(Yaxe, 3000)
+        SetAcceleration(Zaxe, 1000)
         Go_Middle()
 
 
@@ -127,7 +133,7 @@ Public Class ZaberNew
     End Sub
 
     Public Sub Go_Middle()
-        MoveAbsolute(Xaxe, 12.5)
+        MoveAbsolute(Xaxe, 12.7)
         MoveAbsolute(Yaxe, 38)
 
 
