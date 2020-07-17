@@ -15,7 +15,7 @@ Public Class ImageDisplay
 
     Public zoom As Boolean
     Public BmpPreview As FastBMP
-    Public bmp As FastBMP
+    Public Fbmp As FastBMP
 
     Public GainR, GainG, GainB As Single
 
@@ -50,7 +50,7 @@ Public Class ImageDisplay
         rawImageSampled.bmp8bit = New Bitmap(rawImageSampled.Width, rawImageSampled.Height, Imaging.PixelFormat.Format8bppIndexed)
         rawImageSampled.Sampling = sampeling
 
-        bmp = New FastBMP(W, H, Imaging.PixelFormat.Format24bppRgb)
+        Fbmp = New FastBMP(W, H, Imaging.PixelFormat.Format24bppRgb)
         BmpPreview = New FastBMP(rawImageSampled.Width, rawImageSampled.Height, Imaging.PixelFormat.Format24bppRgb)
 
         Bayer = New Filters.BayerFilter
@@ -92,9 +92,9 @@ Public Class ImageDisplay
 
         '  Bayer.Apply(OutputImage.bmp8bit)
 
-        bmp = New FastBMP(Bayer.Apply(OutputImage.bmp8bit))
+        Fbmp = New FastBMP(Bayer.Apply(OutputImage.bmp8bit))
 
-        Return bmp.bmp
+        Return Fbmp.bmp
 
 
     End Function
@@ -109,9 +109,9 @@ Public Class ImageDisplay
 
         '  Bayer.Apply(OutputImage.bmp8bit)
 
-        bmp = New FastBMP(Bayer.Apply(OutputImage.bmp8bit))
+        Fbmp = New FastBMP(Bayer.Apply(OutputImage.bmp8bit))
 
-        Return bmp.bytes
+        Return Fbmp.bytes
 
 
     End Function
@@ -255,6 +255,10 @@ Public Class ImageDisplay
 
     End Sub
 
+    Public Sub Preview(InterpolatedBytes As Byte())
+
+        Fbmp.MakeNewFromBytes(CoolBright(InterpolatedBytes))
+    End Sub
 
     Public Sub SetColorGain(R As Single, G As Single, B As Single)
         GainR = R

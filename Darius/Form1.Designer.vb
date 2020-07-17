@@ -23,11 +23,11 @@ Partial Class Form1
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Form1))
-        Dim ChartArea1 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
-        Dim Legend1 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
-        Dim Series1 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
-        Dim Series2 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
-        Dim Series3 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
+        Dim ChartArea2 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
+        Dim Legend2 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
+        Dim Series4 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
+        Dim Series5 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
+        Dim Series6 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
         Me.ToolStrip1 = New System.Windows.Forms.ToolStrip()
         Me.ToolStripLabel1 = New System.Windows.Forms.ToolStripLabel()
         Me.Textbox_exposure = New System.Windows.Forms.ToolStripTextBox()
@@ -41,6 +41,21 @@ Partial Class Form1
         Me.RadioButton_zoom_out = New System.Windows.Forms.RadioButton()
         Me.RadioButton_zoom_in = New System.Windows.Forms.RadioButton()
         Me.TabControl_Settings = New System.Windows.Forms.TabControl()
+        Me.TabPage1 = New System.Windows.Forms.TabPage()
+        Me.Button11 = New System.Windows.Forms.Button()
+        Me.Button3 = New System.Windows.Forms.Button()
+        Me.TextBoxGC = New System.Windows.Forms.TextBox()
+        Me.TextBoxGY = New System.Windows.Forms.TextBox()
+        Me.TextBoxGain = New System.Windows.Forms.TextBox()
+        Me.LabelGC = New System.Windows.Forms.Label()
+        Me.LabelGY = New System.Windows.Forms.Label()
+        Me.LabelGain = New System.Windows.Forms.Label()
+        Me.TextBox_GainB = New System.Windows.Forms.TextBox()
+        Me.TextBox_GainG = New System.Windows.Forms.TextBox()
+        Me.TextBox_GainR = New System.Windows.Forms.TextBox()
+        Me.Label13 = New System.Windows.Forms.Label()
+        Me.Label14 = New System.Windows.Forms.Label()
+        Me.Label17 = New System.Windows.Forms.Label()
         Me.TabPage13 = New System.Windows.Forms.TabPage()
         Me.Label8 = New System.Windows.Forms.Label()
         Me.TextBox10 = New System.Windows.Forms.TextBox()
@@ -65,21 +80,6 @@ Partial Class Form1
         Me.Label3 = New System.Windows.Forms.Label()
         Me.Label2 = New System.Windows.Forms.Label()
         Me.Label1 = New System.Windows.Forms.Label()
-        Me.TabPage1 = New System.Windows.Forms.TabPage()
-        Me.Button11 = New System.Windows.Forms.Button()
-        Me.Button3 = New System.Windows.Forms.Button()
-        Me.TextBoxGC = New System.Windows.Forms.TextBox()
-        Me.TextBoxGY = New System.Windows.Forms.TextBox()
-        Me.TextBoxGain = New System.Windows.Forms.TextBox()
-        Me.LabelGC = New System.Windows.Forms.Label()
-        Me.LabelGY = New System.Windows.Forms.Label()
-        Me.LabelGain = New System.Windows.Forms.Label()
-        Me.TextBox_GainB = New System.Windows.Forms.TextBox()
-        Me.TextBox_GainG = New System.Windows.Forms.TextBox()
-        Me.TextBox_GainR = New System.Windows.Forms.TextBox()
-        Me.Label13 = New System.Windows.Forms.Label()
-        Me.Label14 = New System.Windows.Forms.Label()
-        Me.Label17 = New System.Windows.Forms.Label()
         Me.TabPage12 = New System.Windows.Forms.TabPage()
         Me.Label_html_dir = New System.Windows.Forms.Label()
         Me.CheckBox_no_html = New System.Windows.Forms.CheckBox()
@@ -124,8 +124,8 @@ Partial Class Form1
         Me.ToolStrip1.SuspendLayout()
         Me.GroupBox3.SuspendLayout()
         Me.TabControl_Settings.SuspendLayout()
-        Me.TabPage13.SuspendLayout()
         Me.TabPage1.SuspendLayout()
+        Me.TabPage13.SuspendLayout()
         Me.TabPage12.SuspendLayout()
         Me.TabPage2.SuspendLayout()
         Me.TabControl1.SuspendLayout()
@@ -269,8 +269,8 @@ Partial Class Form1
         'TabControl_Settings
         '
         Me.TabControl_Settings.Appearance = System.Windows.Forms.TabAppearance.FlatButtons
-        Me.TabControl_Settings.Controls.Add(Me.TabPage1)
         Me.TabControl_Settings.Controls.Add(Me.TabPage13)
+        Me.TabControl_Settings.Controls.Add(Me.TabPage1)
         Me.TabControl_Settings.Controls.Add(Me.TabPage12)
         Me.TabControl_Settings.Controls.Add(Me.TabPage2)
         Me.TabControl_Settings.Location = New System.Drawing.Point(1257, 809)
@@ -278,6 +278,180 @@ Partial Class Form1
         Me.TabControl_Settings.SelectedIndex = 0
         Me.TabControl_Settings.Size = New System.Drawing.Size(449, 255)
         Me.TabControl_Settings.TabIndex = 111
+        '
+        'TabPage1
+        '
+        Me.TabPage1.BackColor = System.Drawing.Color.WhiteSmoke
+        Me.TabPage1.Controls.Add(Me.Button11)
+        Me.TabPage1.Controls.Add(Me.Button3)
+        Me.TabPage1.Controls.Add(Me.TextBoxGC)
+        Me.TabPage1.Controls.Add(Me.TextBoxGY)
+        Me.TabPage1.Controls.Add(Me.TextBoxGain)
+        Me.TabPage1.Controls.Add(Me.LabelGC)
+        Me.TabPage1.Controls.Add(Me.LabelGY)
+        Me.TabPage1.Controls.Add(Me.LabelGain)
+        Me.TabPage1.Controls.Add(Me.TextBox_GainB)
+        Me.TabPage1.Controls.Add(Me.TextBox_GainG)
+        Me.TabPage1.Controls.Add(Me.TextBox_GainR)
+        Me.TabPage1.Controls.Add(Me.Label13)
+        Me.TabPage1.Controls.Add(Me.Label14)
+        Me.TabPage1.Controls.Add(Me.Label17)
+        Me.TabPage1.Location = New System.Drawing.Point(4, 25)
+        Me.TabPage1.Name = "TabPage1"
+        Me.TabPage1.Size = New System.Drawing.Size(441, 226)
+        Me.TabPage1.TabIndex = 5
+        Me.TabPage1.Text = "Camera"
+        '
+        'Button11
+        '
+        Me.Button11.Enabled = False
+        Me.Button11.Location = New System.Drawing.Point(219, 145)
+        Me.Button11.Name = "Button11"
+        Me.Button11.Size = New System.Drawing.Size(133, 28)
+        Me.Button11.TabIndex = 138
+        Me.Button11.Text = "Load FlatField"
+        Me.Button11.UseVisualStyleBackColor = True
+        '
+        'Button3
+        '
+        Me.Button3.Location = New System.Drawing.Point(38, 145)
+        Me.Button3.Name = "Button3"
+        Me.Button3.Size = New System.Drawing.Size(133, 28)
+        Me.Button3.TabIndex = 137
+        Me.Button3.Text = "Acquire FlatField"
+        Me.Button3.UseVisualStyleBackColor = True
+        '
+        'TextBoxGC
+        '
+        Me.TextBoxGC.BorderStyle = System.Windows.Forms.BorderStyle.None
+        Me.TextBoxGC.Font = New System.Drawing.Font("Calibri", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.TextBoxGC.ForeColor = System.Drawing.SystemColors.ControlDarkDark
+        Me.TextBoxGC.Location = New System.Drawing.Point(296, 110)
+        Me.TextBoxGC.Name = "TextBoxGC"
+        Me.TextBoxGC.Size = New System.Drawing.Size(56, 20)
+        Me.TextBoxGC.TabIndex = 49
+        Me.TextBoxGC.Text = "0"
+        Me.TextBoxGC.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        '
+        'TextBoxGY
+        '
+        Me.TextBoxGY.BorderStyle = System.Windows.Forms.BorderStyle.None
+        Me.TextBoxGY.Font = New System.Drawing.Font("Calibri", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.TextBoxGY.ForeColor = System.Drawing.SystemColors.ControlDarkDark
+        Me.TextBoxGY.Location = New System.Drawing.Point(296, 74)
+        Me.TextBoxGY.Name = "TextBoxGY"
+        Me.TextBoxGY.Size = New System.Drawing.Size(56, 20)
+        Me.TextBoxGY.TabIndex = 48
+        Me.TextBoxGY.Text = "1"
+        Me.TextBoxGY.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        '
+        'TextBoxGain
+        '
+        Me.TextBoxGain.BorderStyle = System.Windows.Forms.BorderStyle.None
+        Me.TextBoxGain.Font = New System.Drawing.Font("Calibri", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.TextBoxGain.ForeColor = System.Drawing.SystemColors.ControlDarkDark
+        Me.TextBoxGain.Location = New System.Drawing.Point(296, 39)
+        Me.TextBoxGain.Name = "TextBoxGain"
+        Me.TextBoxGain.Size = New System.Drawing.Size(56, 20)
+        Me.TextBoxGain.TabIndex = 47
+        Me.TextBoxGain.Text = "10"
+        Me.TextBoxGain.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        '
+        'LabelGC
+        '
+        Me.LabelGC.AutoSize = True
+        Me.LabelGC.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.LabelGC.Location = New System.Drawing.Point(225, 114)
+        Me.LabelGC.Name = "LabelGC"
+        Me.LabelGC.Size = New System.Drawing.Size(65, 16)
+        Me.LabelGC.TabIndex = 46
+        Me.LabelGC.Text = "GammaC"
+        '
+        'LabelGY
+        '
+        Me.LabelGY.AutoSize = True
+        Me.LabelGY.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.LabelGY.Location = New System.Drawing.Point(225, 76)
+        Me.LabelGY.Name = "LabelGY"
+        Me.LabelGY.Size = New System.Drawing.Size(65, 16)
+        Me.LabelGY.TabIndex = 45
+        Me.LabelGY.Text = "GammaY"
+        '
+        'LabelGain
+        '
+        Me.LabelGain.AutoSize = True
+        Me.LabelGain.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.LabelGain.Location = New System.Drawing.Point(225, 41)
+        Me.LabelGain.Name = "LabelGain"
+        Me.LabelGain.Size = New System.Drawing.Size(36, 16)
+        Me.LabelGain.TabIndex = 44
+        Me.LabelGain.Text = "Gain"
+        '
+        'TextBox_GainB
+        '
+        Me.TextBox_GainB.BorderStyle = System.Windows.Forms.BorderStyle.None
+        Me.TextBox_GainB.Font = New System.Drawing.Font("Calibri", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.TextBox_GainB.ForeColor = System.Drawing.SystemColors.ControlDarkDark
+        Me.TextBox_GainB.Location = New System.Drawing.Point(89, 110)
+        Me.TextBox_GainB.Name = "TextBox_GainB"
+        Me.TextBox_GainB.Size = New System.Drawing.Size(56, 20)
+        Me.TextBox_GainB.TabIndex = 43
+        Me.TextBox_GainB.Text = "1"
+        Me.TextBox_GainB.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        '
+        'TextBox_GainG
+        '
+        Me.TextBox_GainG.BorderStyle = System.Windows.Forms.BorderStyle.None
+        Me.TextBox_GainG.Font = New System.Drawing.Font("Calibri", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.TextBox_GainG.ForeColor = System.Drawing.SystemColors.ControlDarkDark
+        Me.TextBox_GainG.Location = New System.Drawing.Point(89, 74)
+        Me.TextBox_GainG.Name = "TextBox_GainG"
+        Me.TextBox_GainG.Size = New System.Drawing.Size(56, 20)
+        Me.TextBox_GainG.TabIndex = 42
+        Me.TextBox_GainG.Text = "1"
+        Me.TextBox_GainG.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        '
+        'TextBox_GainR
+        '
+        Me.TextBox_GainR.BorderStyle = System.Windows.Forms.BorderStyle.None
+        Me.TextBox_GainR.Font = New System.Drawing.Font("Calibri", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.TextBox_GainR.ForeColor = System.Drawing.SystemColors.ControlDarkDark
+        Me.TextBox_GainR.Location = New System.Drawing.Point(89, 39)
+        Me.TextBox_GainR.Name = "TextBox_GainR"
+        Me.TextBox_GainR.Size = New System.Drawing.Size(56, 20)
+        Me.TextBox_GainR.TabIndex = 41
+        Me.TextBox_GainR.Text = "1"
+        Me.TextBox_GainR.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        '
+        'Label13
+        '
+        Me.Label13.AutoSize = True
+        Me.Label13.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label13.Location = New System.Drawing.Point(35, 114)
+        Me.Label13.Name = "Label13"
+        Me.Label13.Size = New System.Drawing.Size(48, 16)
+        Me.Label13.TabIndex = 40
+        Me.Label13.Text = "Gain B"
+        '
+        'Label14
+        '
+        Me.Label14.AutoSize = True
+        Me.Label14.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label14.Location = New System.Drawing.Point(35, 76)
+        Me.Label14.Name = "Label14"
+        Me.Label14.Size = New System.Drawing.Size(49, 16)
+        Me.Label14.TabIndex = 39
+        Me.Label14.Text = "Gain G"
+        '
+        'Label17
+        '
+        Me.Label17.AutoSize = True
+        Me.Label17.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label17.Location = New System.Drawing.Point(35, 39)
+        Me.Label17.Name = "Label17"
+        Me.Label17.Size = New System.Drawing.Size(49, 16)
+        Me.Label17.TabIndex = 38
+        Me.Label17.Text = "Gain R"
         '
         'TabPage13
         '
@@ -559,179 +733,6 @@ Partial Class Form1
         Me.Label1.TabIndex = 11
         Me.Label1.Text = "X (mm):"
         '
-        'TabPage1
-        '
-        Me.TabPage1.BackColor = System.Drawing.Color.WhiteSmoke
-        Me.TabPage1.Controls.Add(Me.Button11)
-        Me.TabPage1.Controls.Add(Me.Button3)
-        Me.TabPage1.Controls.Add(Me.TextBoxGC)
-        Me.TabPage1.Controls.Add(Me.TextBoxGY)
-        Me.TabPage1.Controls.Add(Me.TextBoxGain)
-        Me.TabPage1.Controls.Add(Me.LabelGC)
-        Me.TabPage1.Controls.Add(Me.LabelGY)
-        Me.TabPage1.Controls.Add(Me.LabelGain)
-        Me.TabPage1.Controls.Add(Me.TextBox_GainB)
-        Me.TabPage1.Controls.Add(Me.TextBox_GainG)
-        Me.TabPage1.Controls.Add(Me.TextBox_GainR)
-        Me.TabPage1.Controls.Add(Me.Label13)
-        Me.TabPage1.Controls.Add(Me.Label14)
-        Me.TabPage1.Controls.Add(Me.Label17)
-        Me.TabPage1.Location = New System.Drawing.Point(4, 25)
-        Me.TabPage1.Name = "TabPage1"
-        Me.TabPage1.Size = New System.Drawing.Size(441, 226)
-        Me.TabPage1.TabIndex = 5
-        Me.TabPage1.Text = "Camera"
-        '
-        'Button11
-        '
-        Me.Button11.Location = New System.Drawing.Point(219, 145)
-        Me.Button11.Name = "Button11"
-        Me.Button11.Size = New System.Drawing.Size(133, 28)
-        Me.Button11.TabIndex = 138
-        Me.Button11.Text = "Load FlatField"
-        Me.Button11.UseVisualStyleBackColor = True
-        '
-        'Button3
-        '
-        Me.Button3.Location = New System.Drawing.Point(38, 145)
-        Me.Button3.Name = "Button3"
-        Me.Button3.Size = New System.Drawing.Size(133, 28)
-        Me.Button3.TabIndex = 137
-        Me.Button3.Text = "Acquire FlatField"
-        Me.Button3.UseVisualStyleBackColor = True
-        '
-        'TextBoxGC
-        '
-        Me.TextBoxGC.BorderStyle = System.Windows.Forms.BorderStyle.None
-        Me.TextBoxGC.Font = New System.Drawing.Font("Calibri", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.TextBoxGC.ForeColor = System.Drawing.SystemColors.ControlDarkDark
-        Me.TextBoxGC.Location = New System.Drawing.Point(296, 110)
-        Me.TextBoxGC.Name = "TextBoxGC"
-        Me.TextBoxGC.Size = New System.Drawing.Size(56, 20)
-        Me.TextBoxGC.TabIndex = 49
-        Me.TextBoxGC.Text = "0"
-        Me.TextBoxGC.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        '
-        'TextBoxGY
-        '
-        Me.TextBoxGY.BorderStyle = System.Windows.Forms.BorderStyle.None
-        Me.TextBoxGY.Font = New System.Drawing.Font("Calibri", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.TextBoxGY.ForeColor = System.Drawing.SystemColors.ControlDarkDark
-        Me.TextBoxGY.Location = New System.Drawing.Point(296, 74)
-        Me.TextBoxGY.Name = "TextBoxGY"
-        Me.TextBoxGY.Size = New System.Drawing.Size(56, 20)
-        Me.TextBoxGY.TabIndex = 48
-        Me.TextBoxGY.Text = "1"
-        Me.TextBoxGY.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        '
-        'TextBoxGain
-        '
-        Me.TextBoxGain.BorderStyle = System.Windows.Forms.BorderStyle.None
-        Me.TextBoxGain.Font = New System.Drawing.Font("Calibri", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.TextBoxGain.ForeColor = System.Drawing.SystemColors.ControlDarkDark
-        Me.TextBoxGain.Location = New System.Drawing.Point(296, 39)
-        Me.TextBoxGain.Name = "TextBoxGain"
-        Me.TextBoxGain.Size = New System.Drawing.Size(56, 20)
-        Me.TextBoxGain.TabIndex = 47
-        Me.TextBoxGain.Text = "10"
-        Me.TextBoxGain.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        '
-        'LabelGC
-        '
-        Me.LabelGC.AutoSize = True
-        Me.LabelGC.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.LabelGC.Location = New System.Drawing.Point(225, 114)
-        Me.LabelGC.Name = "LabelGC"
-        Me.LabelGC.Size = New System.Drawing.Size(65, 16)
-        Me.LabelGC.TabIndex = 46
-        Me.LabelGC.Text = "GammaC"
-        '
-        'LabelGY
-        '
-        Me.LabelGY.AutoSize = True
-        Me.LabelGY.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.LabelGY.Location = New System.Drawing.Point(225, 76)
-        Me.LabelGY.Name = "LabelGY"
-        Me.LabelGY.Size = New System.Drawing.Size(65, 16)
-        Me.LabelGY.TabIndex = 45
-        Me.LabelGY.Text = "GammaY"
-        '
-        'LabelGain
-        '
-        Me.LabelGain.AutoSize = True
-        Me.LabelGain.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.LabelGain.Location = New System.Drawing.Point(225, 41)
-        Me.LabelGain.Name = "LabelGain"
-        Me.LabelGain.Size = New System.Drawing.Size(36, 16)
-        Me.LabelGain.TabIndex = 44
-        Me.LabelGain.Text = "Gain"
-        '
-        'TextBox_GainB
-        '
-        Me.TextBox_GainB.BorderStyle = System.Windows.Forms.BorderStyle.None
-        Me.TextBox_GainB.Font = New System.Drawing.Font("Calibri", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.TextBox_GainB.ForeColor = System.Drawing.SystemColors.ControlDarkDark
-        Me.TextBox_GainB.Location = New System.Drawing.Point(89, 110)
-        Me.TextBox_GainB.Name = "TextBox_GainB"
-        Me.TextBox_GainB.Size = New System.Drawing.Size(56, 20)
-        Me.TextBox_GainB.TabIndex = 43
-        Me.TextBox_GainB.Text = "1"
-        Me.TextBox_GainB.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        '
-        'TextBox_GainG
-        '
-        Me.TextBox_GainG.BorderStyle = System.Windows.Forms.BorderStyle.None
-        Me.TextBox_GainG.Font = New System.Drawing.Font("Calibri", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.TextBox_GainG.ForeColor = System.Drawing.SystemColors.ControlDarkDark
-        Me.TextBox_GainG.Location = New System.Drawing.Point(89, 74)
-        Me.TextBox_GainG.Name = "TextBox_GainG"
-        Me.TextBox_GainG.Size = New System.Drawing.Size(56, 20)
-        Me.TextBox_GainG.TabIndex = 42
-        Me.TextBox_GainG.Text = "1"
-        Me.TextBox_GainG.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        '
-        'TextBox_GainR
-        '
-        Me.TextBox_GainR.BorderStyle = System.Windows.Forms.BorderStyle.None
-        Me.TextBox_GainR.Font = New System.Drawing.Font("Calibri", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.TextBox_GainR.ForeColor = System.Drawing.SystemColors.ControlDarkDark
-        Me.TextBox_GainR.Location = New System.Drawing.Point(89, 39)
-        Me.TextBox_GainR.Name = "TextBox_GainR"
-        Me.TextBox_GainR.Size = New System.Drawing.Size(56, 20)
-        Me.TextBox_GainR.TabIndex = 41
-        Me.TextBox_GainR.Text = "1"
-        Me.TextBox_GainR.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        '
-        'Label13
-        '
-        Me.Label13.AutoSize = True
-        Me.Label13.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label13.Location = New System.Drawing.Point(35, 114)
-        Me.Label13.Name = "Label13"
-        Me.Label13.Size = New System.Drawing.Size(48, 16)
-        Me.Label13.TabIndex = 40
-        Me.Label13.Text = "Gain B"
-        '
-        'Label14
-        '
-        Me.Label14.AutoSize = True
-        Me.Label14.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label14.Location = New System.Drawing.Point(35, 76)
-        Me.Label14.Name = "Label14"
-        Me.Label14.Size = New System.Drawing.Size(49, 16)
-        Me.Label14.TabIndex = 39
-        Me.Label14.Text = "Gain G"
-        '
-        'Label17
-        '
-        Me.Label17.AutoSize = True
-        Me.Label17.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label17.Location = New System.Drawing.Point(35, 39)
-        Me.Label17.Name = "Label17"
-        Me.Label17.Size = New System.Drawing.Size(49, 16)
-        Me.Label17.TabIndex = 38
-        Me.Label17.Text = "Gain R"
-        '
         'TabPage12
         '
         Me.TabPage12.BackColor = System.Drawing.Color.WhiteSmoke
@@ -921,32 +922,32 @@ Partial Class Form1
         'Chart1
         '
         Me.Chart1.BackColor = System.Drawing.Color.Transparent
-        ChartArea1.AxisX.MajorGrid.Enabled = False
-        ChartArea1.AxisX.MajorTickMark.Enabled = False
-        ChartArea1.AxisY.MajorGrid.Enabled = False
-        ChartArea1.BackColor = System.Drawing.Color.Transparent
-        ChartArea1.Name = "ChartArea1"
-        Me.Chart1.ChartAreas.Add(ChartArea1)
-        Legend1.Name = "Legend1"
-        Me.Chart1.Legends.Add(Legend1)
+        ChartArea2.AxisX.MajorGrid.Enabled = False
+        ChartArea2.AxisX.MajorTickMark.Enabled = False
+        ChartArea2.AxisY.MajorGrid.Enabled = False
+        ChartArea2.BackColor = System.Drawing.Color.Transparent
+        ChartArea2.Name = "ChartArea1"
+        Me.Chart1.ChartAreas.Add(ChartArea2)
+        Legend2.Name = "Legend1"
+        Me.Chart1.Legends.Add(Legend2)
         Me.Chart1.Location = New System.Drawing.Point(1458, 579)
         Me.Chart1.Name = "Chart1"
-        Series1.ChartArea = "ChartArea1"
-        Series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Area
-        Series1.IsVisibleInLegend = False
-        Series1.Legend = "Legend1"
-        Series1.Name = "Series1"
-        Series2.ChartArea = "ChartArea1"
-        Series2.IsVisibleInLegend = False
-        Series2.Legend = "Legend1"
-        Series2.Name = "Series2"
-        Series3.ChartArea = "ChartArea1"
-        Series3.IsVisibleInLegend = False
-        Series3.Legend = "Legend1"
-        Series3.Name = "Series3"
-        Me.Chart1.Series.Add(Series1)
-        Me.Chart1.Series.Add(Series2)
-        Me.Chart1.Series.Add(Series3)
+        Series4.ChartArea = "ChartArea1"
+        Series4.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Area
+        Series4.IsVisibleInLegend = False
+        Series4.Legend = "Legend1"
+        Series4.Name = "Series1"
+        Series5.ChartArea = "ChartArea1"
+        Series5.IsVisibleInLegend = False
+        Series5.Legend = "Legend1"
+        Series5.Name = "Series2"
+        Series6.ChartArea = "ChartArea1"
+        Series6.IsVisibleInLegend = False
+        Series6.Legend = "Legend1"
+        Series6.Name = "Series3"
+        Me.Chart1.Series.Add(Series4)
+        Me.Chart1.Series.Add(Series5)
+        Me.Chart1.Series.Add(Series6)
         Me.Chart1.Size = New System.Drawing.Size(317, 122)
         Me.Chart1.TabIndex = 120
         Me.Chart1.Text = "Chart1"
@@ -1176,10 +1177,10 @@ Partial Class Form1
         Me.ToolStrip1.PerformLayout()
         Me.GroupBox3.ResumeLayout(False)
         Me.TabControl_Settings.ResumeLayout(False)
-        Me.TabPage13.ResumeLayout(False)
-        Me.TabPage13.PerformLayout()
         Me.TabPage1.ResumeLayout(False)
         Me.TabPage1.PerformLayout()
+        Me.TabPage13.ResumeLayout(False)
+        Me.TabPage13.PerformLayout()
         Me.TabPage12.ResumeLayout(False)
         Me.TabPage12.PerformLayout()
         Me.TabPage2.ResumeLayout(False)

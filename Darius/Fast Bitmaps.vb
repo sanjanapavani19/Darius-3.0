@@ -68,12 +68,16 @@ Public Class FastBMP
 
 
     Public Sub MakeNewFromBytes()
-
         byteToBitmap(bytes, bmp)
         GR = Graphics.FromImage(bmp)
-
     End Sub
 
+
+    Public Sub MakeNewFromBytes(bytes As Byte())
+        Me.bytes = bytes
+        byteToBitmap(bytes, bmp)
+        GR = Graphics.FromImage(bmp)
+    End Sub
     Public Sub RefreshROI()
         Reset()
         For i = 0 To ROI.GetUpperBound(0)

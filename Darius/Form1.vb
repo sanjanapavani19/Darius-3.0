@@ -149,28 +149,30 @@ Public Class Form1
     Public Sub Live()
         '' Setting the waithandle to false because the initial setting was true.
         ''WaitHandle_LiveReturned.Reset()
+
         Do
             Camera.busy = True
             If Camera.Dostop Then Exit Do
 
-
+            Camera.Capture()
+            Application.DoEvents()
             If Camera.ExposureChanged Then Camera.SetExposure() : Camera.ExposureChanged = False
 
 
             If Imagetype = ImagetypeEnum.Brightfield Then
                 Display.Preview(Camera.Bytes, True)
-                PictureBox0.Image = Camera.captureBmp
-                Application.DoEvents()
+                PictureBox0.Image = Display.BmpPreview.bmp
             End If
 
             If Imagetype = ImagetypeEnum.Fluorescence Then
-                'Display.Preview(Camera.Bytes, True)
-                PictureBox1.Image = Camera.BmpRef
+                Display.Preview(Camera.Bytes, True)
+                PictureBox1.Image = Display.BmpPreview.bmp
             End If
 
 
         Loop
         Camera.busy = False
+
 
     End Sub
 
@@ -371,22 +373,27 @@ Public Class Form1
 
     Public Sub Acquire()
         If SaveFileDialog1.ShowDialog() = DialogResult.Cancel Then Exit Sub
-
+        If Camera.busy Then ExitLive()
         If Imagetype = ImagetypeEnum.Brightfield Then
-            Display.MakeFullsizeImage.Save(SaveFileDialog1.FileName + "_WD.jpg")
+            Camera.SetDataMode(Colortype.RGB)
+            Camera.captureBmp.Save(SaveFileDialog1.FileName + "_WD.jpg")
+            Camera.SetDataMode(Colortype.Grey)
+            'Display.MakeFullsizeImage.Save(SaveFileDialog1.FileName + "_WD.jpg")
             ReDim Preserve Filenames(fileN)
             Filenames(fileN) = SaveFileDialog1.FileName + "_WD.jpg"
             fileN += 1
             ListBox1.Items.Add(Path.GetFileName(SaveFileDialog1.FileName + "_WD.jpg"))
         ElseIf Imagetype = ImagetypeEnum.Fluorescence Then
-            Display.MakeFullsizeImage.Save(SaveFileDialog1.FileName + "_FiBi.jpg")
+            Camera.SetDataMode(Colortype.RGB)
+            Camera.captureBmp.Save(SaveFileDialog1.FileName + "_FiBi.jpg")
+            Camera.SetDataMode(Colortype.Grey)
             ReDim Preserve Filenames(fileN)
             Filenames(fileN) = SaveFileDialog1.FileName + "_FiBi.jpg"
             fileN += 1
             ListBox1.Items.Add(Path.GetFileName(SaveFileDialog1.FileName + "_FiBi.jpg"))
         End If
 
-
+        GoLive()
 
     End Sub
 
@@ -576,6 +583,7 @@ Public Class Form1
 
         Pbar.Value = 0
         'Camera.SetPolicyToUNSafe()
+        Camera.Flatfield(0)
         Camera.SetDataMode(Colortype.Grey)
         GoLive()
 
@@ -861,18 +869,9 @@ Public Class Form1
         Stage.StorePosition(Stage.Zaxe, 2)
     End Sub
 
-
-
-
-
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
         Tracking.clear()
-
     End Sub
-
-
-
-
 
     Private Sub RadioButton_zoom_out_CheckedChanged(sender As Object, e As EventArgs) Handles RadioButton_zoom_out.CheckedChanged
 
@@ -901,7 +900,7 @@ Public Class Form1
         Camera.Capture()
         SaveSinglePageTiff16("ff.tif", Camera.Bytes, Camera.Dim_X, Camera.Dim_Y)
         Camera.SetFlatField("ff.tif", "dark.tif")
-        Camera.Flatfield(1)
+        Camera.Flatfield(0)
         Camera.SetDataMode(Colortype.Grey)
         If WasLive Then GoLive()
     End Sub

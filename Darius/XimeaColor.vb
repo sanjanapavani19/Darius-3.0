@@ -39,7 +39,7 @@ Public Class XimeaColor
 
             Name = cam.GetParamString(PRM.DEVICE_NAME)
             cam.SetParam(PRM.BUFFER_POLICY, BUFF_POLICY.SAFE)
-            cam.SetParam(PRM.IMAGE_DATA_FORMAT, IMG_FORMAT.RGB24)
+            cam.SetParam(PRM.IMAGE_DATA_FORMAT, IMG_FORMAT.RAW8)
 
             '    cam.SetParam(PRM.TRG_SELECTOR, 1)
             'cam.SetParam(PRM.ACQ_TIMING_MODE, ACQ_TIMING_MODE.FRAME_RATE)
@@ -105,7 +105,7 @@ Public Class XimeaColor
             Dim_X = cam.GetParamInt(PRM.WIDTH)
             Dim_Y = cam.GetParamInt(PRM.HEIGHT)
             BmpRef = New Bitmap(Dim_X, Dim_Y, Imaging.PixelFormat.Format24bppRgb)
-            ReDim Bytes(Dim_X * Dim_Y * 3 - 1)
+            ReDim Bytes(Dim_X * Dim_Y - 1)
         End If
     End Sub
     Public Sub SetPolicyToSafe()
@@ -141,7 +141,6 @@ Public Class XimeaColor
         cam.SetParam(PRM.FFC, 1)
         FFsetup = True
     End Sub
-
 
     Public Sub Flatfield(value As Integer)
         cam.SetParam(PRM.FFC, value)
