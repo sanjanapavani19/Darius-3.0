@@ -16,12 +16,8 @@ Public Class XimeaColor
     Public ready As Boolean
     Public gain As Single
     Public exp As Single
-
-
     Public BmpRef As Bitmap
     Public bit_scale As Byte = 2 ^ 4
-
-
     Private timeout As Integer
 
     Public Bytes As Byte()
@@ -43,7 +39,7 @@ Public Class XimeaColor
 
             Name = cam.GetParamString(PRM.DEVICE_NAME)
             cam.SetParam(PRM.BUFFER_POLICY, BUFF_POLICY.SAFE)
-            cam.SetParam(PRM.IMAGE_DATA_FORMAT, IMG_FORMAT.RAW8)
+            cam.SetParam(PRM.IMAGE_DATA_FORMAT, IMG_FORMAT.RGB24)
 
             '    cam.SetParam(PRM.TRG_SELECTOR, 1)
             'cam.SetParam(PRM.ACQ_TIMING_MODE, ACQ_TIMING_MODE.FRAME_RATE)
@@ -109,7 +105,7 @@ Public Class XimeaColor
             Dim_X = cam.GetParamInt(PRM.WIDTH)
             Dim_Y = cam.GetParamInt(PRM.HEIGHT)
             BmpRef = New Bitmap(Dim_X, Dim_Y, Imaging.PixelFormat.Format24bppRgb)
-            ReDim Bytes(Dim_X * Dim_Y - 1)
+            ReDim Bytes(Dim_X * Dim_Y * 3 - 1)
         End If
     End Sub
     Public Sub SetPolicyToSafe()
@@ -167,10 +163,11 @@ Public Class XimeaColor
     '    cam.GetXI_IMG()
     'End Sub
 
-    Public Sub captureBmp()
+    Public Function captureBmp() As Bitmap
         cam.SetParam(PRM.TRG_SOFTWARE, 1)
         cam.GetBitmap(BmpRef, timeout)
-    End Sub
+        Return BmpRef
+    End Function
 
     Public Sub SetDataMode(type As Colortype)
         Select Case type

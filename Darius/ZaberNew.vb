@@ -19,7 +19,7 @@ Public Class ZaberNew
         Zaxe = Devicelist(0)
         Me.FOVX = FOVX
         Me.FOVY = FOVY
-        Home()
+        '     Home()
 
     End Sub
 

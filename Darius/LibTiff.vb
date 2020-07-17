@@ -305,6 +305,9 @@ Module LibTiff
             output.WriteDirectory()
         End Using
 
+
+
+
     End Sub
 
 
@@ -347,7 +350,44 @@ Module LibTiff
 
     End Sub
 
+    Public Sub SaveSinglePageTiff16(ByVal filename As String, frame() As Byte, W As Integer, H As Integer)
 
+        Dim Stack(W - 1, H - 1) As Byte
+
+        Const samplesPerPixel As Integer = 1
+        Const bitsPerSample As Integer = 16
+
+
+        Dim page As Integer
+        Dim numberOfPages As Integer = 1
+
+        Dim samples As UShort() = New UShort(W) {}
+
+        Using output As Tiff = Tiff.Open(filename, "w")
+
+            output.SetField(TiffTag.IMAGEWIDTH, W / samplesPerPixel)
+            output.SetField(TiffTag.SAMPLESPERPIXEL, samplesPerPixel)
+            output.SetField(TiffTag.BITSPERSAMPLE, bitsPerSample)
+
+            ' specify that it's a page within the multipage file
+            output.SetField(TiffTag.SUBFILETYPE, FileType.PAGE)
+            ' specify the page number
+            output.SetField(TiffTag.PAGENUMBER, page, numberOfPages)
+
+            Dim p As Integer = 0
+            For i As Integer = 0 To H - 1
+                For j As Integer = 0 To W - 1
+                    samples(j) = frame(p)
+                    p += 1
+                Next
+                Dim buf As Byte() = New Byte(samples.Length * 2 - 1) {}
+                Buffer.BlockCopy(samples, 0, buf, 0, buf.Length)
+                output.WriteScanline(buf, i)
+            Next
+            output.WriteDirectory()
+        End Using
+
+    End Sub
 
 
     Public Sub Save_MultiTiff(ByVal Frame(,,) As Single, ByVal filename As String)

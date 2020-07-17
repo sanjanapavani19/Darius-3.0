@@ -141,6 +141,7 @@ Public Class Form1
     Public Sub GoLive()
         Dim Thread1 As New System.Threading.Thread(AddressOf Live)
         Thread1.Start()
+        '    Live()
     End Sub
 
 
@@ -151,19 +152,20 @@ Public Class Form1
         Do
             Camera.busy = True
             If Camera.Dostop Then Exit Do
-            Camera.Capture()
-            Application.DoEvents()
+
+
             If Camera.ExposureChanged Then Camera.SetExposure() : Camera.ExposureChanged = False
 
 
             If Imagetype = ImagetypeEnum.Brightfield Then
                 Display.Preview(Camera.Bytes, True)
-                PictureBox0.Image = Display.BmpPreview.bmp
+                PictureBox0.Image = Camera.captureBmp
+                Application.DoEvents()
             End If
 
             If Imagetype = ImagetypeEnum.Fluorescence Then
-                Display.Preview(Camera.Bytes, True)
-                PictureBox1.Image = Display.BmpPreview.bmp
+                'Display.Preview(Camera.Bytes, True)
+                PictureBox1.Image = Camera.BmpRef
             End If
 
 
@@ -476,7 +478,7 @@ Public Class Form1
 
 
         Camera.SetDataMode(Colortype.RGB)
-        'Camera.SetFlatField("ff.tif", "dark.tif")
+        Camera.SetFlatField("ff.tif", "dark.tif")
 
 
         'Camera.SetPolicyToSafe()
@@ -889,17 +891,18 @@ Public Class Form1
         If Camera.busy Then ExitLive() : WasLive = True
         Camera.Capture()
         Camera.Flatfield(0)
-
+        Camera.SetDataMode(Colortype.Grey)
         CheckBox1.Checked = False
         Thread.Sleep(500)
         Camera.Capture()
-        SaveSinglePageTiff("dark.tif", Camera.Bytes, Camera.Dim_X, Camera.Dim_Y)
+        SaveSinglePageTiff16("dark.tif", Camera.Bytes, Camera.Dim_X, Camera.Dim_Y)
         CheckBox1.Checked = True
         Thread.Sleep(500)
         Camera.Capture()
-        SaveSinglePageTiff("ff.tif", Camera.Bytes, Camera.Dim_X, Camera.Dim_Y)
+        SaveSinglePageTiff16("ff.tif", Camera.Bytes, Camera.Dim_X, Camera.Dim_Y)
         Camera.SetFlatField("ff.tif", "dark.tif")
         Camera.Flatfield(1)
+        Camera.SetDataMode(Colortype.Grey)
         If WasLive Then GoLive()
     End Sub
 
