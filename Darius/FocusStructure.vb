@@ -6,6 +6,7 @@ Public Class FocusStructure
     Public Z0 As Single
     Dim readout As Single
     Dim exp As Single
+    Dim steps As Single
     Dim BinnedImage()() As Byte
     Dim FT As ExtendedDepth5
     Public Sub New(Range As Single, Nimg As Integer, bin As Integer)
@@ -27,6 +28,7 @@ Public Class FocusStructure
     End Sub
 
     Public Sub Initialize()
+
         Camera.Flatfield(0)
         exp = Camera.exp
         Camera.SetExposure(exp / bin ^ 2, False)
@@ -49,81 +51,69 @@ Public Class FocusStructure
         Next
 
 
-
-        Dim Srange As Single = Range
-
-        Dim CM(Nimg - 1) As Single
         Dim CmXMax As Single
         Dim Startpoint As Single
-        Dim direction As Integer = 1
-        Startpoint = Stage.Z
-            Form1.Chart1.Series(0).Points.Clear()
-            Form1.Chart1.Series(1).Points.Clear()
-            For zz = 0 To Nimg - 1
-                Camera.Capture(BinnedImage(zz))
-                If zz < (Nimg - 1) Then Stage.MoveRelative(Stage.Zaxe, (Srange) / Nimg) ' The lastimage should be acquired with no movement afterwards
-                CM(zz) = FT.FindCenterOfMass(BinnedImage(zz))
-                Form1.Chart1.Series(1).Points.AddXY(Int((zz * Srange / Nimg) * 1000), CM(zz))
-                If CM(zz) = CM.Max Then CmXMax = zz
-                Application.DoEvents()
+        Dim focus As Single
 
-            Next
-
-        If CmXMax = 0 Then direction = -1
-        If CmXMax = Nimg - 1 Then direction = 1
-
-
-
-        Startpoint = Stage.Z
-
-        ReDim CM(Nimg * 10 - 1)
         Form1.Chart1.Series(0).Points.Clear()
         Form1.Chart1.Series(1).Points.Clear()
-        For zz = 0 To Nimg * 10 - 1
+        Camera.Capture(BinnedImage(0))
+
+
+        Startpoint = Stage.Z
+
+        steps = Range / Nimg
+        Dim CM(Nimg - 1) As Single
+        Dim Pos(Nimg - 1) As Single
+        Dim decline As Integer
+
+        Form1.Chart1.Series(0).Points.Clear()
+        Form1.Chart1.Series(1).Points.Clear()
+        For zz = 0 To Nimg - 1
+            If zz > 0 Then Stage.MoveRelative(Stage.Zaxe, steps) ' The first time should be acquired with no movement 
+            Pos(zz) = Stage.Z
             Camera.Capture(BinnedImage(0))
-            If zz < (Nimg * 10 - 1) Then Stage.MoveRelative(Stage.Zaxe, (Srange) / Nimg * direction) ' The lastimage should be acquired with no movement afterwards
             CM(zz) = FT.FindCenterOfMass(BinnedImage(0))
-            Form1.Chart1.Series(1).Points.AddXY(Int((zz * Srange / Nimg) * 1000), CM(zz))
-            If CM(zz) = CM.Max Then CmXMax = zz
+            SaveSinglePageTiff("C:\temp\POS- " + Pos(zz).ToString + "CM- " + CM(zz).ToString + ".tif", BinnedImage(0), Camera.Wbinned, Camera.Hbinned)
+            Form1.Chart1.Series(1).Points.AddXY(Int((zz * steps) * 1000), CM(zz))
             Application.DoEvents()
+            If CM(zz) = CM.Max Then decline = 0
+            If CM(zz) < CM.Max Then decline += 1
+            If decline = 10 Then Exit For
 
         Next
 
+        ' For some stupid reason camera captures the previous frame? So at focous point it delivers an image from ther previous position!
+        ' That is why I have +2 instead of +1
+        'Igo one step further to start the focus from there.
+
+        Stage.MoveRelative(Stage.Zaxe, -steps * (decline + 1))
+        Camera.Capture(BinnedImage(0))
 
 
-        Dim focus As Single = (CmXMax - 1) * (Srange / Nimg)
-
-        If direction = 1 Then Stage.MoveAbsolute(Stage.Zaxe, Startpoint + focus)
-        If direction = -1 Then Stage.MoveAbsolute(Stage.Zaxe, Startpoint - focus)
-
-
-        For j = 0 To 2
-            Srange = Srange / 2
-
-            Startpoint = Stage.Z
-            Form1.Chart1.Series(0).Points.Clear()
-            Form1.Chart1.Series(1).Points.Clear()
-            For zz = 0 To Nimg - 1
-                Camera.Capture(BinnedImage(zz))
-                If zz < (Nimg - 1) Then Stage.MoveRelative(Stage.Zaxe, (Srange) / Nimg) ' The lastimage should be acquired with no movement afterwards
-
-                CM(zz) = FT.FindCenterOfMass(BinnedImage(zz))
-                Form1.Chart1.Series(1).Points.AddXY(Int((zz * Srange / Nimg) * 1000), CM(zz))
-                If CM(zz) = CM.Max Then CmXMax = zz
-                Application.DoEvents()
-
-            Next
-
-            focus = (CmXMax - 1) * (Srange / Nimg)
-            Stage.MoveAbsolute(Stage.Zaxe, Startpoint + focus)
-
+        steps = steps / 10
+        ReDim CM(Nimg - 1)
+        ReDim Pos(Nimg - 1)
+        decline = 0
+        Form1.Chart1.Series(0).Points.Clear()
+        Form1.Chart1.Series(1).Points.Clear()
+        For zz = 0 To Nimg - 1
+            If zz > 0 Then Stage.MoveRelative(Stage.Zaxe, steps) ' The first time should be acquired with no movement 
+            Pos(zz) = Stage.Z
+            Camera.Capture(BinnedImage(0))
+            CM(zz) = FT.FindCenterOfMass(BinnedImage(0))
+            SaveSinglePageTiff("C:\temp\2nd\POS- " + Pos(zz).ToString + "CM- " + CM(zz).ToString + ".tif", BinnedImage(0), Camera.Wbinned, Camera.Hbinned)
+            Form1.Chart1.Series(1).Points.AddXY(Int((zz * steps) * 1000), CM(zz))
+            Application.DoEvents()
+            If CM(zz) = CM.Max Then decline = 0
+            If CM(zz) < CM.Max Then decline += 1
+            If decline = 10 Then Exit For
         Next
 
-        Stage.MoveRelative(Stage.Zaxe, (Srange / Nimg))
+        Stage.MoveRelative(Stage.Zaxe, -steps * (decline))
         focus = Stage.Z
 
 
-        'Z0 = stage.Z
         Return focus
     End Function
 

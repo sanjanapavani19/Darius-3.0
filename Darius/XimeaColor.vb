@@ -91,15 +91,18 @@ Public Class XimeaColor
         Setting.Sett("GainB", B)
         Setting.Sett("GainG", G)
         Setting.Sett("GainR", R)
+
     End Sub
     Public Sub SetBinning(yes As Boolean, size As Integer)
         If yes Then
+
             cam.SetParam(PRM.DOWNSAMPLING, size)
             Wbinned = cam.GetParamInt(PRM.WIDTH)
             Hbinned = cam.GetParamInt(PRM.HEIGHT)
 
             BmpRef = New Bitmap(Wbinned, Hbinned, Imaging.PixelFormat.Format24bppRgb)
             ReDim Bytes(Wbinned * Hbinned - 1)
+
         Else
             cam.SetParam(PRM.DOWNSAMPLING, 1)
             Dim_X = cam.GetParamInt(PRM.WIDTH)

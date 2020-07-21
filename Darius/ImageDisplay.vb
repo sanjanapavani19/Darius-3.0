@@ -268,6 +268,8 @@ Public Class ImageDisplay
         Setting.Sett("GainB", B)
         Setting.Sett("GainG", G)
         Setting.Sett("GainR", R)
+
+        Camera.SetColorGain(R, G, B)
     End Sub
 
 

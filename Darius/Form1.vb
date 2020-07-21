@@ -37,7 +37,7 @@ Public Class Form1
 
         If Camera.status Then
             Textbox_exposure.Text = Camera.exp
-            AutoFocus = New FocusStructure(0.5, 5, 4)
+            AutoFocus = New FocusStructure(2, 20, 4)
 
             Display = New ImageDisplay(Camera.Dim_X, Camera.Dim_Y, 2)
 
@@ -67,8 +67,7 @@ Public Class Form1
             ArrangeControls(10)
 
         End If
-        'comes down to focus
-        Stage.MoveRelative(Stage.Zaxe, AutoFocus.Range / 2)
+
     End Sub
 
 
@@ -374,8 +373,10 @@ Public Class Form1
     Public Sub Acquire()
         If SaveFileDialog1.ShowDialog() = DialogResult.Cancel Then Exit Sub
         If Camera.busy Then ExitLive()
+
         If Imagetype = ImagetypeEnum.Brightfield Then
             Camera.SetDataMode(Colortype.RGB)
+            Thread.Sleep(500)
             Camera.captureBmp.Save(SaveFileDialog1.FileName + "_WD.jpg")
             Camera.SetDataMode(Colortype.Grey)
             'Display.MakeFullsizeImage.Save(SaveFileDialog1.FileName + "_WD.jpg")
@@ -385,6 +386,7 @@ Public Class Form1
             ListBox1.Items.Add(Path.GetFileName(SaveFileDialog1.FileName + "_WD.jpg"))
         ElseIf Imagetype = ImagetypeEnum.Fluorescence Then
             Camera.SetDataMode(Colortype.RGB)
+            Thread.Sleep(500)
             Camera.captureBmp.Save(SaveFileDialog1.FileName + "_FiBi.jpg")
             Camera.SetDataMode(Colortype.Grey)
             ReDim Preserve Filenames(fileN)
@@ -416,10 +418,11 @@ Public Class Form1
     End Sub
 
     Public Function DoAutoFocus(position As Integer)
-        'Stage.GoZero(Stage.Zaxe, 1)
+        Stage.GoZero(Stage.Zaxe, 1)
 
         Dim WasLive As Boolean
         If Camera.busy Then ExitLive() : WasLive = True
+
 
         Dim focus As Single
         AutoFocus.Initialize()
@@ -470,7 +473,7 @@ Public Class Form1
         Dim watch As Stopwatch
         watch = New Stopwatch
         watch.Start()
-        FastScan(TextBoxX.Text, TextBoxY.Text, 0.05, SaveFileDialog1.FileName)
+        FastScan(TextBoxX.Text, TextBoxY.Text, 0.00, SaveFileDialog1.FileName)
         watch.Stop()
         MsgBox("Scanned in " + (watch.ElapsedMilliseconds / 1000).ToString + " s")
 
@@ -921,7 +924,7 @@ Public Class Form1
         Stage.MoveAbsolute(Stage.Yaxe, 0)
         Stage.MoveAbsolute(Stage.Xaxe, 12.5)
         Stage.MoveAbsolute(Stage.Zaxe, 0)
-        MsgBox("Load the sample and then hit OK.")
+        'MsgBox("Load the sample and then hit OK.")
 
         Tracking.UpdateBmp(Preview.Capture(Val(TextBox_PrevieEXp.Text), Val(TextBox_PreviewFocus.Text)))
 
@@ -937,7 +940,7 @@ Public Class Form1
     End Sub
 
     Private Sub Button7_Click(sender As Object, e As EventArgs) Handles Button7.Click
-        Stage.GoZero(Stage.Zaxe, 1)
+        Stage.GoToFocus()
     End Sub
 
     Private Sub CheckBox1_CheckedChanged(sender As Object, e As EventArgs) Handles CheckBox1.CheckedChanged
@@ -1078,6 +1081,10 @@ Public Class Form1
         If e.KeyCode = Keys.Return Then
             Stage.SetAcceleration(Stage.Zaxe, TextBox12.Text)
         End If
+    End Sub
+
+    Private Sub TextBox_GainR_TextChanged(sender As Object, e As EventArgs) Handles TextBox_GainR.TextChanged
+
     End Sub
 End Class
 

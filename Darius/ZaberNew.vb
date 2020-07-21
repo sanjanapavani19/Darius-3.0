@@ -19,7 +19,7 @@ Public Class ZaberNew
         Zaxe = Devicelist(0)
         Me.FOVX = FOVX
         Me.FOVY = FOVY
-        '     Home()
+        Home()
 
     End Sub
 
@@ -34,7 +34,7 @@ Public Class ZaberNew
         StorePosition(Zaxe, 2)
 
 
-        GoToFocus()
+
         SetSpeed(Xaxe, 65)
         SetSpeed(Yaxe, 65)
         SetSpeed(Zaxe, 48)
@@ -45,7 +45,7 @@ Public Class ZaberNew
         SetAcceleration(Yaxe, 3000)
         SetAcceleration(Zaxe, 1000)
         Go_Middle()
-
+        GoToFocus()
 
     End Sub
     Public Sub MoveRelative(ByRef Axis As Device, R As Single)
@@ -95,6 +95,8 @@ Public Class ZaberNew
     Public Sub GoZero(ByRef Axis As Device, position As Integer)
         Try
             Axis.GenericCommand(18, position, 0, True)
+            UpdatePositions()
+            Tracking.Update()
         Catch ex As Exception
 
         End Try
@@ -104,6 +106,8 @@ Public Class ZaberNew
     Public Sub GoToFocus()
         Try
             Zaxe.GenericCommand(18, 2, 0, True)
+            UpdatePositions()
+            Tracking.Update()
         Catch ex As Exception
 
         End Try
@@ -124,12 +128,9 @@ Public Class ZaberNew
     End Sub
 
     Public Sub UpdatePositions()
-
-
         X = Xaxe.GetPosition(Units.Length_Millimetres)
         Y = Yaxe.GetPosition(Units.Length_Millimetres)
         Z = Zaxe.GetPosition(Units.Length_Millimetres)
-
     End Sub
 
     Public Sub Go_Middle()
