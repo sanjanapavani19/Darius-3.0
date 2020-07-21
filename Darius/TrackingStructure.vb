@@ -13,7 +13,7 @@ Public Class TrackingStructure
         Public Class DotsStructure
             Public Rect As Rectangle
             Public selected As Boolean
-            Public pen As New Pen(Brushes.Yellow, 2)
+            Public pen As New Pen(Brushes.Green, 2)
             Public InitialX, InitialY As Integer
             Public IsMoved As Boolean
             Public Grabbed As Boolean
@@ -31,7 +31,7 @@ Public Class TrackingStructure
         Public IsMade As Boolean
         Public IsMoved As Boolean
         Public Dots(2) As DotsStructure
-        Public pen As New Pen(Brushes.Yellow, 2)
+        Public pen As New Pen(Brushes.White, 2)
         Public InitialX, InitialY As Integer
         Public ClickX, ClickY, width, height As Integer
 
@@ -85,7 +85,7 @@ Public Class TrackingStructure
         End Sub
 
         Public Sub Refresh()
-            pen = New Pen(Brushes.Yellow, 2)
+            pen = New Pen(Brushes.White, 2)
             Pbox.Refresh()
             Pbox.CreateGraphics.DrawRectangle(pen, Rect)
 

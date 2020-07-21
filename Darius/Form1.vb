@@ -37,7 +37,7 @@ Public Class Form1
 
         If Camera.status Then
             Textbox_exposure.Text = Camera.exp
-            AutoFocus = New FocusStructure(2, 20, 4)
+            AutoFocus = New FocusStructure(2, 0.1, 4)
 
             Display = New ImageDisplay(Camera.Dim_X, Camera.Dim_Y, 2)
 
@@ -68,6 +68,7 @@ Public Class Form1
 
         End If
 
+        GetPreview()
     End Sub
 
 
@@ -486,11 +487,6 @@ Public Class Form1
     Public Sub FastScan(X As Integer, y As Integer, overlap As Single, Address As String)
         If Camera.busy Then ExitLive()
 
-
-        Camera.SetDataMode(Colortype.RGB)
-        Camera.SetFlatField("ff.tif", "dark.tif")
-
-
         'Camera.SetPolicyToSafe()
         Dim TravelX, TravelY As Single
         Dim Filen As Integer = 1
@@ -512,6 +508,71 @@ Public Class Form1
 
         Dim Tiles As New TileStructure(X, y, Camera.Dim_X, Camera.Dim_Y, 1, Address, 100)
         Dim ColorBytes(Camera.Dim_X * Camera.Dim_Y * 3 - 1)
+
+
+
+        ReDim FocusMap(X, y)
+        If Tracking.ROI.IsMade And CheckBox2.Checked Then
+
+
+            Dim A, B, C, D As Single
+            Dim X0, X1, X2, X3 As Single
+            Dim Y0, Y1, Y2, Y3 As Single
+            Dim Z1, Z2, Z3 As Single
+
+
+            Tracking.MovetoDots(0)
+            DoAutoFocus(1)
+            Z1 = Stage.Z
+            X1 = Stage.X
+            Y1 = Stage.Y
+
+            Tracking.MovetoDots(1)
+            DoAutoFocus(1)
+            Z2 = Stage.Z
+            X2 = Stage.X
+            Y2 = Stage.Y
+
+
+            Tracking.MovetoDots(2)
+            DoAutoFocus(1)
+            Z3 = Stage.Z
+            X3 = Stage.X
+            Y3 = Stage.Y
+
+
+
+            A = (Y2 - Y1) * (Z3 - Z1) - (Y3 - Y1) * (Z2 - Z1)
+            B = (Z2 - Z1) * (X3 - X1) - (Z3 - Z1) * (X2 - X1)
+            C = (X2 - X1) * (Y3 - Y1) - (X3 - X1) * (Y2 - Y1)
+            D = -(A * X1 + B * Y1 + C * Z1)
+
+            Tracking.MovetoROIEdge()
+            X0 = Stage.X
+            Y0 = Stage.Y
+
+            For j = 1 To y
+                For i = 1 To X
+                    If j Mod 2 = 0 Then
+                        FocusMap(i, j) = -(A * (X0 + (X - i) * -AdjustedStepX) + B * (Y0 + (j - 1) * AdjustedStepY) + D) / C
+                    Else
+
+                        FocusMap(i, j) = -(A * (X0 + (i - 1) * -AdjustedStepX) + B * (Y0 + (j - 1) * AdjustedStepY) + D) / C
+                    End If
+
+                Next
+            Next
+
+        End If
+
+
+
+
+
+        Camera.SetDataMode(Colortype.RGB)
+        Camera.SetFlatField("ff.tif", "dark.tif")
+        UpdateLED(True)
+
         ' Dim BytesExport(Camera.Bytes.GetUpperBound(0)) As Byte
         For loop_y = 1 To y
             For loop_x = 1 To X
@@ -520,12 +581,12 @@ Public Class Form1
                 Camera.Capture_Threaded()
                 Thread.Sleep(Camera.exp * 1200)
 
+                If CheckBox2.Checked Then Stage.MoveAbsolute(Stage.Zaxe, FocusMap(loop_x, loop_y))
+
 
                 'Moves while it generates the preview and others.
                 If loop_x < X Then
-
                     Stage.MoveRelative(Stage.Xaxe, -AdjustedStepX * direction) : Axis = "X"
-
                     TravelX += AdjustedStepX * direction
                 Else
                     If loop_y < y Then
@@ -557,8 +618,6 @@ Public Class Form1
                 End If
                 'byteToBitmap(Camera.Bytes, Display.Bmp)
                 'Array.Copy(Camera.GetBytes, BytesExport, BytesExport.GetLength(0))
-
-
                 'Display.Bmp.Save("C:\temp\" + Filen.ToString + "RGB.bmp")
                 If Axis = "X" Then
                     Filen += direction
@@ -568,8 +627,6 @@ Public Class Form1
                     direction = direction * -1
 
                 End If
-
-
                 Application.DoEvents()
 
             Next
@@ -900,7 +957,28 @@ Public Class Form1
         SaveSinglePageTiff16("dark.tif", Camera.Bytes, Camera.Dim_X, Camera.Dim_Y)
         CheckBox1.Checked = True
         Thread.Sleep(500)
-        Camera.Capture()
+
+        'Dim Flatfield(Camera.Dim_X * Camera.Dim_Y - 1) As Single
+        'Dim Flatfieldbytes(Camera.Dim_X * Camera.Dim_Y - 1) As Byte
+        'Dim direction As Integer = 1
+        'For y = 1 To 5
+        '    For x = 1 To 5
+        '        Stage.MoveRelative(Stage.Xaxe, direction * Stage.FOVX / 10)
+        '        Camera.Capture()
+        '        For i = 0 To Camera.Dim_X * Camera.Dim_Y - 1
+        '            Flatfield(i) += Camera.Bytes(i)
+        '        Next
+        '    Next
+        '    Stage.MoveRelative(Stage.Yaxe, direction * Stage.FOVY / 10)
+        '    direction *= -1
+        'Next
+
+
+        'For i = 0 To Camera.Dim_X * Camera.Dim_Y - 1
+        '    Flatfieldbytes(i) = Flatfield(i) / 25
+        'Next
+
+
         SaveSinglePageTiff16("ff.tif", Camera.Bytes, Camera.Dim_X, Camera.Dim_Y)
         Camera.SetFlatField("ff.tif", "dark.tif")
         Camera.Flatfield(0)
@@ -920,7 +998,10 @@ Public Class Form1
     End Sub
 
     Private Sub Button6_Click(sender As Object, e As EventArgs) Handles Button6.Click
+        GetPreview()
 
+    End Sub
+    Public Sub GetPreview()
         Stage.MoveAbsolute(Stage.Yaxe, 0)
         Stage.MoveAbsolute(Stage.Xaxe, 12.5)
         Stage.MoveAbsolute(Stage.Zaxe, 0)
@@ -938,15 +1019,20 @@ Public Class Form1
 
         Stage.GoToFocus()
     End Sub
-
     Private Sub Button7_Click(sender As Object, e As EventArgs) Handles Button7.Click
         Stage.GoToFocus()
     End Sub
 
     Private Sub CheckBox1_CheckedChanged(sender As Object, e As EventArgs) Handles CheckBox1.CheckedChanged
 
+        UpdateLED(CheckBox1.Checked)
+
+    End Sub
+
+    Public Sub UpdateLED(status As Boolean)
+
         Try
-            If CheckBox1.Checked Then
+            If status Then
                 If Imagetype = ImagetypeEnum.Brightfield Then
 
                     LEDcontroller.SetRelays(2, False)
@@ -965,15 +1051,9 @@ Public Class Form1
         Catch ex As Exception
 
         End Try
-
-
-
-
-
-
-
-
     End Sub
+
+
 
     Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
 
@@ -1085,6 +1165,18 @@ Public Class Form1
 
     Private Sub TextBox_GainR_TextChanged(sender As Object, e As EventArgs) Handles TextBox_GainR.TextChanged
 
+    End Sub
+
+    Private Sub Button14_Click(sender As Object, e As EventArgs) Handles Button14.Click
+        Setting.Sett("Xmin", Stage.X)
+        Tracking = New TrackingStructure(PictureBox_Preview)
+        Tracking.Update()
+    End Sub
+
+    Private Sub Button15_Click(sender As Object, e As EventArgs) Handles Button15.Click
+        Setting.Sett("ymin", Stage.Y)
+        Tracking = New TrackingStructure(PictureBox_Preview)
+        Tracking.Update()
     End Sub
 End Class
 

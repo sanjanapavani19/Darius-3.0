@@ -44,8 +44,6 @@ Public Class ZaberNew
         SetAcceleration(Xaxe, 3000)
         SetAcceleration(Yaxe, 3000)
         SetAcceleration(Zaxe, 1000)
-        Go_Middle()
-        GoToFocus()
 
     End Sub
     Public Sub MoveRelative(ByRef Axis As Device, R As Single)
@@ -63,6 +61,17 @@ Public Class ZaberNew
     Public Sub MoveAbsolute(ByRef Axis As Device, R As Single)
         Try
             Axis.MoveAbsolute(R, Units.Length_Millimetres)
+            UpdatePositions()
+            Tracking.Update()
+        Catch ex As Exception
+
+        End Try
+
+    End Sub
+
+    Public Sub MoveAbsoluteAsync(ByRef Axis As Device, R As Single)
+        Try
+            Axis.MoveAbsoluteAsync(R, Units.Length_Millimetres)
             UpdatePositions()
             Tracking.Update()
         Catch ex As Exception
