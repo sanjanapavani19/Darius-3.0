@@ -272,12 +272,14 @@ Public Class TrackingStructure
                 ' open_Gimp(sender.tag)
             End If
         End Sub
-        Public Sub UpdateBmp(bmpin As Bitmap)
-            Dim resize As New ResizeNearestNeighbor(Pbox.Width, Pbox.Height)
-            Tracking.bmp = New FastBMP(resize.Apply(Preview.Bmp))
-
+    Public Sub UpdateBmp(bmpin As Bitmap)
+        Tracking.bmp = New FastBMP(bmpin)
+        Tracking.Pbox.Image = Tracking.bmp.bmp
     End Sub
-        Public Sub clear()
+    Public Sub Refreshbmp()
+        Pbox.Image = bmp.bmp
+    End Sub
+    Public Sub clear()
         'bmp = New FastBMP(Pbox.Width, Pbox.Height, Imaging.PixelFormat.Format32bppArgb)
 
 

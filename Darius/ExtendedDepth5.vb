@@ -265,15 +265,25 @@ Public Class ExtendedDepth5
 
         ReDim DuperFrame.LineArray(SuperFrame.DimX - 1)
 
-        Buffer.BlockCopy(DuperFrame.Singles, 0, DuperFrame.TwoDArray, 0, SuperFrame.DimX * SuperFrame.DimY - 1)
-        ' since the data os real, only half of the FFT is sufficient
+        '  Buffer.BlockCopy(DuperFrame.Singles, 0, DuperFrame.TwoDArray, 0, SuperFrame.DimX * SuperFrame.DimY * 4 - 1)
 
+        For y = 0 To DuperFrame.DimY - 1
+            For x = 0 To DuperFrame.DimX - 1
+                DuperFrame.TwoDArray(x, y) = DuperFrame.Singles(p)
+                p += 1
+            Next
+        Next
+        p = 0
+
+
+        ' since the data os real, only half of the FFT is sufficient
+        'saveSinglePage32("C:\temp\ff.tif", DuperFrame.TwoDArray)
         Dim r As Integer
         For y = 0 To SuperFrame.DimY / 2 - 1
             For x = 0 To SuperFrame.DimX / 2 - 1
                 r = Math.Sqrt(x ^ 2 + y ^ 2)
-                DuperFrame.LineArray(r) += DuperFrame.TwoDArray(x, y)
-           '     p += 1
+                DuperFrame.LineArray(r) += (DuperFrame.TwoDArray(x, y))
+                '     p += 1
             Next
         Next
 
@@ -281,14 +291,71 @@ Public Class ExtendedDepth5
         Dim Cm As Single = 0
         Dim sum As Single = DuperFrame.LineArray.Sum
 
-        For i = 0 To SuperFrame.DimX / 2 - 1
+        For i = 0 To SuperFrame.DimX / 4 - 1
             DuperFrame.LineArray(i) = DuperFrame.LineArray(i) / sum
         Next
 
 
 
-        For i = 0 To SuperFrame.DimX / 2 - 1
+        For i = 0 To SuperFrame.DimX / 4 - 1
             Cm += DuperFrame.LineArray(i) * i
+        Next
+        Return Cm
+
+    End Function
+
+    Public Function FindCenterOfMass2(arrayin() As Byte) As Single
+        'I will only use the green to estimate the focus
+        arrayin.CopyTo(SuperFrame.Bytes, 0)
+
+        GetSuperFrameColorBytes(SuperFrame.bytesGL, Position.BottomLeft)
+
+        DuperFrame.Singles = FFTFocus.DFT2DM(SuperFrame.bytesGL)
+        'sends only the middle  line of the transformation.
+        'Array.Copy(DuperFrame.Singles, SuperFrame.DimX * SuperFrame.DimY \ 2, DuperFrame.LineArray, 0, SuperFrame.DimX)
+        Dim p As Integer
+
+
+        ReDim DuperFrame.TwoDArray(SuperFrame.DimX - 1, SuperFrame.DimY - 1)
+
+        ReDim DuperFrame.LineArray(SuperFrame.DimX - 1)
+
+        '  Buffer.BlockCopy(DuperFrame.Singles, 0, DuperFrame.TwoDArray, 0, SuperFrame.DimX * SuperFrame.DimY * 4 - 1)
+
+        For y = 0 To DuperFrame.DimY - 1
+            For x = 0 To DuperFrame.DimX - 1
+                DuperFrame.TwoDArray(x, y) = DuperFrame.Singles(p)
+                p += 1
+            Next
+        Next
+        p = 0
+
+
+        ' since the data os real, only half of the FFT is sufficient
+        'saveSinglePage32("C:\temp\ff.tif", DuperFrame.TwoDArray)
+        Dim r As Integer
+        Dim nr(SuperFrame.DimX) As Integer
+        For y = 0 To SuperFrame.DimY / 2 - 1
+            For x = 0 To SuperFrame.DimX / 2 - 1
+                r = Math.Sqrt(x ^ 2 + y ^ 2)
+                DuperFrame.LineArray(r) += (DuperFrame.TwoDArray(x, y))
+                nr(r) += 1
+                '     p += 1
+            Next
+        Next
+
+        'This is to normlize to the number of pixels traken.
+        For r = 0 To SuperFrame.DimY / 2 - 1
+            DuperFrame.LineArray(r) = (DuperFrame.LineArray(r) / nr(r))
+        Next
+
+
+        'center of Mass
+        Dim Cm As Single = 0
+        ' I have removed total normalization, as usually, focus is also bvrighter.
+
+        For i = 1 To SuperFrame.DimY / 2 - 1
+            Cm += (DuperFrame.LineArray(i))
         Next
         Return Cm
 

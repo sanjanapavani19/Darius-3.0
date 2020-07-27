@@ -248,8 +248,11 @@ Public Class Form1
 
     Private Sub TextBox3_KeyDown(sender As Object, e As KeyEventArgs) Handles TextBox3.KeyDown
         If e.KeyCode = Keys.Return Then
-
+            Dim watch As New Stopwatch
+            watch.Start()
             Stage.MoveRelative(Stage.Zaxe, Val(TextBox3.Text))
+            watch.Stop()
+            MsgBox(watch.ElapsedMilliseconds)
         End If
     End Sub
 
@@ -471,10 +474,14 @@ Public Class Form1
 
     Private Sub Button_Scan_Click(sender As Object, e As EventArgs) Handles Button_Scan.Click
         If SaveFileDialog1.ShowDialog = DialogResult.Cancel Then Exit Sub
+        SaveFileDialog1.AddExtension = True
+        SaveFileDialog1.DefaultExt = ".tif"
         Dim watch As Stopwatch
         watch = New Stopwatch
         watch.Start()
+        UpdateLED(True)
         FastScan(TextBoxX.Text, TextBoxY.Text, 0.00, SaveFileDialog1.FileName)
+        UpdateLED(False)
         watch.Stop()
         MsgBox("Scanned in " + (watch.ElapsedMilliseconds / 1000).ToString + " s")
 
@@ -554,10 +561,11 @@ Public Class Form1
             For j = 1 To y
                 For i = 1 To X
                     If j Mod 2 = 0 Then
-                        FocusMap(i, j) = -(A * (X0 + (X - i) * -AdjustedStepX) + B * (Y0 + (j - 1) * AdjustedStepY) + D) / C
-                    Else
 
                         FocusMap(i, j) = -(A * (X0 + (i - 1) * -AdjustedStepX) + B * (Y0 + (j - 1) * AdjustedStepY) + D) / C
+                    Else
+                        FocusMap(i, j) = -(A * (X0 + (X - i) * -AdjustedStepX) + B * (Y0 + (j - 1) * AdjustedStepY) + D) / C
+
                     End If
 
                 Next
@@ -566,6 +574,8 @@ Public Class Form1
         End If
 
 
+
+        If Tracking.ROI.IsMade Then Tracking.MovetoROIEdge()
 
 
 
@@ -1012,7 +1022,7 @@ Public Class Form1
         Stage.Go_Middle()
         'stage.MoveAbsolute(stage.Zaxe, lastZ)
 
-        PictureBox_Preview.Image = Tracking.bmp.bmp
+        Tracking.Pbox.Image = Tracking.bmp.bmp
 
         Slideloaded = True
         Button_Scan.Enabled = True
@@ -1175,6 +1185,15 @@ Public Class Form1
 
     Private Sub Button15_Click(sender As Object, e As EventArgs) Handles Button15.Click
         Setting.Sett("ymin", Stage.Y)
+        Tracking = New TrackingStructure(PictureBox_Preview)
+        Tracking.Update()
+    End Sub
+
+    Private Sub Button16_Click(sender As Object, e As EventArgs) Handles Button16.Click
+        Tracking = New TrackingStructure(PreScan.PictureBox1)
+        Tracking.Update()
+        Tracking.UpdateBmp(Preview.Bmp)
+        PreScan.ShowDialog()
         Tracking = New TrackingStructure(PictureBox_Preview)
         Tracking.Update()
     End Sub

@@ -33,7 +33,7 @@ Public Class FocusStructure
 
         Camera.Flatfield(0)
         exp = Camera.exp
-        Camera.SetExposure(exp / bin ^ 2, False)
+        Camera.SetExposure(exp / bin, False)
         Camera.SetBinning(True, bin)
         ReDim BinnedImage(Nimg - 1)
         'To use only integer steps 
@@ -71,11 +71,15 @@ Public Class FocusStructure
 
         Form1.Chart1.Series(0).Points.Clear()
         Form1.Chart1.Series(1).Points.Clear()
+        'Stage.SetSpeed(Stage.Zaxe, 2)
+        'Stage.MoveRelativeAsync(Stage.Zaxe, 2)
+
         For zz = 0 To Nimg - 1
-            If zz > 0 Then Stage.MoveRelative(Stage.Zaxe, steps) ' The first time should be acquired with no movement 
+            If zz > 0 Then Stage.MoveRelative(Stage.Zaxe, Steps) ' The first time should be acquired with no movement 
+            Stage.UpdateZPositions()
             Pos(zz) = Stage.Z
             Camera.Capture(BinnedImage(0))
-            CM(zz) = FT.FindCenterOfMass(BinnedImage(0))
+            CM(zz) = FT.FindCenterOfMass2(BinnedImage(0))
             'SaveSinglePageTiff("C:\temp\POS- " + Pos(zz).ToString + "CM- " + CM(zz).ToString + ".tif", BinnedImage(0), Camera.Wbinned, Camera.Hbinned)
             Form1.Chart1.Series(1).Points.AddXY(Int((zz * steps) * 1000), CM(zz))
             Application.DoEvents()
@@ -85,11 +89,19 @@ Public Class FocusStructure
 
         Next
 
+
+        'CmXMax = CM.Max
+        'For zz = 0 To Nimg - 1
+        '    If CM(zz) = CmXMax Then focus = Pos(zz)
+        'Next
+
+        'Stage.SetSpeed(Stage.Zaxe, 48)
         ' For some stupid reason camera captures the previous frame? So at focous point it delivers an image from ther previous position!
         ' That is why I have +2 instead of +1
         'Igo one step further to start the focus from there.
 
-        Stage.MoveRelative(Stage.Zaxe, -Steps * (decline + 1) * 1.2)
+        Stage.MoveRelative(Stage.Zaxe, -Steps * (decline + 1))
+        'Stage.MoveAbsolute(Stage.Zaxe, focus)
         Camera.Capture(BinnedImage(0))
         Camera.Capture(BinnedImage(0))
 
@@ -103,8 +115,8 @@ Public Class FocusStructure
             If zz > 0 Then Stage.MoveRelative(Stage.Zaxe, MicroSteps) ' The first time should be acquired with no movement 
             Pos(zz) = Stage.Z
             Camera.Capture(BinnedImage(0))
-            CM(zz) = FT.FindCenterOfMass(BinnedImage(0))
-            '   SaveSinglePageTiff("C:\temp\2nd\POS- " + zz.ToString + Pos(zz).ToString + "CM- " + CM(zz).ToString + ".tif", BinnedImage(0), Camera.Wbinned, Camera.Hbinned)
+            CM(zz) = FT.FindCenterOfMass2(BinnedImage(0))
+            'SaveSinglePageTiff("C:\temp\2nd\POS- " + zz.ToString + Pos(zz).ToString + "CM- " + CM(zz).ToString + ".tif", BinnedImage(0), Camera.Wbinned, Camera.Hbinned)
             Form1.Chart1.Series(1).Points.AddXY(Int((zz * MicroSteps) * 1000), CM(zz))
             Application.DoEvents()
             If CM(zz) = CM.Max Then decline = 0
@@ -115,7 +127,7 @@ Public Class FocusStructure
         Form1.Chart1.Series(0).Points.Clear()
         Form1.Chart1.Series(1).Points.Clear()
 
-        Stage.MoveRelative(Stage.Zaxe, -MicroSteps * (decline + 1))
+        Stage.MoveRelative(Stage.Zaxe, -MicroSteps * (decline))
         focus = Stage.Z
 
 

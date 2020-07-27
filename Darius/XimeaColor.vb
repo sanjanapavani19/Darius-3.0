@@ -97,6 +97,7 @@ Public Class XimeaColor
         If yes Then
 
             cam.SetParam(PRM.DOWNSAMPLING, size)
+            cam.SetParam(PRM.DOWNSAMPLING_TYPE, BINNING_MODE.SUM)
             Wbinned = cam.GetParamInt(PRM.WIDTH)
             Hbinned = cam.GetParamInt(PRM.HEIGHT)
 
