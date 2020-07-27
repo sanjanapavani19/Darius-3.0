@@ -250,6 +250,12 @@
   <ItemGroup>
     <Content Include="SCI Version.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\IMSLs\IMSLs.csproj">
+      <Project>{8b2e38d5-6577-4229-89e4-d1cc9b8fc3c8}</Project>
+      <Name>IMSLs</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <Import Project="..\packages\Zaber.Motion.1.4.3\build\net45\Zaber.Motion.targets" Condition="Exists('..\packages\Zaber.Motion.1.4.3\build\net45\Zaber.Motion.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

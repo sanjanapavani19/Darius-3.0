@@ -30,15 +30,19 @@ Public Class TrackingStructure
         Public IsDragging As Boolean
         Public IsMade As Boolean
         Public IsMoved As Boolean
-        Public Dots(2) As DotsStructure
+        Public Dots() As DotsStructure
+        Public numDots As Integer
         Public pen As New Pen(Brushes.White, 2)
         Public InitialX, InitialY As Integer
         Public ClickX, ClickY, width, height As Integer
 
-        Public Sub New()
-            Dots(0) = New DotsStructure
-            Dots(1) = New DotsStructure
-            Dots(2) = New DotsStructure
+        Public Sub New(numDots As Integer)
+            Me.numDots = numDots
+            ReDim Dots(numDots)
+            For i = 0 To numDots - 1
+                Dots(i) = New DotsStructure
+            Next
+
         End Sub
 
         Public Sub CorrectROI(W As Single, H As Single)
@@ -79,6 +83,13 @@ Public Class TrackingStructure
 
 
 
+            Dots(3).Rect = New Rectangle(Rect.Right - Cursor.Width, Rect.Bottom - Cursor.Height, Cursor.Width, Cursor.Height)
+            Dots(3).InitialX = Dots(3).Rect.X
+            Dots(3).InitialY = Dots(3).Rect.Y
+
+            Dots(4).Rect = New Rectangle(Rect.Left + Rect.Width / 2, Rect.Top + Rect.Height / 2, Cursor.Width, Cursor.Height)
+            Dots(4).InitialX = Dots(4).Rect.X
+            Dots(4).InitialY = Dots(4).Rect.Y
 
 
             IsMade = True
@@ -89,7 +100,7 @@ Public Class TrackingStructure
             Pbox.Refresh()
             Pbox.CreateGraphics.DrawRectangle(pen, Rect)
 
-            For i = 0 To 2
+            For i = 0 To numDots - 1
                 Pbox.CreateGraphics.DrawRectangle(Dots(i).pen, Dots(i).Rect)
             Next
         End Sub
@@ -99,7 +110,7 @@ Public Class TrackingStructure
             Rect.Y = InitialY + Dy
             Form1.Label4.Text = Dx.ToString
 
-            For i = 0 To 2
+            For i = 0 To numDots - 1
                 Dots(i).Move(Dx, Dy)
             Next
 
@@ -111,7 +122,7 @@ Public Class TrackingStructure
             InitialX = Rect.X
             InitialY = Rect.Y
 
-            For i = 0 To 2
+            For i = 0 To numDots - 1
                 Dots(i).InitialX = Dots(i).Rect.X
                 Dots(i).InitialY = Dots(i).Rect.Y
 
@@ -128,7 +139,7 @@ Public Class TrackingStructure
     Dim RecentX, RecentY As Single
 
 
-    Public ROI As New ROIStructure
+    Public ROI As New ROIStructure(Setting.Gett("numdots"))
 
 
     'Public IsDragging As Boolean
@@ -184,7 +195,7 @@ Public Class TrackingStructure
         ROI.ClickY = e.Y
         ROI.ClickX = e.X
 
-        For i = 0 To 2
+        For i = 0 To ROI.numDots - 1
             If ROI.Dots(i).Rect.Contains(e.X, e.Y) Then
                 ROI.Dots(i).Grabbed = True
 
@@ -205,14 +216,14 @@ Public Class TrackingStructure
 
         If ROI.IsDragging And ROI.IsMade And ROI.Rect.Contains(e.X, e.Y) Then
 
-            For i = 0 To 2
+            For i = 0 To ROI.numDots - 1
                 If ROI.Dots(i).Grabbed Then
                     ROI.Dots(i).Move(e.X - ROI.ClickX, e.Y - ROI.ClickY)
                     ROI.Dots(i).IsMoved = True
                 End If
             Next
 
-            If Not (ROI.Dots(0).IsMoved Or ROI.Dots(1).IsMoved Or ROI.Dots(2).IsMoved) Then
+            If Not (ROI.Dots(0).IsMoved Or ROI.Dots(1).IsMoved Or ROI.Dots(2).IsMoved Or ROI.Dots(3).IsMoved Or ROI.Dots(4).IsMoved) Then
                 ROI.IsMoved = True
                 ROI.Move(e.X - ROI.ClickX, e.Y - ROI.ClickY)
             End If
@@ -233,7 +244,7 @@ Public Class TrackingStructure
 
         If ROI.IsMade Then
             If ROI.IsMoved Then ROI.IsMoved = False
-            For i = 0 To 2
+            For i = 0 To ROI.numDots - 1
                 If ROI.Dots(i).IsMoved Then ROI.Dots(i).IsMoved = False
                 If ROI.Dots(i).Grabbed Then ROI.Dots(i).Grabbed = False
             Next
@@ -283,7 +294,7 @@ Public Class TrackingStructure
         'bmp = New FastBMP(Pbox.Width, Pbox.Height, Imaging.PixelFormat.Format32bppArgb)
 
 
-        ROI = New ROIStructure
+        ROI = New ROIStructure(Setting.Gett("numdots"))
         Pbox.Refresh()
 
 
