@@ -549,6 +549,7 @@ Public Class Form1
 
 
 
+
             A = (Y2 - Y1) * (Z3 - Z1) - (Y3 - Y1) * (Z2 - Z1)
             B = (Z2 - Z1) * (X3 - X1) - (Z3 - Z1) * (X2 - X1)
             C = (X2 - X1) * (Y3 - Y1) - (X3 - X1) * (Y2 - Y1)

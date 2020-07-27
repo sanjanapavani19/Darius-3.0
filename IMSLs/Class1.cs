@@ -34,16 +34,12 @@ public class Activation_functions : NonlinearRegression.IFunction
             double sum = 0;
 
             Single[] xd = new Single[Z];
+            
+            xd[0] = xdata[iobs * 2 ];
+            xd[1] = xdata[iobs * 2+1];
 
+            ComputeE(xd, theta);
 
-            for (int c = 0; c < Z; c++)
-            {
-                xd[c] = xdata[iobs * Z + c];
-
-            }
-            E1 = ComputeE(xd, theta, Z);
-            E = SegmentA(E1, 0);
-            //   E += 2 * SegmentB(E1);
             e[0] = Math.Abs(ydata[iobs] - E);
 
         }
@@ -53,80 +49,44 @@ public class Activation_functions : NonlinearRegression.IFunction
         }
         return iend;
     }
-    public double ComputeE(Single[] xd, double[] teta, int Z)
+    public double ComputeE(Single[] xd, double[] teta)
     {
         double E = 0;
         double I = 0;
 
-        //   for (int c = 0; c < Z; c++) { I += xd[c] + Math.Pow((xd[c]), 0.5); }
-
-        for (int c = 0; c < Z; c++)
-        {
-            // runing trough the layeres
-            for (int l = c * L * 3; l < c * L * 3 + L * 3; l += 3) { E += teta[l] * Sigmoid(xd[c], teta[l + 1], teta[l + 2]); }
-        }
+        E = xd[0] * teta[0] + xd[1] * teta[1];
+        E += xd[0]*xd[0] * teta[2] + xd[1] *xd[1]* teta[3];
+        E += teta[4];
 
         return E;
     }
 
-    public double SegmentA(double x, double offset)
-    {
-        return Sigmoid(x, offset, SigmoidSlope);
-        //return Convert.ToDouble(x > 0);
-        //return Gauss(x, 10, 10);
-    }
 
 
-    public double SegmentB(double x)
-    {
-        //return SigmoidR(x, 0, 0.5);
-        return Gauss(x, -20, 10);
-    }
 
 
-    public double Sigmoid(double x, double b, double a)
-    {
-        return 1 / (1 + Math.Exp(-(x - b) * a));
-
-    }
-
-    public double SigmoidR(double x, double b, double a)
-    {
-        return 1 / (1 + Math.Exp((x - b) * a));
-    }
-
-
-    public double Gauss(double x, double x0, double b)
-    {
-        return Math.Exp(-Math.Pow(Math.Abs(x - x0), 1) / b);
-    }
-
-    public double[] Main(byte[] vx, byte[] vy, double scal, double tol, int Zin)
+    public double[] Main(Single[] vx, Single [] vy, double scal, double tol)
     {
         nobs = vy.GetLength(0);
 
-        Z = Zin;
-        xdata = new Single[nobs * Z];
+  // To account x and y
+        xdata = new Single[nobs*2];
         ydata = new Single[nobs];
         for (int i = 0; i < nobs; i++)
         {
             ydata[i] = vy[i];
+                    }
 
-        }
 
-
-        for (int i = 0; i < nobs * Z; i++)
+        for (int i = 0; i < nobs*2; i++)
         {
             xdata[i] = vx[i];
-
         }
-
-
-
-        int nparm = L * Z * 3;
+               
+        int nparm = 5;
         double[] theta = new double[nparm];
         NonlinearRegression regression = new NonlinearRegression(nparm);
-        theta = new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+        theta = new double[] { 0, 0, 0, 0, 0 };
         regression.Guess = theta;
 
 
