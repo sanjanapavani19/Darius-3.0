@@ -80,28 +80,30 @@ Public Class FocusStructure
             Pos(zz) = Stage.Z
             Camera.Capture(BinnedImage(0))
             CM(zz) = FT.FindCenterOfMass2(BinnedImage(0))
-            'SaveSinglePageTiff("C:\temp\POS- " + Pos(zz).ToString + "CM- " + CM(zz).ToString + ".tif", BinnedImage(0), Camera.Wbinned, Camera.Hbinned)
+            ' SaveSinglePageTiff("C:\temp\POS- " + zz.ToString + Pos(zz).ToString + "CM- " + CM(zz).ToString + ".tif", BinnedImage(0), Camera.Wbinned, Camera.Hbinned)
             Form1.Chart1.Series(1).Points.AddXY(Int((zz * steps) * 1000), CM(zz))
             Application.DoEvents()
-            If CM(zz) = CM.Max Then decline = 0
+            If zz > 0 Then
+                If CM(zz) > CM(zz - 1) Then decline = 0
+            End If
             If CM(zz) < CM.Max Then decline += 1
-            If decline = 10 Then Exit For
+            If decline = 5 Then Exit For
 
         Next
 
 
-        'CmXMax = CM.Max
-        'For zz = 0 To Nimg - 1
-        '    If CM(zz) = CmXMax Then focus = Pos(zz)
-        'Next
+        CmXMax = CM.Max
+        For zz = 0 To Nimg - 1
+            If CM(zz) = CmXMax Then focus = Pos(zz)
+        Next
 
         'Stage.SetSpeed(Stage.Zaxe, 48)
         ' For some stupid reason camera captures the previous frame? So at focous point it delivers an image from ther previous position!
         ' That is why I have +2 instead of +1
         'Igo one step further to start the focus from there.
 
-        Stage.MoveRelative(Stage.Zaxe, -Steps * (decline + 1))
-        'Stage.MoveAbsolute(Stage.Zaxe, focus)
+        'Stage.MoveRelative(Stage.Zaxe, -Steps * (decline + 2))
+        Stage.MoveAbsolute(Stage.Zaxe, focus - Steps)
         Camera.Capture(BinnedImage(0))
         Camera.Capture(BinnedImage(0))
 
@@ -116,10 +118,12 @@ Public Class FocusStructure
             Pos(zz) = Stage.Z
             Camera.Capture(BinnedImage(0))
             CM(zz) = FT.FindCenterOfMass2(BinnedImage(0))
-            'SaveSinglePageTiff("C:\temp\2nd\POS- " + zz.ToString + Pos(zz).ToString + "CM- " + CM(zz).ToString + ".tif", BinnedImage(0), Camera.Wbinned, Camera.Hbinned)
+            '  SaveSinglePageTiff("C:\temp\2nd\POS- " + zz.ToString + Pos(zz).ToString + "CM- " + CM(zz).ToString + ".tif", BinnedImage(0), Camera.Wbinned, Camera.Hbinned)
             Form1.Chart1.Series(1).Points.AddXY(Int((zz * MicroSteps) * 1000), CM(zz))
             Application.DoEvents()
-            If CM(zz) = CM.Max Then decline = 0
+            If zz > 0 Then
+                If CM(zz) > CM(zz - 1) Then decline = 0
+            End If
             If CM(zz) < CM.Max Then decline += 1
             If decline = 5 Then Exit For
         Next
@@ -127,7 +131,11 @@ Public Class FocusStructure
         Form1.Chart1.Series(0).Points.Clear()
         Form1.Chart1.Series(1).Points.Clear()
 
-        Stage.MoveRelative(Stage.Zaxe, -MicroSteps * (decline))
+        CmXMax = CM.Max
+        For zz = 0 To Nimg - 1
+            If CM(zz) = CmXMax Then focus = Pos(zz)
+        Next
+        Stage.MoveAbsolute(Stage.Zaxe, focus - MicroSteps)
         focus = Stage.Z
 
 

@@ -6,8 +6,8 @@ Public Class XimeaColor
 
     Public readoutnoise As Single
     Public Name As String
-    Public Dim_X As Integer
-    Public Dim_Y As Integer
+    Public W As Integer
+    Public H As Integer
     Public status As Boolean
     Public FFsetup As Boolean
     Public Wbinned, Hbinned As Integer
@@ -106,10 +106,10 @@ Public Class XimeaColor
 
         Else
             cam.SetParam(PRM.DOWNSAMPLING, 1)
-            Dim_X = cam.GetParamInt(PRM.WIDTH)
-            Dim_Y = cam.GetParamInt(PRM.HEIGHT)
-            BmpRef = New Bitmap(Dim_X, Dim_Y, Imaging.PixelFormat.Format24bppRgb)
-            ReDim Bytes(Dim_X * Dim_Y - 1)
+            W = cam.GetParamInt(PRM.WIDTH)
+            H = cam.GetParamInt(PRM.HEIGHT)
+            BmpRef = New Bitmap(W, H, Imaging.PixelFormat.Format24bppRgb)
+            ReDim Bytes(W * H - 1)
         End If
     End Sub
     Public Sub SetPolicyToSafe()
@@ -177,11 +177,11 @@ Public Class XimeaColor
             Case Colortype.RGB
                 cam.SetParam(PRM.IMAGE_DATA_FORMAT, IMG_FORMAT.RGB24)
 
-                ReDim Bytes(Dim_X * Dim_Y * 3 - 1)
+                ReDim Bytes(W * H * 3 - 1)
 
             Case Colortype.Grey
                 cam.SetParam(PRM.IMAGE_DATA_FORMAT, IMG_FORMAT.RAW8)
-                ReDim Bytes(Dim_X * Dim_Y - 1)
+                ReDim Bytes(W * H - 1)
         End Select
 
     End Sub

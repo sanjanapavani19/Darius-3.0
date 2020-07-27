@@ -345,16 +345,16 @@ Public Class ExtendedDepth5
         Next
 
         'This is to normlize to the number of pixels traken.
-        For r = 0 To SuperFrame.DimY / 2 - 1
-            DuperFrame.LineArray(r) = (DuperFrame.LineArray(r) / nr(r))
-        Next
+        'For r = 0 To SuperFrame.DimY / 2 - 1
+        '    DuperFrame.LineArray(r) = (DuperFrame.LineArray(r) / nr(r))
+        'Next
 
 
         'center of Mass
         Dim Cm As Single = 0
         ' I have removed total normalization, as usually, focus is also bvrighter.
-
-        For i = 1 To SuperFrame.DimY / 2 - 1
+        Dim sum As Single = DuperFrame.LineArray.Sum
+        For i = 50 To SuperFrame.DimY / 2 - 1
             Cm += (DuperFrame.LineArray(i))
         Next
         Return Cm

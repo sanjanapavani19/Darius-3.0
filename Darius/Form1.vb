@@ -24,7 +24,11 @@ Public Class Form1
     Dim fileN As Integer
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-
+        'Dim vx() As Single = {17.036356, 31.4184856, 12.8087683, 31.370985, 17.0838566, 35.74095, 12.90377, 35.8359528, 14.5188036, 33.9834137}
+        'Dim vy() As Single = {10.8271627, 10.9771814, 10.72715, 10.7571545, 10.7371511}
+        'Dim fit As New Polynomial_fit
+        'Dim A(4) As Double
+        'A = fit.Main(vx, vy, 1000, 0.001)
 
         Preview = New PreviewStructure
         TextBox_PrevieEXp.Text = Setting.Gett("PREVIEWEXP")
@@ -39,10 +43,10 @@ Public Class Form1
             Textbox_exposure.Text = Camera.exp
             AutoFocus = New FocusStructure(2, 0.1, 4)
 
-            Display = New ImageDisplay(Camera.Dim_X, Camera.Dim_Y, 2)
+            Display = New ImageDisplay(Camera.W, Camera.H, 2)
 
         End If
-        Stage = New ZaberNew(Setting.Gett("FOVX"), Setting.Gett("FOVX") * Camera.Dim_Y / Camera.Dim_X)
+        Stage = New ZaberNew(Setting.Gett("FOVX"), Setting.Gett("FOVX") * Camera.H / Camera.W)
 
 
 
@@ -52,8 +56,8 @@ Public Class Form1
 
 
         If Camera.status Then
-            CollagenImage = New StackImage(Camera.Dim_X, Camera.Dim_Y, 4, Imaging.PixelFormat.Format32bppArgb)
-            ReDim Concatenate(Camera.Dim_X, Camera.Dim_Y, 5)
+            CollagenImage = New StackImage(Camera.W, Camera.H, 4, Imaging.PixelFormat.Format32bppArgb)
+            ReDim Concatenate(Camera.W, Camera.H, 5)
 
             Camera.Flatfield(0)
             'Camera.SetFlatField("ff.tif")
@@ -252,7 +256,7 @@ Public Class Form1
             watch.Start()
             Stage.MoveRelative(Stage.Zaxe, Val(TextBox3.Text))
             watch.Stop()
-            MsgBox(watch.ElapsedMilliseconds)
+            ' MsgBox(watch.ElapsedMilliseconds)
         End If
     End Sub
 
@@ -375,6 +379,7 @@ Public Class Form1
     End Sub
 
     Public Sub Acquire()
+        SaveFileDialog1.DefaultExt = ".jpg"
         If SaveFileDialog1.ShowDialog() = DialogResult.Cancel Then Exit Sub
         If Camera.busy Then ExitLive()
 
@@ -421,7 +426,7 @@ Public Class Form1
 
     End Sub
 
-    Public Function DoAutoFocus(position As Integer)
+    Public Function DoAutoFocus(position As Integer) As Single
         Stage.GoZero(Stage.Zaxe, 1)
 
         Dim WasLive As Boolean
@@ -473,9 +478,10 @@ Public Class Form1
 
 
     Private Sub Button_Scan_Click(sender As Object, e As EventArgs) Handles Button_Scan.Click
+        SaveFileDialog1.DefaultExt = ".tif"
         If SaveFileDialog1.ShowDialog = DialogResult.Cancel Then Exit Sub
         SaveFileDialog1.AddExtension = True
-        SaveFileDialog1.DefaultExt = ".tif"
+
         Dim watch As Stopwatch
         watch = New Stopwatch
         watch.Start()
@@ -513,60 +519,46 @@ Public Class Form1
         Dim watch As New Stopwatch
 
 
-        Dim Tiles As New TileStructure(X, y, Camera.Dim_X, Camera.Dim_Y, 1, Address, 100)
-        Dim ColorBytes(Camera.Dim_X * Camera.Dim_Y * 3 - 1)
+        Dim Tiles As New TileStructure(X, y, Camera.W, Camera.H, 1, Address, 100)
+        Dim ColorBytes(Camera.W * Camera.H * 3 - 1)
 
-
-
+        Dim Fit As New Polynomial_fit
+        Dim A(4) As Double
         ReDim FocusMap(X, y)
         If Tracking.ROI.IsMade And CheckBox2.Checked Then
 
 
-            Dim A, B, C, D As Single
-            Dim X0, X1, X2, X3 As Single
-            Dim Y0, Y1, Y2, Y3 As Single
-            Dim Z1, Z2, Z3 As Single
+            Dim vx(Tracking.ROI.numDots * 2 - 1) As Single
+            Dim vy(Tracking.ROI.numDots - 1) As Single
 
 
-            Tracking.MovetoDots(0)
-            DoAutoFocus(1)
-            Z1 = Stage.Z
-            X1 = Stage.X
-            Y1 = Stage.Y
-
-            Tracking.MovetoDots(1)
-            DoAutoFocus(1)
-            Z2 = Stage.Z
-            X2 = Stage.X
-            Y2 = Stage.Y
+            For i = 0 To Tracking.ROI.numDots - 1
+                Tracking.MovetoDots(i)
+                vy(i) = DoAutoFocus(1)
+                vx(i * 2) = Stage.X
+                vx(i * 2 + 1) = Stage.Y
+                Dim imgtest(Camera.Wbinned * Camera.Hbinned - 1) As Byte
+                Camera.Capture()
+                SaveSinglePageTiff("c:\temp\" + i.ToString + ".tif", Camera.Bytes, Camera.W, Camera.H)
 
 
-            Tracking.MovetoDots(2)
-            DoAutoFocus(1)
-            Z3 = Stage.Z
-            X3 = Stage.X
-            Y3 = Stage.Y
+            Next
+            A = Fit.Main(vx, vy, 100, 1)
 
-
-
-
-            A = (Y2 - Y1) * (Z3 - Z1) - (Y3 - Y1) * (Z2 - Z1)
-            B = (Z2 - Z1) * (X3 - X1) - (Z3 - Z1) * (X2 - X1)
-            C = (X2 - X1) * (Y3 - Y1) - (X3 - X1) * (Y2 - Y1)
-            D = -(A * X1 + B * Y1 + C * Z1)
 
             Tracking.MovetoROIEdge()
-            X0 = Stage.X
-            Y0 = Stage.Y
+            Dim X0 As Single = Stage.X
+            Dim Y0 As Single = Stage.Y
 
             For j = 1 To y
                 For i = 1 To X
                     If j Mod 2 = 0 Then
 
-                        FocusMap(i, j) = -(A * (X0 + (i - 1) * -AdjustedStepX) + B * (Y0 + (j - 1) * AdjustedStepY) + D) / C
+                        ' FocusMap(i, j) = -(A * (X0 + (i - 1) * -AdjustedStepX) + B * (Y0 + (j - 1) * AdjustedStepY) + D) / C
+                        FocusMap(i, j) = Fit.ComputeE({(X0 + (i - 1) * -AdjustedStepX), (Y0 + (j - 1) * AdjustedStepY)}, A)
                     Else
-                        FocusMap(i, j) = -(A * (X0 + (X - i) * -AdjustedStepX) + B * (Y0 + (j - 1) * AdjustedStepY) + D) / C
-
+                        'FocusMap(i, j) = -(A * (X0 + (X - i) * -AdjustedStepX) + B * (Y0 + (j - 1) * AdjustedStepY) + D) / C
+                        FocusMap(i, j) = Fit.ComputeE({X0 + (X - i) * -AdjustedStepX, Y0 + (j - 1) * AdjustedStepY}, A)
                     End If
 
                 Next
@@ -651,7 +643,7 @@ Public Class Form1
         Loop
         Tiles.Close()
         'MakeMontage(X, Y, Bmp, True)
-
+1:
         Pbar.Value = 0
         'Camera.SetPolicyToUNSafe()
         Camera.Flatfield(0)
@@ -752,8 +744,8 @@ Public Class Form1
         Outputfile.write(X)
         Outputfile.write(Y)
         'bitmap width  and height 
-        Outputfile.write(Camera.Dim_X)
-        Outputfile.write(Camera.Dim_Y)
+        Outputfile.write(Camera.W)
+        Outputfile.write(Camera.H)
 
 
 
@@ -791,7 +783,7 @@ Public Class Form1
         Dim bytes(999) As Byte
         Outputfile.write(bytes, 999)
         'The returned frmae from the camera is 1 byte longer!
-        Dim framelength = Camera.Dim_X * Camera.Dim_Y
+        Dim framelength = Camera.W * Camera.H
 
 
         Dim loop_x, loop_y As Integer
@@ -822,7 +814,7 @@ Public Class Form1
                 FocusMap(loop_x - 1, loop_y - 1) = DoAutoFocus(0)
                 Camera.Capture()
                 '  LEDcontroller.SetRelays(1, False)
-                Display.ApplyColorGain(Camera.Bytes, Camera.Dim_X, Camera.Dim_Y)
+                Display.ApplyColorGain(Camera.Bytes, Camera.W, Camera.H)
                 Outputfile.write(Camera.Bytes, framelength)
 
                 'If Camera.exp < 0.1 Then Threading.Thread.Sleep(100)
@@ -965,7 +957,7 @@ Public Class Form1
         CheckBox1.Checked = False
         Thread.Sleep(500)
         Camera.Capture()
-        SaveSinglePageTiff16("dark.tif", Camera.Bytes, Camera.Dim_X, Camera.Dim_Y)
+        SaveSinglePageTiff16("dark.tif", Camera.Bytes, Camera.W, Camera.H)
         CheckBox1.Checked = True
         Thread.Sleep(500)
 
@@ -990,7 +982,7 @@ Public Class Form1
         'Next
 
 
-        SaveSinglePageTiff16("ff.tif", Camera.Bytes, Camera.Dim_X, Camera.Dim_Y)
+        SaveSinglePageTiff16("ff.tif", Camera.Bytes, Camera.W, Camera.H)
         Camera.SetFlatField("ff.tif", "dark.tif")
         Camera.Flatfield(0)
         Camera.SetDataMode(Colortype.Grey)
@@ -1088,7 +1080,7 @@ Public Class Form1
 
     Private Sub Button13_Click(sender As Object, e As EventArgs) Handles Button13.Click
 
-        stage.Go_Middle()
+        Stage.Go_Middle()
         Stage.GoToFocus()
     End Sub
 

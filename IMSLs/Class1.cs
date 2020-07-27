@@ -2,7 +2,7 @@
 using Imsl.Math;
 using Imsl.Stat;
 
-public class Activation_functions : NonlinearRegression.IFunction
+public class Polynomial_fit : NonlinearRegression.IFunction
 {
 
     static Single[] ydata;
@@ -33,12 +33,12 @@ public class Activation_functions : NonlinearRegression.IFunction
             double S = 0;
             double sum = 0;
 
-            Single[] xd = new Single[Z];
+            Single[] xd = new Single[2];
             
             xd[0] = xdata[iobs * 2 ];
             xd[1] = xdata[iobs * 2+1];
 
-            ComputeE(xd, theta);
+            E=ComputeE(xd, theta);
 
             e[0] = Math.Abs(ydata[iobs] - E);
 
@@ -52,7 +52,7 @@ public class Activation_functions : NonlinearRegression.IFunction
     public double ComputeE(Single[] xd, double[] teta)
     {
         double E = 0;
-        double I = 0;
+     
 
         E = xd[0] * teta[0] + xd[1] * teta[1];
         E += xd[0]*xd[0] * teta[2] + xd[1] *xd[1]* teta[3];
@@ -103,7 +103,7 @@ public class Activation_functions : NonlinearRegression.IFunction
         regression.MaxIterations = 500;
         regression.AbsoluteTolerance = tol;
 
-        NonlinearRegression.IFunction fcn = new Activation_functions();
+        NonlinearRegression.IFunction fcn = new Polynomial_fit();
         // GenerateData();
         double[] coef = regression.Solve(fcn);
 
