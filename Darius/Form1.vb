@@ -1190,5 +1190,17 @@ Public Class Form1
         Tracking = New TrackingStructure(PictureBox_Preview)
         Tracking.Update()
     End Sub
+
+    Private Sub Button17_Click(sender As Object, e As EventArgs) Handles Button17.Click
+
+        Dim WasLive As Boolean
+        If Camera.busy Then ExitLive() : WasLive = True
+
+        AutoFocus.Calibrate(Pbar)
+
+        'if camera is stopped because  of this sub then it resumes the live.
+        If WasLive Then GoLive()
+
+    End Sub
 End Class
 

@@ -217,8 +217,8 @@ Public Class XimeaColor
 
     Public Sub SetExposure(ex As Single, save As Boolean)
         If ex = 0 Then MsgBox("Richard : Please Enter a valid value for exposure time.") : Exit Sub
-        cam.SetParam(PRM.EXPOSURE, ex * 1000000)
-        timeout = ex * 100000
+        cam.SetParam(PRM.EXPOSURE, ex * 1000)
+        timeout = ex * 1000
         If save Then Setting.Sett("exposure", ex)
         exp = ex
     End Sub
@@ -226,8 +226,8 @@ Public Class XimeaColor
     Public Sub SetExposure()
         'Sets exposure time in microseconds.
         If exp = 0 Then MsgBox("Richard : Please Enter a valid value for exposure time." + vbCrLf + "Expsure is fixed!") : Exit Sub
-        cam.SetParam(PRM.EXPOSURE, exp * 1000000)
-        timeout = exp * 100000
+        cam.SetParam(PRM.EXPOSURE, exp * 1000)
+        timeout = exp * 1000
 
     End Sub
 

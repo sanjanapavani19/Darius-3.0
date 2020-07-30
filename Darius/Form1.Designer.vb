@@ -125,6 +125,8 @@ Partial Class Form1
         Me.CheckBox2 = New System.Windows.Forms.CheckBox()
         Me.PictureBox_Preview = New System.Windows.Forms.PictureBox()
         Me.Button16 = New System.Windows.Forms.Button()
+        Me.TabPage5 = New System.Windows.Forms.TabPage()
+        Me.Button17 = New System.Windows.Forms.Button()
         Me.ToolStrip1.SuspendLayout()
         Me.GroupBox3.SuspendLayout()
         Me.TabControl_Settings.SuspendLayout()
@@ -141,6 +143,7 @@ Partial Class Form1
         Me.StatusStrip1.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
         CType(Me.PictureBox_Preview, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.TabPage5.SuspendLayout()
         Me.SuspendLayout()
         '
         'ToolStrip1
@@ -277,6 +280,7 @@ Partial Class Form1
         Me.TabControl_Settings.Controls.Add(Me.TabPage1)
         Me.TabControl_Settings.Controls.Add(Me.TabPage12)
         Me.TabControl_Settings.Controls.Add(Me.TabPage2)
+        Me.TabControl_Settings.Controls.Add(Me.TabPage5)
         Me.TabControl_Settings.Location = New System.Drawing.Point(1257, 809)
         Me.TabControl_Settings.Name = "TabControl_Settings"
         Me.TabControl_Settings.SelectedIndex = 0
@@ -1183,6 +1187,25 @@ Partial Class Form1
         Me.Button16.Text = "Button16"
         Me.Button16.UseVisualStyleBackColor = True
         '
+        'TabPage5
+        '
+        Me.TabPage5.Controls.Add(Me.Button17)
+        Me.TabPage5.Location = New System.Drawing.Point(4, 25)
+        Me.TabPage5.Name = "TabPage5"
+        Me.TabPage5.Size = New System.Drawing.Size(441, 226)
+        Me.TabPage5.TabIndex = 7
+        Me.TabPage5.Text = "Auto Focus"
+        Me.TabPage5.UseVisualStyleBackColor = True
+        '
+        'Button17
+        '
+        Me.Button17.Location = New System.Drawing.Point(33, 39)
+        Me.Button17.Name = "Button17"
+        Me.Button17.Size = New System.Drawing.Size(75, 23)
+        Me.Button17.TabIndex = 6
+        Me.Button17.Text = "Calibrate"
+        Me.Button17.UseVisualStyleBackColor = True
+        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -1240,6 +1263,7 @@ Partial Class Form1
         Me.GroupBox1.ResumeLayout(False)
         Me.GroupBox1.PerformLayout()
         CType(Me.PictureBox_Preview, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.TabPage5.ResumeLayout(False)
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -1341,4 +1365,6 @@ Partial Class Form1
     Friend WithEvents Button14 As Button
     Friend WithEvents CheckBox2 As CheckBox
     Friend WithEvents Button16 As Button
+    Friend WithEvents TabPage5 As TabPage
+    Friend WithEvents Button17 As Button
 End Class

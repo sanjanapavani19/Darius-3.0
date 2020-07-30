@@ -1,13 +1,18 @@
+Imports MathNet.Numerics
 Public Class FocusStructure
     Public Range As Single
     Public Nimg As Single
     Public bin As Integer
     Dim Steps, MicroSteps As Single
+    ' For speed calibration of the stage 
+    Dim Sx(19), sy(19) As Double
+    Dim Cx(), Cy() As Double
     'focus point
     Public Z0 As Single
     Dim readout As Single
     Dim exp As Single
-
+    'One is for camera Cpline  one is for stage spline
+    Dim Spline, Cpline As Interpolation.LinearSpline
     Dim BinnedImage()() As Byte
     Dim FT As ExtendedDepth5
     Public Sub New(Range As Single, Steps As Single, bin As Integer)
@@ -40,6 +45,53 @@ Public Class FocusStructure
         '      Range = Int(Range / Nimg * stage.ZMMtoSteps) * Nimg / stage.ZMMtoSteps
 
     End Sub
+    Public Sub Calibrate(ByRef pbar As ProgressBar)
+        pbar.Maximum = 19
+
+        For s = 0 To 19
+            Stage.SetSpeed(Stage.Zaxe, (s + 1) / 2)
+            Sx(s) = s + 1
+            Dim watch As New Stopwatch
+            watch.Start()
+            Stage.MoveRelative(Stage.Zaxe, Range)
+            watch.Stop()
+            sy(s) = watch.ElapsedMilliseconds
+            Stage.MoveRelative(Stage.Zaxe, -Range)
+            pbar.Value = s
+            Application.DoEvents()
+        Next
+        Spline = Interpolate.Linear(Sx, sy)
+
+
+
+        Dim Binnedimage(Camera.Wbinned * Camera.Hbinned - 1) As Byte
+        Camera.SetBinning(True, bin)
+        Camera.Flatfield(0)
+
+        Dim tc As Integer = 0
+        pbar.Maximum = 300
+        For t = 1 To 300 Step 10
+            Camera.SetExposure(t / bin, False)
+            ReDim Preserve Cx(tc)
+            Cx(tc) = tc
+            Dim watch As New Stopwatch
+            watch.Start()
+            For i = 1 To 5
+                Camera.Capture(Binnedimage)
+                FT.FindCenterOfMass2(Binnedimage)
+            Next
+            watch.Stop()
+            ReDim Preserve Cy(tc)
+            Cy(tc) = watch.ElapsedMilliseconds / 5
+            tc += 1
+            pbar.Value = t
+            Application.DoEvents()
+        Next
+        Cpline = Interpolate.Linear(Cx, Cy)
+        pbar.Value = 0
+
+    End Sub
+
 
     Public Function Analyze() As Single
 
@@ -81,7 +133,7 @@ Public Class FocusStructure
             Camera.Capture(BinnedImage(0))
             CM(zz) = FT.FindCenterOfMass2(BinnedImage(0))
             ' SaveSinglePageTiff("C:\temp\POS- " + zz.ToString + Pos(zz).ToString + "CM- " + CM(zz).ToString + ".tif", BinnedImage(0), Camera.Wbinned, Camera.Hbinned)
-            Form1.Chart1.Series(1).Points.AddXY(Int((zz * steps) * 1000), CM(zz))
+            Form1.Chart1.Series(1).Points.AddXY(Int((zz * Steps) * 1000), CM(zz))
             Application.DoEvents()
             If zz > 0 Then
                 If CM(zz) > CM(zz - 1) Then decline = 0

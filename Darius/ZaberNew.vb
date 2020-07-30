@@ -43,7 +43,7 @@ Public Class ZaberNew
 
         SetAcceleration(Xaxe, 300)
         SetAcceleration(Yaxe, 300)
-        SetAcceleration(Zaxe, 1000)
+        SetAcceleration(Zaxe, 3000)
 
     End Sub
     Public Sub MoveRelative(ByRef Axis As Device, R As Single)
