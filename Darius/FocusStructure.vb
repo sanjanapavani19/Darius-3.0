@@ -31,6 +31,15 @@ Public Class FocusStructure
             Case 8
                 readout = 12
         End Select
+        Try
+            ReadS()
+            ReadC()
+
+        Catch ex As Exception
+
+        End Try
+
+
 
     End Sub
 
@@ -50,19 +59,18 @@ Public Class FocusStructure
 
         For s = 0 To 19
             Stage.SetSpeed(Stage.Zaxe, (s + 1) / 2)
-            Sx(s) = s + 1
+            sy(s) = s + 1
             Dim watch As New Stopwatch
             watch.Start()
             Stage.MoveRelative(Stage.Zaxe, Range)
             watch.Stop()
-            sy(s) = watch.ElapsedMilliseconds
+            Sx(s) = watch.ElapsedMilliseconds
             Stage.MoveRelative(Stage.Zaxe, -Range)
             pbar.Value = s
             Application.DoEvents()
         Next
         Spline = Interpolate.Linear(Sx, sy)
-
-
+        WriteS()
 
         Dim Binnedimage(Camera.Wbinned * Camera.Hbinned - 1) As Byte
         Camera.SetBinning(True, bin)
@@ -73,7 +81,7 @@ Public Class FocusStructure
         For t = 1 To 300 Step 10
             Camera.SetExposure(t / bin, False)
             ReDim Preserve Cx(tc)
-            Cx(tc) = tc
+            Cx(tc) = t
             Dim watch As New Stopwatch
             watch.Start()
             For i = 1 To 5
@@ -88,10 +96,60 @@ Public Class FocusStructure
             Application.DoEvents()
         Next
         Cpline = Interpolate.Linear(Cx, Cy)
+        WriteC()
         pbar.Value = 0
-
+        Release()
     End Sub
 
+    Sub WriteS()
+        Dim fn As Integer = FreeFile()
+        FileOpen(fn, "stage.txt", OpenMode.Output)
+        For i = 0 To sy.GetUpperBound(0)
+            PrintLine(fn, Sx(i), sy(i))
+        Next
+        FileClose(fn)
+    End Sub
+
+    Sub WriteC()
+        Dim fn As Integer = FreeFile()
+        FileOpen(fn, "Camera.txt", OpenMode.Output)
+        For i = 0 To sy.GetUpperBound(0)
+            PrintLine(fn, Cx(i), Cy(i))
+        Next
+        FileClose(fn)
+    End Sub
+
+
+    Sub ReadC()
+        Dim fn As Integer = FreeFile()
+        FileOpen(fn, "Camera.txt", OpenMode.Input)
+        Dim i As Integer
+        Do Until (EOF(fn))
+            ReDim Preserve Cx(i)
+            ReDim Preserve Cy(i)
+            Input(fn, Cx(i))
+            Input(fn, Cy(i))
+            i += 1
+        Loop
+        FileClose(fn)
+        Cpline = Interpolate.Linear(Cx, Cy)
+    End Sub
+
+
+    Sub ReadS()
+        Dim fn As Integer = FreeFile()
+        FileOpen(fn, "Stage.txt", OpenMode.Input)
+        Dim i As Integer
+        Do Until (EOF(fn))
+            ReDim Preserve Sx(i)
+            ReDim Preserve sy(i)
+            Input(fn, Sx(i))
+            Input(fn, sy(i))
+            i += 1
+        Loop
+        FileClose(fn)
+        Spline = Interpolate.Linear(Sx, sy)
+    End Sub
 
     Public Function Analyze() As Single
 
