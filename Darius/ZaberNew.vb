@@ -9,6 +9,7 @@ Public Class ZaberNew
     Public X, Y, Z As Single
     Public xp, yp As Single
     Public FOVX, FOVY As Single
+    Public SweptZ As Single
     Public Xaxe, Yaxe, Zaxe As Device
 
     Public Sub New(FOVX As Single, FOVY As Single)
@@ -43,7 +44,7 @@ Public Class ZaberNew
 
         SetAcceleration(Xaxe, 300)
         SetAcceleration(Yaxe, 300)
-        SetAcceleration(Zaxe, 3000)
+        SetAcceleration(Zaxe, 1000)
 
     End Sub
     Public Sub MoveRelative(ByRef Axis As Device, R As Single)
@@ -124,15 +125,7 @@ Public Class ZaberNew
     End Sub
 
     Public Sub MoveRelativeAsync(ByRef Axis As Device, R As Single)
-        Watch.Reset()
-        Try
-            Watch.Start()
-            Axis.MoveRelativeAsync(R, Units.Length_Millimetres)
-            Watch.Stop()
-            Elapsedtime = Watch.ElapsedMilliseconds
-        Catch ex As Exception
-
-        End Try
+        Axis.MoveRelativeAsync(R, Units.Length_Millimetres)
 
     End Sub
 
@@ -148,8 +141,14 @@ Public Class ZaberNew
     Public Sub Go_Middle()
         MoveAbsolute(Xaxe, 12.7)
         MoveAbsolute(Yaxe, 38)
-
-
     End Sub
 
+    Public Sub SetSweptZ(SweptZ As Single)
+        Me.SweptZ = SweptZ
+    End Sub
+
+    Public Sub MoveSweptZ()
+        Zaxe.MoveRelative(SweptZ, Units.Length_Millimetres)
+
+    End Sub
 End Class

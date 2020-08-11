@@ -59,15 +59,16 @@ Public Class XimeaColor
 
             exp = Setting.Gett("exposureb")
             SetExposure(exp, True)
-            SetBinning(False, 1)
+
 
             timeout = 5000
             busy = False
             status = True
-
+            'SetROI(0, 0, 100, 100)
+            SetBinning(False, 1)
             '------------------------------------------------------------
             cam.StartAcquisition()
-            SetROI(0, 0, 100, 100)
+
         End If
 
 

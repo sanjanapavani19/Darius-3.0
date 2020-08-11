@@ -543,7 +543,7 @@ Public Class Form1
 
 
             Next
-            A = Fit.Main(vx, vy, 100, 1)
+            A = Fit.Main(vx, vy, 100, 0.001)
 
 
             Tracking.MovetoROIEdge()
@@ -558,7 +558,7 @@ Public Class Form1
                         FocusMap(i, j) = Fit.ComputeE({(X0 + (i - 1) * -AdjustedStepX), (Y0 + (j - 1) * AdjustedStepY)}, A)
                     Else
                         'FocusMap(i, j) = -(A * (X0 + (X - i) * -AdjustedStepX) + B * (Y0 + (j - 1) * AdjustedStepY) + D) / C
-                        FocusMap(i, j) = Fit.ComputeE({X0 + (X - i) * -AdjustedStepX, Y0 + (j - 1) * AdjustedStepY}, A)
+                        FocusMap(i, j) = Fit.ComputeE({X0 + (X - i - 1) * -AdjustedStepX, Y0 + (j - 1) * AdjustedStepY}, A)
                     End If
 
                 Next
@@ -567,8 +567,9 @@ Public Class Form1
         End If
 
 
-
+        Stage.SetAcceleration(Stage.Zaxe, 3000)
         If Tracking.ROI.IsMade Then Tracking.MovetoROIEdge()
+        If CheckBox2.Checked Then Stage.MoveAbsolute(Stage.Zaxe, Fit.ComputeE({Stage.X, Stage.Y}, A))
 
 
 
@@ -582,9 +583,7 @@ Public Class Form1
                 Pbar.Increment(1)
 
                 Camera.Capture_Threaded()
-                Thread.Sleep(Camera.exp * 1200)
-
-                If CheckBox2.Checked Then Stage.MoveAbsolute(Stage.Zaxe, FocusMap(loop_x, loop_y))
+                Thread.Sleep(Camera.exp * 1.2)
 
 
                 'Moves while it generates the preview and others.
@@ -598,6 +597,7 @@ Public Class Form1
                     End If
                 End If
 
+                If CheckBox2.Checked Then Stage.MoveAbsolute(Stage.Zaxe, Fit.ComputeE({Stage.X, Stage.Y}, A))
                 Do Until Camera.ready
 
                 Loop
