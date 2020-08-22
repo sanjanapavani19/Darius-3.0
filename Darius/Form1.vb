@@ -72,7 +72,7 @@ Public Class Form1
 
         End If
 
-        GetPreview()
+
     End Sub
 
 
@@ -543,7 +543,7 @@ Public Class Form1
 
 
             Next
-            A = Fit.Main(vx, vy, 100, 0.001)
+            A = Fit.Main(vx, vy, 1000, 0.0001)
 
 
             Tracking.MovetoROIEdge()
@@ -1011,6 +1011,7 @@ Public Class Form1
         'MsgBox("Load the sample and then hit OK.")
 
         Tracking.UpdateBmp(Preview.Capture(Val(TextBox_PrevieEXp.Text), Val(TextBox_PreviewFocus.Text)))
+
 
         Stage.Go_Middle()
         'stage.MoveAbsolute(stage.Zaxe, lastZ)

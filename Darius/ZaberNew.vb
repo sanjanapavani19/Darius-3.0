@@ -36,14 +36,14 @@ Public Class ZaberNew
 
 
 
-        SetSpeed(Xaxe, 25)
-        SetSpeed(Yaxe, 25)
+        SetSpeed(Xaxe, 65)
+        SetSpeed(Yaxe, 65)
         SetSpeed(Zaxe, 48)
 
 
 
-        SetAcceleration(Xaxe, 300)
-        SetAcceleration(Yaxe, 300)
+        SetAcceleration(Xaxe, 3000)
+        SetAcceleration(Yaxe, 3000)
         SetAcceleration(Zaxe, 1000)
 
     End Sub

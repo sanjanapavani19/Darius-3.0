@@ -23,11 +23,11 @@ Partial Class Form1
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Form1))
-        Dim ChartArea2 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
-        Dim Legend2 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
-        Dim Series4 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
-        Dim Series5 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
-        Dim Series6 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
+        Dim ChartArea1 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
+        Dim Legend1 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
+        Dim Series1 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
+        Dim Series2 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
+        Dim Series3 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
         Me.ToolStrip1 = New System.Windows.Forms.ToolStrip()
         Me.ToolStripLabel1 = New System.Windows.Forms.ToolStripLabel()
         Me.Textbox_exposure = New System.Windows.Forms.ToolStripTextBox()
@@ -94,6 +94,8 @@ Partial Class Form1
         Me.Button8 = New System.Windows.Forms.Button()
         Me.TextBox_PreviewFocus = New System.Windows.Forms.TextBox()
         Me.TextBox_PrevieEXp = New System.Windows.Forms.TextBox()
+        Me.TabPage5 = New System.Windows.Forms.TabPage()
+        Me.Button17 = New System.Windows.Forms.Button()
         Me.TabControl1 = New System.Windows.Forms.TabControl()
         Me.TabPage3 = New System.Windows.Forms.TabPage()
         Me.PictureBox0 = New System.Windows.Forms.PictureBox()
@@ -125,8 +127,6 @@ Partial Class Form1
         Me.CheckBox2 = New System.Windows.Forms.CheckBox()
         Me.PictureBox_Preview = New System.Windows.Forms.PictureBox()
         Me.Button16 = New System.Windows.Forms.Button()
-        Me.TabPage5 = New System.Windows.Forms.TabPage()
-        Me.Button17 = New System.Windows.Forms.Button()
         Me.ToolStrip1.SuspendLayout()
         Me.GroupBox3.SuspendLayout()
         Me.TabControl_Settings.SuspendLayout()
@@ -134,6 +134,7 @@ Partial Class Form1
         Me.TabPage1.SuspendLayout()
         Me.TabPage12.SuspendLayout()
         Me.TabPage2.SuspendLayout()
+        Me.TabPage5.SuspendLayout()
         Me.TabControl1.SuspendLayout()
         Me.TabPage3.SuspendLayout()
         CType(Me.PictureBox0, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -143,7 +144,6 @@ Partial Class Form1
         Me.StatusStrip1.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
         CType(Me.PictureBox_Preview, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.TabPage5.SuspendLayout()
         Me.SuspendLayout()
         '
         'ToolStrip1
@@ -885,6 +885,25 @@ Partial Class Form1
         Me.TextBox_PrevieEXp.TabIndex = 0
         Me.TextBox_PrevieEXp.Text = "-11"
         '
+        'TabPage5
+        '
+        Me.TabPage5.Controls.Add(Me.Button17)
+        Me.TabPage5.Location = New System.Drawing.Point(4, 25)
+        Me.TabPage5.Name = "TabPage5"
+        Me.TabPage5.Size = New System.Drawing.Size(441, 226)
+        Me.TabPage5.TabIndex = 7
+        Me.TabPage5.Text = "Auto Focus"
+        Me.TabPage5.UseVisualStyleBackColor = True
+        '
+        'Button17
+        '
+        Me.Button17.Location = New System.Drawing.Point(33, 39)
+        Me.Button17.Name = "Button17"
+        Me.Button17.Size = New System.Drawing.Size(75, 23)
+        Me.Button17.TabIndex = 6
+        Me.Button17.Text = "Calibrate"
+        Me.Button17.UseVisualStyleBackColor = True
+        '
         'TabControl1
         '
         Me.TabControl1.Controls.Add(Me.TabPage3)
@@ -950,32 +969,32 @@ Partial Class Form1
         'Chart1
         '
         Me.Chart1.BackColor = System.Drawing.Color.Transparent
-        ChartArea2.AxisX.MajorGrid.Enabled = False
-        ChartArea2.AxisX.MajorTickMark.Enabled = False
-        ChartArea2.AxisY.MajorGrid.Enabled = False
-        ChartArea2.BackColor = System.Drawing.Color.Transparent
-        ChartArea2.Name = "ChartArea1"
-        Me.Chart1.ChartAreas.Add(ChartArea2)
-        Legend2.Name = "Legend1"
-        Me.Chart1.Legends.Add(Legend2)
+        ChartArea1.AxisX.MajorGrid.Enabled = False
+        ChartArea1.AxisX.MajorTickMark.Enabled = False
+        ChartArea1.AxisY.MajorGrid.Enabled = False
+        ChartArea1.BackColor = System.Drawing.Color.Transparent
+        ChartArea1.Name = "ChartArea1"
+        Me.Chart1.ChartAreas.Add(ChartArea1)
+        Legend1.Name = "Legend1"
+        Me.Chart1.Legends.Add(Legend1)
         Me.Chart1.Location = New System.Drawing.Point(1458, 579)
         Me.Chart1.Name = "Chart1"
-        Series4.ChartArea = "ChartArea1"
-        Series4.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Area
-        Series4.IsVisibleInLegend = False
-        Series4.Legend = "Legend1"
-        Series4.Name = "Series1"
-        Series5.ChartArea = "ChartArea1"
-        Series5.IsVisibleInLegend = False
-        Series5.Legend = "Legend1"
-        Series5.Name = "Series2"
-        Series6.ChartArea = "ChartArea1"
-        Series6.IsVisibleInLegend = False
-        Series6.Legend = "Legend1"
-        Series6.Name = "Series3"
-        Me.Chart1.Series.Add(Series4)
-        Me.Chart1.Series.Add(Series5)
-        Me.Chart1.Series.Add(Series6)
+        Series1.ChartArea = "ChartArea1"
+        Series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Area
+        Series1.IsVisibleInLegend = False
+        Series1.Legend = "Legend1"
+        Series1.Name = "Series1"
+        Series2.ChartArea = "ChartArea1"
+        Series2.IsVisibleInLegend = False
+        Series2.Legend = "Legend1"
+        Series2.Name = "Series2"
+        Series3.ChartArea = "ChartArea1"
+        Series3.IsVisibleInLegend = False
+        Series3.Legend = "Legend1"
+        Series3.Name = "Series3"
+        Me.Chart1.Series.Add(Series1)
+        Me.Chart1.Series.Add(Series2)
+        Me.Chart1.Series.Add(Series3)
         Me.Chart1.Size = New System.Drawing.Size(317, 122)
         Me.Chart1.TabIndex = 120
         Me.Chart1.Text = "Chart1"
@@ -1068,11 +1087,12 @@ Partial Class Form1
         'Label4
         '
         Me.Label4.AutoSize = True
-        Me.Label4.Location = New System.Drawing.Point(1480, 75)
+        Me.Label4.Location = New System.Drawing.Point(1672, 36)
         Me.Label4.Name = "Label4"
         Me.Label4.Size = New System.Drawing.Size(39, 13)
         Me.Label4.TabIndex = 136
         Me.Label4.Text = "Label4"
+        Me.Label4.Visible = False
         '
         'RadioButton3
         '
@@ -1153,9 +1173,9 @@ Partial Class Form1
         Me.Button2.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Button2.Location = New System.Drawing.Point(1704, 358)
         Me.Button2.Name = "Button2"
-        Me.Button2.Size = New System.Drawing.Size(176, 81)
+        Me.Button2.Size = New System.Drawing.Size(176, 41)
         Me.Button2.TabIndex = 140
-        Me.Button2.Text = "Open Gimp"
+        Me.Button2.Text = "Open Image"
         Me.Button2.UseVisualStyleBackColor = True
         '
         'CheckBox2
@@ -1186,25 +1206,6 @@ Partial Class Form1
         Me.Button16.TabIndex = 142
         Me.Button16.Text = "Button16"
         Me.Button16.UseVisualStyleBackColor = True
-        '
-        'TabPage5
-        '
-        Me.TabPage5.Controls.Add(Me.Button17)
-        Me.TabPage5.Location = New System.Drawing.Point(4, 25)
-        Me.TabPage5.Name = "TabPage5"
-        Me.TabPage5.Size = New System.Drawing.Size(441, 226)
-        Me.TabPage5.TabIndex = 7
-        Me.TabPage5.Text = "Auto Focus"
-        Me.TabPage5.UseVisualStyleBackColor = True
-        '
-        'Button17
-        '
-        Me.Button17.Location = New System.Drawing.Point(33, 39)
-        Me.Button17.Name = "Button17"
-        Me.Button17.Size = New System.Drawing.Size(75, 23)
-        Me.Button17.TabIndex = 6
-        Me.Button17.Text = "Calibrate"
-        Me.Button17.UseVisualStyleBackColor = True
         '
         'Form1
         '
@@ -1252,6 +1253,7 @@ Partial Class Form1
         Me.TabPage12.PerformLayout()
         Me.TabPage2.ResumeLayout(False)
         Me.TabPage2.PerformLayout()
+        Me.TabPage5.ResumeLayout(False)
         Me.TabControl1.ResumeLayout(False)
         Me.TabPage3.ResumeLayout(False)
         CType(Me.PictureBox0, System.ComponentModel.ISupportInitialize).EndInit()
@@ -1263,7 +1265,6 @@ Partial Class Form1
         Me.GroupBox1.ResumeLayout(False)
         Me.GroupBox1.PerformLayout()
         CType(Me.PictureBox_Preview, System.ComponentModel.ISupportInitialize).EndInit()
-        Me.TabPage5.ResumeLayout(False)
         Me.ResumeLayout(False)
         Me.PerformLayout()
 

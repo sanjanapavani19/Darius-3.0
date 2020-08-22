@@ -42,6 +42,7 @@ Partial Class PreScan
         Me.Controls.Add(Me.PictureBox1)
         Me.Name = "PreScan"
         Me.Text = "PreScan"
+        Me.WindowState = System.Windows.Forms.FormWindowState.Maximized
         CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 
