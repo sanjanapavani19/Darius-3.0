@@ -95,7 +95,7 @@ Public Class PreviewStructure
         'Bmp = Cropfilter.Apply(Bmp)
         'Dim bmpCropped As Bitmap = New Bitmap(Cropfilter.Apply(Bmp))
         'Bmp = FlipFilter.Apply(Bmp)
-        Bmp.Save("C:\temp\" & Now.ToString("R").Replace(":", " ") & ".jpg")
+        'Bmp.Save("C:\temp\" & Now.ToString("R").Replace(":", " ") & ".jpg")
 
 
 

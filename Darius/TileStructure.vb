@@ -16,7 +16,7 @@ Public Class TileStructure
     Dim Scale As Integer
 
     Dim stride As Integer
-    Dim pages, page As Integer
+    Public pages, page As Integer
     Dim address As String
     Dim tiff As Tiff
     Dim tsx, tsy As Integer
@@ -28,7 +28,7 @@ Public Class TileStructure
     Dim bytes As Byte()
     Dim compress As Integer
     Dim Tile As TileStructure
-    Public Sub New(X As Integer, Y As Integer, bmpWidth As Integer, bmpHeight As Integer, pages As Integer, address As String, compression As Integer)
+    Public Sub New(X As Integer, Y As Integer, bmpWidth As Integer, bmpHeight As Integer, pages As Integer, page As Integer, address As String, compression As Integer)
 
         Me.pages = pages
         Me.X = X
@@ -52,7 +52,6 @@ Public Class TileStructure
         ReDim bytes(stride * bmpHeight - 1)
 
 
-        page = 0
         Scale = 2 ^ page
         Tile.X = 8 / Scale
         Tile.Y = 8 / Scale

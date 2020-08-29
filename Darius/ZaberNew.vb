@@ -7,6 +7,7 @@ Public Class ZaberNew
     Public Elapsedtime As Long
     Dim Watch As New Stopwatch
     Public X, Y, Z As Single
+    Public Xacc, Yacc, Zacc As Single
     Public xp, yp As Single
     Public FOVX, FOVY As Single
     Public SweptZ As Single
@@ -40,11 +41,13 @@ Public Class ZaberNew
         SetSpeed(Yaxe, 65)
         SetSpeed(Zaxe, 48)
 
+        Xacc = 3000
+        Yacc = 3000
+        Zacc = 100
 
-
-        SetAcceleration(Xaxe, 3000)
-        SetAcceleration(Yaxe, 3000)
-        SetAcceleration(Zaxe, 1000)
+        SetAcceleration(Xaxe, Xacc)
+        SetAcceleration(Yaxe, Yacc)
+        SetAcceleration(Zaxe, Zacc)
 
     End Sub
     Public Sub MoveRelative(ByRef Axis As Device, R As Single)
@@ -59,6 +62,8 @@ Public Class ZaberNew
         End Try
 
     End Sub
+
+
     Public Sub MoveAbsolute(ByRef Axis As Device, R As Single)
         Try
             Axis.MoveAbsolute(R, Units.Length_Millimetres)
@@ -134,6 +139,7 @@ Public Class ZaberNew
         Y = Yaxe.GetPosition(Units.Length_Millimetres)
         Z = Zaxe.GetPosition(Units.Length_Millimetres)
     End Sub
+
     Public Sub UpdateZPositions()
         Z = Zaxe.GetPosition(Units.Length_Millimetres)
     End Sub

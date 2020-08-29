@@ -390,20 +390,20 @@ Public Class ExtendedDepth5
 
         ' since the data os real, only half of the FFT is sufficient
         'saveSinglePage32("C:\temp\ff.tif", DuperFrame.TwoDArray)
-        Dim Mx(SuperFrame.DimY / 2 - 1) As Single
+        Dim Mx(SuperFrame.DimY / 3 - 1) As Single
         Dim Mxx As Single
-        For y = 0 To SuperFrame.DimY / 2 - 1
-            For x = 0 To SuperFrame.DimX / 2 - 1
+        For y = 0 To SuperFrame.DimY / 3 - 1
+            For x = 0 To SuperFrame.DimX / 3 - 1
                 Mx(y) += x * DuperFrame.TwoDArray(x, y)
             Next
         Next
         Mxx = Mx.Sum / DuperFrame.TwoDArray(0, 0)
 
-        Dim My(SuperFrame.DimX / 2 - 1) As Single
+        Dim My(SuperFrame.DimX / 3 - 1) As Single
         Dim Myy As Single
 
-        For x = 0 To SuperFrame.DimX / 2 - 1
-            For y = 0 To SuperFrame.DimY / 2 - 1
+        For x = 0 To SuperFrame.DimX / 3 - 1
+            For y = 0 To SuperFrame.DimY / 3 - 1
                 My(x) += y * DuperFrame.TwoDArray(x, y)
             Next
         Next

@@ -11,10 +11,11 @@
     <AssemblyName>Darius</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MyType>WindowsForms</MyType>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -133,8 +134,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>bin\x64\Debug\xiApi.NETX64.dll</HintPath>
     </Reference>
-    <Reference Include="Zaber.Motion, Version=1.4.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Zaber.Motion.1.4.3\lib\net45\Zaber.Motion.dll</HintPath>
+    <Reference Include="Zaber.Motion, Version=1.5.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Zaber.Motion.1.5.0\lib\net45\Zaber.Motion.dll</HintPath>
     </Reference>
     <Reference Include="Zaber.Serial.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -261,11 +262,11 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
-  <Import Project="..\packages\Zaber.Motion.1.4.3\build\net45\Zaber.Motion.targets" Condition="Exists('..\packages\Zaber.Motion.1.4.3\build\net45\Zaber.Motion.targets')" />
+  <Import Project="..\packages\Zaber.Motion.1.5.0\build\net45\Zaber.Motion.targets" Condition="Exists('..\packages\Zaber.Motion.1.5.0\build\net45\Zaber.Motion.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Zaber.Motion.1.4.3\build\net45\Zaber.Motion.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Zaber.Motion.1.4.3\build\net45\Zaber.Motion.targets'))" />
+    <Error Condition="!Exists('..\packages\Zaber.Motion.1.5.0\build\net45\Zaber.Motion.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Zaber.Motion.1.5.0\build\net45\Zaber.Motion.targets'))" />
   </Target>
 </Project>

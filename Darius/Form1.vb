@@ -4,13 +4,12 @@ Imports AForge.Imaging.Filters
 Imports Microsoft.VisualBasic.Devices
 Imports AForge.Imaging
 Imports System.Threading
+Imports System.Windows.Forms.DataVisualization.Charting
 
 Public Class Form1
 
     Public Display As ImageDisplay
-
     Public LEDcontroller As Relay
-
     Dim IsDragging As Boolean
     Dim CollagenImage As StackImage
     Dim Concatenate As Single(,,)
@@ -20,6 +19,7 @@ Public Class Form1
     Dim LinearUnmixing As LinearUnmixingStructure
     Dim FocusMap(,) As Single
     Dim panel As Integer
+    Dim Focusing As Boolean
     Dim Filenames() As String
     Dim fileN As Integer
 
@@ -34,33 +34,27 @@ Public Class Form1
         TextBox_PrevieEXp.Text = Setting.Gett("PREVIEWEXP")
         TextBox_PreviewFocus.Text = Setting.Gett("PREVIEWFOCUS")
 
-
         Imagetype = ImagetypeEnum.Brightfield
         Camera = New XimeaColor
 
-
         If Camera.status Then
-            Textbox_exposure.Text = Camera.exp
+            TextBox_exposure.Text = Camera.exp
             AutoFocus = New FocusStructure(2, 0.1, 4)
-
-            Display = New ImageDisplay(Camera.W, Camera.H, 2)
-
+            Display = New ImageDisplay(Camera.W, Camera.H, Chart1)
         End If
         Stage = New ZaberNew(Setting.Gett("FOVX"), Setting.Gett("FOVX") * Camera.H / Camera.W)
 
 
-
-
         TextBoxGain.Text = Setting.Gett("Gain")
-        Textbox_exposure.Text = Setting.Gett("exposure")
+        TextBox_exposure.Text = Setting.Gett("exposure")
 
 
         If Camera.status Then
             CollagenImage = New StackImage(Camera.W, Camera.H, 4, Imaging.PixelFormat.Format32bppArgb)
             ReDim Concatenate(Camera.W, Camera.H, 5)
 
-            Camera.Flatfield(0)
-            'Camera.SetFlatField("ff.tif")
+            Camera.SetFlatField("ff.tif", "dark.tif")
+
             GoLive()
             LEDcontroller = New Relay
             LEDcontroller.SetRelays(1, True)
@@ -72,26 +66,24 @@ Public Class Form1
 
         End If
 
-
+        GetPreview()
     End Sub
 
 
     Sub ArrangeControls(d As Integer)
-        Dim scale As Single = 0.65
+        Dim scale As Single = 0.33
 
-
-
-        PictureBox0.Width = Display.BmpPreview.width * scale
-        PictureBox0.Height = Display.BmpPreview.height * scale
+        PictureBox0.Width = Display.Width * scale
+        PictureBox0.Height = Display.Height * scale
         PictureBox0.SizeMode = PictureBoxSizeMode.Zoom
 
-        PictureBox1.Width = Display.BmpPreview.width * scale
-        PictureBox1.Height = Display.BmpPreview.height * scale
+        PictureBox1.Width = Display.Width * scale
+        PictureBox1.Height = Display.Height * scale
         PictureBox1.SizeMode = PictureBoxSizeMode.Zoom
 
 
-        TabControl1.Width = Display.BmpPreview.width * (0.1 + scale)
-        TabControl1.Height = Display.BmpPreview.width * (0.1 + scale)
+        TabControl1.Width = Display.Width * scale + 2 * d
+        TabControl1.Height = Display.Height * scale + 2 * d
 
 
         PictureBox_Preview.Left = TabControl1.Left + TabControl1.Width + d
@@ -109,20 +101,10 @@ Public Class Form1
         ListBox1.Left = PictureBox_Preview.Width + PictureBox_Preview.Left + d
     End Sub
 
-
-
-    Private Sub Textbox_exposure_KeyDown(sender As Object, e As KeyEventArgs) Handles Textbox_exposure.KeyDown
-        If e.KeyCode = Keys.Return Then
-            ChangeExposure()
-
-        End If
-    End Sub
-
     Public Sub ChangeExposure()
 
-
-        Camera.exp = Val(Textbox_exposure.Text)
         Camera.ExposureChanged = True
+        Camera.exp = Val(TextBox_exposure.Text)
 
         Select Case Imagetype
             Case ImagetypeEnum.Brightfield
@@ -131,7 +113,7 @@ Public Class Form1
                 Setting.Sett("EXPOSUREF", Camera.exp)
         End Select
         Setting.Sett("EXPOSURE", Camera.exp)
-
+        Timer1.Interval = Camera.exp
 
 
         'Do Until Camera.ExposureChanged = False
@@ -143,9 +125,12 @@ Public Class Form1
 
 
     Public Sub GoLive()
+        Timer1.Enabled = True
+        Timer1.Interval = Camera.exp
         Dim Thread1 As New System.Threading.Thread(AddressOf Live)
         Thread1.Start()
-        '    Live()
+
+
     End Sub
 
 
@@ -154,26 +139,19 @@ Public Class Form1
         '' Setting the waithandle to false because the initial setting was true.
         ''WaitHandle_LiveReturned.Reset()
 
+
+
         Do
             Camera.busy = True
             If Camera.Dostop Then Exit Do
 
             Camera.Capture()
+            If Camera.ExposureChanged Then Camera.SetExposure() : Camera.ExposureChanged = False : Display.RequestIbIc = True
+
+            If Imagetype = ImagetypeEnum.Brightfield Then PictureBox0.Image = Display.Preview(Camera.Bytes, True)
+            If Imagetype = ImagetypeEnum.Fluorescence Then PictureBox1.Image = Display.Preview(Camera.Bytes, True)
+
             Application.DoEvents()
-            If Camera.ExposureChanged Then Camera.SetExposure() : Camera.ExposureChanged = False
-
-
-            If Imagetype = ImagetypeEnum.Brightfield Then
-                Display.Preview(Camera.Bytes, True)
-                PictureBox0.Image = Display.BmpPreview.bmp
-            End If
-
-            If Imagetype = ImagetypeEnum.Fluorescence Then
-                Display.Preview(Camera.Bytes, True)
-                PictureBox1.Image = Display.BmpPreview.bmp
-            End If
-
-
         Loop
         Camera.busy = False
 
@@ -187,6 +165,7 @@ Public Class Form1
 
         Loop
         Camera.Dostop = False
+        Timer1.Enabled = False
     End Sub
 
     Private Sub Button_right_Click(sender As Object, e As EventArgs) Handles Button_right.Click
@@ -210,24 +189,13 @@ Public Class Form1
     End Sub
 
     Private Sub Button_adjustBrightness_Click(sender As Object, e As EventArgs) Handles Button_adjustBrightness.Click
+
         Display.AdjustBrightness()
-        Display.PlotHistogram(Chart1)
+
 
     End Sub
 
-    Private Sub Form1_MouseWheel(sender As Object, e As MouseEventArgs) Handles Me.MouseWheel
-        If Not Camera.busy Then GoLive()
-        Dim speed As Single
-        If Control.ModifierKeys = Keys.Control Then speed = 10 Else speed = 1
 
-        'If XYZ.name = "NewPort" Then
-        If e.Delta > 0 Then
-            Stage.MoveRelative(Stage.Zaxe, speed * 0.001 * Math.Abs(e.Delta) / 120)
-        Else
-            Stage.MoveRelative(Stage.Zaxe, speed * -0.001 * Math.Abs(e.Delta) / 120)
-        End If
-
-    End Sub
 
     Private Sub Form1_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
         If Camera.status = True Then
@@ -241,8 +209,11 @@ Public Class Form1
     Private Sub RadioButton_zoom_in_CheckedChanged(sender As Object, e As EventArgs) Handles RadioButton_zoom_in.CheckedChanged
         If RadioButton_zoom_in.Checked Then
             Display.zoom = True
+            PictureBox0.SizeMode = PictureBoxSizeMode.CenterImage
+            PictureBox1.SizeMode = PictureBoxSizeMode.CenterImage
         Else
-            Display.zoom = False
+            PictureBox0.SizeMode = PictureBoxSizeMode.Zoom
+            PictureBox1.SizeMode = PictureBoxSizeMode.Zoom
         End If
     End Sub
 
@@ -338,7 +309,7 @@ Public Class Form1
     Private Sub TabControl1_SelectedIndexChanged(sender As Object, e As EventArgs) _
          Handles TabControl1.SelectedIndexChanged
         If Not Camera.busy Then Exit Sub
-        CheckBox1.Checked = True
+        CheckBoxLED.Checked = True
         If TabControl1.SelectedIndex = 0 Then
 
             'ExitLive()
@@ -350,7 +321,7 @@ Public Class Form1
             LEDcontroller.SetRelays(2, False)
             LEDcontroller.SetRelays(1, True)
             Button_adjustBrightness.PerformClick()
-            Textbox_exposure.Text = Setting.Gett("Exposureb")
+            TextBox_exposure.Text = Setting.Gett("Exposureb")
             ChangeExposure()
             'GoLive()
 
@@ -365,7 +336,7 @@ Public Class Form1
             LEDcontroller.SetRelays(2, True)
             Button_adjustBrightness.PerformClick()
             'Camera.setGain(30)
-            Textbox_exposure.Text = Setting.Gett("Exposuref")
+            TextBox_exposure.Text = Setting.Gett("Exposuref")
             ChangeExposure()
 
             'TextBoxGain.Text = Setting.Gett("Gain")
@@ -379,25 +350,24 @@ Public Class Form1
     End Sub
 
     Public Sub Acquire()
+        ExitLive()
+
+        Dim bmp As New Bitmap(Camera.captureBmp)
         SaveFileDialog1.DefaultExt = ".jpg"
         If SaveFileDialog1.ShowDialog() = DialogResult.Cancel Then Exit Sub
-        If Camera.busy Then ExitLive()
-
         If Imagetype = ImagetypeEnum.Brightfield Then
-            Camera.SetDataMode(Colortype.RGB)
-            Thread.Sleep(500)
-            Camera.captureBmp.Save(SaveFileDialog1.FileName + "_WD.jpg")
-            Camera.SetDataMode(Colortype.Grey)
+
+            bmp.Save(SaveFileDialog1.FileName + "_WD.jpg")
             'Display.MakeFullsizeImage.Save(SaveFileDialog1.FileName + "_WD.jpg")
             ReDim Preserve Filenames(fileN)
             Filenames(fileN) = SaveFileDialog1.FileName + "_WD.jpg"
             fileN += 1
             ListBox1.Items.Add(Path.GetFileName(SaveFileDialog1.FileName + "_WD.jpg"))
         ElseIf Imagetype = ImagetypeEnum.Fluorescence Then
-            Camera.SetDataMode(Colortype.RGB)
-            Thread.Sleep(500)
-            Camera.captureBmp.Save(SaveFileDialog1.FileName + "_FiBi.jpg")
-            Camera.SetDataMode(Colortype.Grey)
+
+
+            bmp.Save(SaveFileDialog1.FileName + "_FiBi.jpg")
+
             ReDim Preserve Filenames(fileN)
             Filenames(fileN) = SaveFileDialog1.FileName + "_FiBi.jpg"
             fileN += 1
@@ -418,10 +388,10 @@ Public Class Form1
 
     Private Sub PictureBox0_MouseUp(sender As Object, e As MouseEventArgs) Handles PictureBox0.MouseUp, PictureBox1.MouseUp
 
-        Dim Z As Integer
-        If Display.zoom Then Z = Display.sampeling Else Z = 1
-        Stage.MoveRelative(Stage.Xaxe, (e.X - Stage.xp) * Stage.FOVX * (1 / Z) / PictureBox0.Width)
-        Stage.MoveRelative(Stage.Yaxe, -(e.Y - Stage.yp) * Stage.FOVY * (1 / Z) / PictureBox0.Height)
+        Dim Z As Integer = 1
+        '   If Display.zoom Then Z = Display.sampeling Else Z = 1
+        Stage.MoveRelativeAsync(Stage.Xaxe, (e.X - Stage.xp) * Stage.FOVX * (1 / Z) / PictureBox0.Width)
+        Stage.MoveRelativeAsync(Stage.Yaxe, -(e.Y - Stage.yp) * Stage.FOVY * (1 / Z) / PictureBox0.Height)
 
 
     End Sub
@@ -485,9 +455,9 @@ Public Class Form1
         Dim watch As Stopwatch
         watch = New Stopwatch
         watch.Start()
-        UpdateLED(True)
+        CheckBoxLED.Checked = True
         FastScan(TextBoxX.Text, TextBoxY.Text, 0.00, SaveFileDialog1.FileName)
-        UpdateLED(False)
+        CheckBoxLED.Checked = False
         watch.Stop()
         MsgBox("Scanned in " + (watch.ElapsedMilliseconds / 1000).ToString + " s")
 
@@ -518,14 +488,19 @@ Public Class Form1
         Dim Axis As String = ""
         Dim watch As New Stopwatch
 
+        Dim Tiles(3) As TileStructure
 
-        Dim Tiles As New TileStructure(X, y, Camera.W, Camera.H, 1, Address, 100)
+        Tiles(0) = New TileStructure(X, y, Camera.W, Camera.H, 4, 0, Address, 100)
+        Tiles(1) = New TileStructure(X, y, Camera.W, Camera.H, 4, 1, Address, 100)
+        Tiles(2) = New TileStructure(X, y, Camera.W, Camera.H, 4, 2, Address, 100)
+        Tiles(3) = New TileStructure(X, y, Camera.W, Camera.H, 4, 3, Address, 100)
+
         Dim ColorBytes(Camera.W * Camera.H * 3 - 1)
 
-        Dim Fit As New Polynomial_fit
+        Dim Fit As New Plannar_fit
         Dim A(4) As Double
         ReDim FocusMap(X, y)
-        If Tracking.ROI.IsMade And CheckBox2.Checked Then
+        If Tracking.ROI.IsMade Then
 
 
             Dim vx(Tracking.ROI.numDots * 2 - 1) As Single
@@ -567,15 +542,12 @@ Public Class Form1
         End If
 
 
-        Stage.SetAcceleration(Stage.Zaxe, 3000)
+        Stage.SetAcceleration(Stage.Zaxe, AutoFocus.Zacceleration)
         If Tracking.ROI.IsMade Then Tracking.MovetoROIEdge()
-        If CheckBox2.Checked Then Stage.MoveAbsolute(Stage.Zaxe, Fit.ComputeE({Stage.X, Stage.Y}, A))
+        Stage.MoveAbsolute(Stage.Zaxe, Fit.ComputeE({Stage.X, Stage.Y}, A))
 
 
 
-        Camera.SetDataMode(Colortype.RGB)
-        Camera.SetFlatField("ff.tif", "dark.tif")
-        UpdateLED(True)
 
         ' Dim BytesExport(Camera.Bytes.GetUpperBound(0)) As Byte
         For loop_y = 1 To y
@@ -597,11 +569,11 @@ Public Class Form1
                     End If
                 End If
 
-                If CheckBox2.Checked Then Stage.MoveAbsolute(Stage.Zaxe, Fit.ComputeE({Stage.X, Stage.Y}, A))
+                Stage.MoveAbsolute(Stage.Zaxe, Fit.ComputeE({Stage.X, Stage.Y}, A))
                 Do Until Camera.ready
 
                 Loop
-                Do Until Tiles.Ready
+                Do Until Tiles(0).Ready
 
                 Loop
 
@@ -615,9 +587,13 @@ Public Class Form1
 
 
                 If direction > 0 Then
-                    Tiles.SaveTile(loop_x - 1, loop_y - 1, (Camera.Bytes))
+                    For i = 0 To Tiles(0).pages - 1
+                        Tiles(i).SaveTile(loop_x - 1, loop_y - 1, (Camera.Bytes))
+                    Next
                 Else
-                    Tiles.SaveTile(X - loop_x, loop_y - 1, (Camera.Bytes))
+                    For i = 0 To Tiles(0).pages - 1
+                        Tiles(i).SaveTile(X - loop_x, loop_y - 1, (Camera.Bytes))
+                    Next
                 End If
                 'byteToBitmap(Camera.Bytes, Display.Bmp)
                 'Array.Copy(Camera.GetBytes, BytesExport, BytesExport.GetLength(0))
@@ -638,227 +614,25 @@ Public Class Form1
 
         Stage.MoveRelative(Stage.Xaxe, TravelX)
         Stage.MoveRelative(Stage.Yaxe, -TravelY)
-        Do Until Tiles.Ready
+        Do Until Tiles(0).Ready
 
         Loop
-        Tiles.Close()
+        For i = 0 To Tiles(0).pages - 1
+            Tiles(i).Close()
+        Next
         'MakeMontage(X, Y, Bmp, True)
 1:
         Pbar.Value = 0
         'Camera.SetPolicyToUNSafe()
-        Camera.Flatfield(0)
-        Camera.SetDataMode(Colortype.Grey)
+        'Camera.Flatfield(0)
+        'Camera.SetDataMode(Colortype.Grey)
+        Stage.SetAcceleration(Stage.Zaxe, Stage.Zacc)
         GoLive()
 
 
 
     End Sub
 
-    Public Sub SciScan()
-        If SaveFileDialog1.ShowDialog = DialogResult.Cancel Then Exit Sub
-
-        ExitLive()
-
-        Dim X, Y As Integer
-        Y = TextBoxY.Text
-        X = TextBoxX.Text
-        Dim filen As Integer
-        Dim direction As Integer
-        Dim AdjustedStepX, AdjustedStepY As Single
-        AdjustedStepX = Stage.FOVX
-        AdjustedStepY = Stage.FOVY
-        Dim bmp(X * Y - 1) As Bitmap
-        Pbar.Maximum = X * Y
-        direction = 1
-        Tracking.ROI.IsMade = False
-        ReDim FocusMap(X, Y)
-        If Tracking.ROI.IsMade Then
-
-
-            Dim A, B, C, D As Single
-            Dim X0, X1, X2, X3 As Single
-            Dim Y0, Y1, Y2, Y3 As Single
-            Dim Z1, Z2, Z3 As Single
-
-
-            Tracking.MovetoDots(0)
-            DoAutoFocus(0)
-            Z1 = Stage.Z
-            X1 = Stage.X
-            Y1 = Stage.Y
-
-            Tracking.MovetoDots(1)
-            DoAutoFocus(0)
-            Z2 = Stage.Z
-            X2 = Stage.X
-            Y2 = Stage.Y
-
-
-            Tracking.MovetoDots(2)
-            DoAutoFocus(0)
-            Z3 = Stage.Z
-            X3 = Stage.X
-            Y3 = Stage.Y
-
-
-
-            A = (Y2 - Y1) * (Z3 - Z1) - (Y3 - Y1) * (Z2 - Z1)
-            B = (Z2 - Z1) * (X3 - X1) - (Z3 - Z1) * (X2 - X1)
-            C = (X2 - X1) * (Y3 - Y1) - (X3 - X1) * (Y2 - Y1)
-            D = -(A * X1 + B * Y1 + C * Z1)
-
-            Tracking.MovetoROIEdge()
-            X0 = Stage.X
-            Y0 = Stage.Y
-
-            For j = 1 To Y
-                For i = 1 To X
-                    If j Mod 2 = 0 Then
-                        FocusMap(i, j) = -(A * (X0 + (X - i) * -AdjustedStepX) + B * (Y0 + (j - 1) * AdjustedStepY) + D) / C
-                    Else
-
-                        FocusMap(i, j) = -(A * (X0 + (i - 1) * -AdjustedStepX) + B * (Y0 + (j - 1) * AdjustedStepY) + D) / C
-                    End If
-
-                Next
-            Next
-
-
-        End If
-        Preview.Bmp = New Bitmap(256, 256, Imaging.PixelFormat.Format24bppRgb)
-        Tracking.UpdateBmp(Preview.Bmp)
-        Dim Outputfile As New BinaryFileStructure(SaveFileDialog1.FileName, FileMode.Append)
-        Dim FocusmapFile As System.IO.StreamWriter = New StreamWriter("C:\temp\focusmap.text")
-        Camera.SetDataMode(Colortype.Grey)
-
-
-        Camera.Capture()
-
-        'Dim Resize As New ResizeBilinear(Camera.Dim_X * 2, Camera.Dim_Y * 2)
-        'Resize.Apply(Camera.BmpRef)
-
-        'writes the version
-        Outputfile.write(2)
-
-        'The number of frmaes at both directions 
-        Outputfile.write(X)
-        Outputfile.write(Y)
-        'bitmap width  and height 
-        Outputfile.write(Camera.W)
-        Outputfile.write(Camera.H)
-
-
-
-        'now writing the preview bitmap
-        Outputfile.write(Tracking.bmp.width)
-        Outputfile.write(Tracking.bmp.bmp.Height)
-        Outputfile.write(Tracking.bmp.bytes.GetLength(0))
-        Outputfile.write(Tracking.bmp.bytes, Tracking.bmp.bytes.Length)
-
-        'Writing the ROI properties 
-        If Tracking.ROI.IsMade Then
-            ' to show that ROI is there 
-            Outputfile.write(1)
-            Outputfile.write(Tracking.ROI.Rect.Width)
-            Outputfile.write(Tracking.ROI.Rect.Height)
-            Outputfile.write(Tracking.ROI.Rect.Y)
-            Outputfile.write(Tracking.ROI.Rect.X)
-        Else
-            ' to show that ROI is not there
-            Outputfile.write(0)
-
-            Outputfile.write(0)
-            Outputfile.write(0)
-            Outputfile.write(0)
-            Outputfile.write(0)
-
-        End If
-        ' version 2 adds a byte to indicate the type of scan
-        Dim ScanType As Byte
-        If RadioButton1.Checked Then ScanType = 1
-        If RadioButton2.Checked Then ScanType = 2
-        If RadioButton3.Checked Then ScanType = 3
-        Outputfile.write(ScanType)
-        ' now preserve the space for future developments. 
-        Dim bytes(999) As Byte
-        Outputfile.write(bytes, 999)
-        'The returned frmae from the camera is 1 byte longer!
-        Dim framelength = Camera.W * Camera.H
-
-
-        Dim loop_x, loop_y As Integer
-
-        Dim Fx, Fy As Integer
-
-        For loop_y = 1 To Y
-
-            If loop_y > 1 Then
-                Stage.MoveRelative(Stage.Yaxe, AdjustedStepY)
-
-                ' stage.MoveAbsolute(stage.Zaxe, FocusMap(X, loop_y))
-                filen = filen + X + direction
-                direction = direction * -1
-                Fy += 1
-                If direction < 0 Then Fx = X - 1 Else Fx = 0
-            End If
-
-            For loop_x = 1 To X
-                '  stage.MoveAbsolute(stage.Zaxe, FocusMap(loop_x, loop_y))
-                If loop_x > 1 Then
-                    Stage.MoveRelative(Stage.Xaxe, -AdjustedStepX * direction)
-                End If
-
-
-                Pbar.Increment(1)
-                'LEDcontroller.SetRelays(1, True)
-                FocusMap(loop_x - 1, loop_y - 1) = DoAutoFocus(0)
-                Camera.Capture()
-                '  LEDcontroller.SetRelays(1, False)
-                Display.ApplyColorGain(Camera.Bytes, Camera.W, Camera.H)
-                Outputfile.write(Camera.Bytes, framelength)
-
-                'If Camera.exp < 0.1 Then Threading.Thread.Sleep(100)
-                ' LEDcontroller.SetRelays(2, True)
-                'Camera.capture()
-                'LEDcontroller.SetRelays(2, False)
-                'Outputfile.write(Camera.frame, framelength)
-                Application.DoEvents()
-
-                If direction < 0 Then
-                    Fx -= 1
-                Else
-                    Fx += 1
-                End If
-
-
-            Next
-        Next
-
-        Dim Outputstring As String
-        For j = 0 To Y - 1
-            Outputstring = ""
-            For i = 0 To X - 1
-                If i < X - 1 Then Outputstring += FocusMap(i, j).ToString + "," Else Outputstring += FocusMap(i, j).ToString
-            Next
-            FocusmapFile.WriteLine(Outputstring)
-        Next
-        FocusmapFile.Close()
-
-
-        LEDcontroller.SetRelays(1, True)
-        LEDcontroller.SetRelays(2, False)
-
-        'stage.MoveAbsolute(stage.Xaxe, 0)
-        'stage.MoveAbsolute(stage.Yaxe, 0)
-
-        Pbar.Value = 0
-        'MakeMontage(bmp, X, Y)
-        Outputfile.CLOSE()
-        GoLive()
-        Button_Scan.Enabled = False
-        TextBoxX.Text = 0
-        TextBoxY.Text = 0
-    End Sub
 
     Public Sub MakeMontage(bmp() As Bitmap, x As Integer, y As Integer)
 
@@ -944,7 +718,7 @@ Public Class Form1
 
     End Sub
 
-    Private Sub Textbox_exposure_Click(sender As Object, e As EventArgs) Handles Textbox_exposure.Click
+    Private Sub Textbox_exposure_Click(sender As Object, e As EventArgs)
 
     End Sub
 
@@ -954,11 +728,11 @@ Public Class Form1
         Camera.Capture()
         Camera.Flatfield(0)
         Camera.SetDataMode(Colortype.Grey)
-        CheckBox1.Checked = False
+        CheckBoxLED.Checked = False
         Thread.Sleep(500)
         Camera.Capture()
         SaveSinglePageTiff16("dark.tif", Camera.Bytes, Camera.W, Camera.H)
-        CheckBox1.Checked = True
+        CheckBoxLED.Checked = True
         Thread.Sleep(500)
 
         'Dim Flatfield(Camera.Dim_X * Camera.Dim_Y - 1) As Single
@@ -1027,9 +801,9 @@ Public Class Form1
         Stage.GoToFocus()
     End Sub
 
-    Private Sub CheckBox1_CheckedChanged(sender As Object, e As EventArgs) Handles CheckBox1.CheckedChanged
+    Private Sub CheckBox1_CheckedChanged(sender As Object, e As EventArgs) Handles CheckBoxLED.CheckedChanged
 
-        UpdateLED(CheckBox1.Checked)
+        UpdateLED(CheckBoxLED.Checked)
 
     End Sub
 
@@ -1202,6 +976,58 @@ Public Class Form1
         'if camera is stopped because  of this sub then it resumes the live.
         If WasLive Then GoLive()
 
+    End Sub
+
+
+
+
+    Private Sub TextBox13_KeyDown(sender As Object, e As KeyEventArgs) Handles TextBox_exposure.KeyDown
+        If e.KeyCode = Keys.Return Then
+            ChangeExposure()
+
+        End If
+    End Sub
+
+    Private Sub TextBox_exposure_TextChanged(sender As Object, e As EventArgs) Handles TextBox_exposure.TextChanged
+
+    End Sub
+
+    Private Sub TextBox_exposure_MouseWheel(sender As Object, e As MouseEventArgs) Handles TextBox_exposure.MouseWheel
+        If Camera.ExposureChanged Then Exit Sub
+
+        TextBox_exposure.Text += e.Delta / 120
+        If TextBox_exposure.Text < 1 Then TextBox_exposure.Text = 1
+        ChangeExposure()
+    End Sub
+
+    Private Sub PictureBox_MouseWheel(sender As Object, e As MouseEventArgs) Handles PictureBox0.MouseWheel, PictureBox1.MouseWheel
+        If Focusing = True Then Exit Sub
+        Focusing = True
+        Dim speed As Single
+        If Control.ModifierKeys = Keys.Control Then speed = 50 Else speed = 5
+
+        'If XYZ.name = "NewPort" Then
+        If e.Delta > 0 Then
+            Stage.MoveRelative(Stage.Zaxe, speed * 0.001 * Math.Abs(e.Delta) / 120)
+        Else
+            Stage.MoveRelative(Stage.Zaxe, speed * -0.001 * Math.Abs(e.Delta) / 120)
+        End If
+        Focusing = False
+    End Sub
+
+    Private Sub TextBox15_TextChanged(sender As Object, e As EventArgs) Handles TextBox15.TextChanged
+
+    End Sub
+
+    Private Sub TextBox15_KeyDown(sender As Object, e As KeyEventArgs) Handles TextBox15.KeyDown
+        If e.KeyCode = Keys.Return Then
+            Camera.SetMatrix(TextBox15.Text)
+        End If
+    End Sub
+
+    Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
+        Display.MakeHistogram()
+        Display.PlotHistogram()
     End Sub
 End Class
 

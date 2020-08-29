@@ -19,10 +19,12 @@ Public Class XimeaColor
     Public BmpRef As Bitmap
     Public bit_scale As Byte = 2 ^ 4
     Private timeout As Integer
-
+    Public CCMAtrix As Single
     Public Bytes As Byte()
     Public TRG_MODE As Integer
     Public ExposureChanged As Boolean
+    Public MatrixResetRequested As Boolean
+    Public MatrixResetChanged As Boolean
     Public Dostop As Boolean
 
 
@@ -39,7 +41,7 @@ Public Class XimeaColor
 
             Name = cam.GetParamString(PRM.DEVICE_NAME)
             cam.SetParam(PRM.BUFFER_POLICY, BUFF_POLICY.SAFE)
-            cam.SetParam(PRM.IMAGE_DATA_FORMAT, IMG_FORMAT.RAW8)
+            cam.SetParam(PRM.IMAGE_DATA_FORMAT, IMG_FORMAT.RGB24)
 
             '    cam.SetParam(PRM.TRG_SELECTOR, 1)
             'cam.SetParam(PRM.ACQ_TIMING_MODE, ACQ_TIMING_MODE.FRAME_RATE)
@@ -59,7 +61,7 @@ Public Class XimeaColor
 
             exp = Setting.Gett("exposureb")
             SetExposure(exp, True)
-
+            ResetMatrix()
 
             timeout = 5000
             busy = False
@@ -84,8 +86,23 @@ Public Class XimeaColor
 
 
     End Sub
+    Public Sub SetMatrix(CCMAtrix As Single)
+        Me.CCMAtrix = CCMAtrix
+        If CCMAtrix > 8 Then CCMAtrix = 8
+        If CCMAtrix < 1 Then CCMAtrix = 1
+        cam.SetParam(PRM.CC_MATRIX_00, CCMAtrix)
+        cam.SetParam(PRM.CC_MATRIX_11, CCMAtrix)
+        cam.SetParam(PRM.CC_MATRIX_22, CCMAtrix)
+    End Sub
+    Public Sub ResetMatrix()
+        cam.SetParam(PRM.CC_MATRIX_00, 1)
+        cam.SetParam(PRM.CC_MATRIX_11, 1)
+        cam.SetParam(PRM.CC_MATRIX_22, 1)
+        CCMAtrix = 1
+    End Sub
 
-    Public Sub SetColorGain(R As Integer, G As Integer, B As Integer)
+
+    Public Sub SetColorGain(R As Single, G As Single, B As Single)
         cam.SetParam(PRM.WB_KB, B)
         cam.SetParam(PRM.WB_KG, G)
         cam.SetParam(PRM.WB_KR, R)
@@ -110,7 +127,7 @@ Public Class XimeaColor
             W = cam.GetParamInt(PRM.WIDTH)
             H = cam.GetParamInt(PRM.HEIGHT)
             BmpRef = New Bitmap(W, H, Imaging.PixelFormat.Format24bppRgb)
-            ReDim Bytes(W * H - 1)
+            ReDim Bytes(W * H * 3 - 1)
         End If
     End Sub
     Public Sub SetPolicyToSafe()

@@ -10,6 +10,7 @@ Public Class FocusStructure
     'focus point
     Public Z0 As Single
     Dim readout As Single
+    Public Zacceleration As Single = 3000
     Dim exp As Single
     'One is for camera Cpline  one is for stage spline
     Dim Spline, Cpline As Interpolation.LinearSpline
@@ -47,10 +48,12 @@ Public Class FocusStructure
 
         Camera.Flatfield(0)
         exp = Camera.exp
+        Camera.SetDataMode(Colortype.Grey)
         Camera.SetExposure(exp / bin, False)
         Camera.SetBinning(True, bin)
         ReDim BinnedImage(Nimg - 1)
-        Stage.SetAcceleration(Stage.Zaxe, 3000)
+        Stage.SetAcceleration(Stage.Zaxe, Zacceleration)
+
         'To use only integer steps 
         '      Range = Int(Range / Nimg * stage.ZMMtoSteps) * Nimg / stage.ZMMtoSteps
 
@@ -221,7 +224,7 @@ Public Class FocusStructure
 
         For zz = 0 To Nimg - 1
             CM(zz) = FT.FindCenterOfMass3(BinnedImage(zz))
-            'SaveSinglePageTiff("C:\temp\POS- " + zz.ToString + "-" + Pos(zz).ToString + "CM- " + CM(zz).ToString + ".tif", BinnedImage(zz), Camera.Wbinned, Camera.Hbinned)
+            SaveSinglePageTiff("C:\test\POS- " + zz.ToString + "-" + Pos(zz).ToString + "CM- " + CM(zz).ToString + ".tif", BinnedImage(zz), Camera.Wbinned, Camera.Hbinned)
 
         Next
 
@@ -283,10 +286,11 @@ Public Class FocusStructure
 
 
     Public Sub Release()
-        ' If Camera.FFsetup Then Camera.Flatfield(1)
+        Camera.SetDataMode(Colortype.RGB)
+        If Camera.FFsetup Then Camera.Flatfield(1)
         Camera.SetExposure(exp, False)
         Camera.SetBinning(False, bin)
-        Stage.SetAcceleration(Stage.Zaxe, 1000)
+        Stage.SetAcceleration(Stage.Zaxe, Stage.Zacc)
     End Sub
 
 

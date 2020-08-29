@@ -5,260 +5,64 @@ Imports AForge.Imaging
 
 Public Class ImageDisplay
 
-    Dim Bayer As AForge.Imaging.Filters.BayerFilter
-    Dim W, H As Integer
-    Public sampeling As Integer
+
+    Public Width, Height As Integer
+
 
     Dim rawImage As ByteImage
-    Dim rawImageSampled As ByteImage
-    Dim OutputImage As ByteImage
-
     Public zoom As Boolean
-    Public BmpPreview As FastBMP
-    Public Fbmp As FastBMP
-
+    Public BmpPreview(10) As FastBMP
+    Dim f As Integer
     Public GainR, GainG, GainB As Single
-
-    Dim HistBin As Integer = 255
+    Public busy As Boolean
+    Public HistBin As Integer = 255
     Public ib, ic As Single
-    Dim Histogram() As Integer
+    Public RequestIbIc As Boolean
+    Dim HistoChart As Chart
+    Public Histogram() As Integer
 
-    Public Sub New(Win As Integer, Hin As Integer, sin As Integer)
-        W = Win
-        H = Hin
-
-        sampeling = sin
+    Public Sub New(W As Integer, H As Integer, ByRef HistoChart As Chart)
+        Me.Width = W
+        Me.Height = H
+        Me.HistoChart = HistoChart
         rawImage.Width = W
         rawImage.Height = H
         ' Get Raw Data
         rawImage.Size = rawImage.Width * rawImage.Height
         ReDim rawImage.data(rawImage.Size - 1)
-
-        ReDim OutputImage.data(rawImage.Size - 1)
-        OutputImage.Width = W
-        OutputImage.Height = H
-        OutputImage.bmp8bit = New Bitmap(W, H, Imaging.PixelFormat.Format8bppIndexed)
-
-        rawImage.bmp8bit = New Bitmap(W, H, Imaging.PixelFormat.Format8bppIndexed)
-
-        rawImageSampled.AdjustedWidth = (W \ (2 * sampeling)) * sampeling * 2
-        rawImageSampled.AdjustedHeight = (H \ (2 * sampeling)) * sampeling * 2
-        rawImageSampled.Width = rawImageSampled.AdjustedWidth / sampeling
-        rawImageSampled.Height = rawImageSampled.AdjustedHeight / sampeling
-        rawImageSampled.Size = rawImageSampled.Width * rawImageSampled.Height
-        ReDim rawImageSampled.data(rawImageSampled.Size - 1)
-        rawImageSampled.bmp8bit = New Bitmap(rawImageSampled.Width, rawImageSampled.Height, Imaging.PixelFormat.Format8bppIndexed)
-        rawImageSampled.Sampling = sampeling
-
-        Fbmp = New FastBMP(W, H, Imaging.PixelFormat.Format24bppRgb)
-        BmpPreview = New FastBMP(rawImageSampled.Width, rawImageSampled.Height, Imaging.PixelFormat.Format24bppRgb)
-
-        Bayer = New Filters.BayerFilter
-        Dim Pattern(1, 1) As Integer
-        Pattern = {{RGB.R, RGB.G}, {RGB.G, RGB.B}}
-        Bayer.BayerPattern = Pattern
-
-        zoom = False
-
+        For i = 0 To 10
+            BmpPreview(i) = New FastBMP(W, H, Imaging.PixelFormat.Format24bppRgb)
+        Next
         SetColorGain(Setting.Gett("GainR"), Setting.Gett("GainG"), Setting.Gett("GainB"))
 
     End Sub
     Public Sub AdjustBrightness()
-        SetIbIc()
+        RequestIbIc = True
     End Sub
 
-    Public Sub PlotHistogram(chrt As Chart)
+    Public Sub PlotHistogram()
 
-        chrt.Series(0).Points.Clear()
+        HistoChart.Series(0).Points.Clear()
 
         For j = 0 To HistBin
-            chrt.Series(0).Points.AddXY(j + 1, Histogram(j))
+            HistoChart.Series(0).Points.AddXY(j + 1, Histogram(j))
         Next
 
     End Sub
-    'Public Sub DrawIbIc(chrt As Chart)
-    '    chrt.Series(1).Points.Clear()
-    '    chrt.Series(2).Points.Clear()
-    '    chrt.Series(1).Points.AddXY(ib, Histogram.Max)
-    '    chrt.Series(2).Points.AddXY(ic, Histogram.Max)
-    'End Sub
-    Public Function MakeFullsizeImage() As Bitmap
 
-        Array.Copy(rawImage.data, OutputImage.data, rawImage.Size - 1)
-
-        ApplyColorGain(OutputImage)
-
-        byteToBitmap(OutputImage.data, OutputImage.bmp8bit)
-
-        '  Bayer.Apply(OutputImage.bmp8bit)
-
-        Fbmp = New FastBMP(Bayer.Apply(OutputImage.bmp8bit))
-
-        Return Fbmp.bmp
-
-
-    End Function
-
-    Public Function MakeFullsizeImage(bytes() As Byte) As Byte()
-
-        Array.Copy(bytes, OutputImage.data, rawImage.Size - 1)
-
-        ApplyColorGain(OutputImage)
-
-        byteToBitmap(OutputImage.data, OutputImage.bmp8bit)
-
-        '  Bayer.Apply(OutputImage.bmp8bit)
-
-        Fbmp = New FastBMP(Bayer.Apply(OutputImage.bmp8bit))
-
-        Return Fbmp.bytes
-
-
-    End Function
-
-
-    Public Sub ApplyColorGain(ByRef rawImageIn As ByteImage)
-        'This is for resampling the image with different Sampling index
-        Dim i, j As Integer
-
-        Dim Offset As Integer = 0
-
-        Dim i1, i2 As Integer
-        Dim R, G, B As Integer
-        For j = 0 To rawImageIn.Height - 1 Step 2
-            'reading RGRG line
-            i1 = Offset : i2 = Offset + rawImageIn.Width - 2
-            For i = i1 To i2 Step 2
-                R = rawImageIn.data(i) * GainR
-                If R > 255 Then R = 255
-
-                G = rawImageIn.data(i + 1) * GainG
-                If G > 255 Then G = 255
-
-                rawImageIn.data(i) = R
-                rawImageIn.data(i + 1) = G
-
-            Next
-            Offset += rawImageIn.Width
-            i1 = Offset : i2 = Offset + rawImageIn.Width - 2
-            'reading GBGB line
-            For i = i1 To i2 Step 2
-
-                G = rawImageIn.data(i) * GainG
-                If G > 255 Then G = 255
-
-                B = rawImageIn.data(i + 1) * GainB
-                If B > 255 Then B = 255
-
-                rawImageIn.data(i) = G
-                rawImageIn.data(i + 1) = B
-
-            Next
-            Offset += rawImageIn.Width
-        Next
-
-
-
-    End Sub
-
-
-    Public Sub ApplyColorGain(ByRef rawImageIn() As Byte, width As Integer, height As Integer)
-        'This is for resampling the image with different Sampling index
-        Dim i, j As Integer
-
-        Dim Offset As Integer = 0
-
-        Dim i1, i2 As Integer
-        Dim R, G, B As Integer
-        For j = 0 To height - 1 Step 2
-            'reading RGRG line
-            i1 = Offset : i2 = Offset + width - 2
-            For i = i1 To i2 Step 2
-                R = rawImageIn(i) * GainR
-                If R > 255 Then R = 255
-
-                G = rawImageIn(i + 1) * GainG
-                If G > 255 Then G = 255
-
-                rawImageIn(i) = R
-                rawImageIn(i + 1) = G
-
-            Next
-            Offset += width
-            i1 = Offset : i2 = Offset + width - 2
-            'reading GBGB line
-            For i = i1 To i2 Step 2
-
-                G = rawImageIn(i) * GainG
-                If G > 255 Then G = 255
-
-                B = rawImageIn(i + 1) * GainB
-                If B > 255 Then B = 255
-
-                rawImageIn(i) = G
-                rawImageIn(i + 1) = B
-
-            Next
-            Offset += width
-        Next
-
-
-
-    End Sub
-
-    Public Sub ApplyColorGain(ByRef bmp As FastBMP)
-
-
-        bmp.Unlock()
-        Dim R, G, B As Integer
-        Dim i As Integer
-        For y = 0 To bmp.height - 1
-            For x = 0 To bmp.width - 1
-                R = bmp.byteCopy(i + 2) * GainR
-                If R > 255 Then R = 255
-
-                G = bmp.byteCopy(i + 1) * GainG
-                If G > 255 Then G = 255
-
-                B = bmp.byteCopy(i) * GainB
-                If B > 255 Then B = 255
-
-                bmp.SetPixel(x, y, B, G, R)
-
-                i += 3
-
-            Next
-
-        Next
-        bmp.lock()
-
-
-
-    End Sub
-
-    Public Sub Preview(rawin As Byte(), Gained As Boolean)
+    Public Function Preview(rawin As Byte(), Gained As Boolean)
         rawImage.data = rawin
+        f += 1
+        If f = 11 Then f = 1
+        BmpPreview(f).MakeFromBytes(rawin)
+        If RequestIbIc Then SetIbIc() : RequestIbIc = False
+        'MakeHistogram()
+        'PlotHistogram(HistoChart)
 
-        If zoom Then
-            ZoomImage(rawImage, rawImageSampled)
-        Else
-            If Gained Then
-                ResampleImage(rawImage, rawImageSampled, GainR, GainG, GainB)
-            Else
-                ResampleImage(rawImage, rawImageSampled, 1, 1, 1)
-            End If
-
-        End If
+        Return BmpPreview(f).bmp
+    End Function
 
 
-        BayerInterpolate(CoolBright(rawImageSampled.data))
-
-    End Sub
-
-    Public Sub Preview(InterpolatedBytes As Byte())
-
-        Fbmp.MakeNewFromBytes(CoolBright(InterpolatedBytes))
-    End Sub
 
     Public Sub SetColorGain(R As Single, G As Single, B As Single)
         GainR = R
@@ -274,92 +78,14 @@ Public Class ImageDisplay
 
 
 
-
-
-    Sub BayerInterpolate(bytein As Byte())
-        byteToBitmap(bytein, rawImageSampled.bmp8bit)
-        BmpPreview = New FastBMP(Bayer.Apply(rawImageSampled.bmp8bit))
-    End Sub
-
-
-    Public Sub ResampleImage(rawImageIn As ByteImage, ByRef rawImageOut As ByteImage, GainR As Single, GianG As Single, GainB As Single)
-        'This is for resampling the image with different Sampling index
-        Dim p, i, j As Integer
-        'ShapeSampledImage(rawImageOut, rawImageIn.Width, rawImageIn.Height, rawImageOut.Sampling)
-        Dim length As Integer = rawImageIn.Width * rawImageOut.AdjustedHeight
-        ReDim rawImageOut.data(rawImageOut.Size - 1)
-        ''The steps are snap.Format.Width * 2 * Sample, 2 is to take into accout the fact that we read two lines each time. First line is RGRGRG and second line is BGBGBG
-        ''Sample is to skip the lines 
-        Dim Offset As Integer = 0
-        Dim Steps As Integer = rawImageOut.Sampling * 2
-        Dim i1, i2 As Integer
-        Dim R, G, B As Integer
-        For j = 0 To rawImageOut.AdjustedHeight - 1 Step Steps
-            'reading RGRG line
-            i1 = Offset : i2 = Offset + rawImageOut.AdjustedWidth - Steps
-            For i = i1 To i2 Step Steps
-                R = rawImageIn.data(i) * GainR
-                If R > 255 Then R = 255
-
-                G = rawImageIn.data(i + 1) * GainG
-                If G > 255 Then G = 255
-
-                rawImageOut.data(p) = R
-                rawImageOut.data(p + 1) = G
-                p = p + 2
-            Next
-            Offset += rawImageIn.Width
-            i1 = Offset : i2 = Offset + rawImageOut.AdjustedWidth - Steps
-            'reading GBGB line
-            For i = i1 To i2 Step Steps
-
-                G = rawImageIn.data(i) * GainG
-                If G > 255 Then G = 255
-
-                B = rawImageIn.data(i + 1) * GainB
-                If B > 255 Then B = 255
-
-                rawImageOut.data(p) = G
-                rawImageOut.data(p + 1) = B
-                p = p + 2
-            Next
-            Offset += rawImageIn.Width * (rawImageOut.Sampling * 2 - 1)
-        Next
-
-    End Sub
-
-
-    Public Sub ZoomImage(rawImageIn As ByteImage, ByRef rawImageOut As ByteImage)
-        'This is for resampling the image with different Sampling index
-        Dim p, i As Integer
-
-
-
-        Dim length As Integer = rawImageIn.Width * rawImageOut.AdjustedHeight
-        ReDim rawImageOut.data(rawImageOut.Size - 1)
-        'This is the  intial offset. It goes to the top left corner of the image
-        Dim Offset As Integer = rawImageIn.Width * (rawImageIn.Height - rawImageOut.Height) / 2 + (rawImageIn.Width - rawImageOut.Width) / 2 + rawImageIn.Width
-        'Dim Offset = rawImageIn.Width * (rawImageIn.Height - rawImageOut.Height) / 2 + (rawImageIn.Width - rawImageOut.Width) / 2
-        For j = 0 To rawImageOut.Height - 1
-            For i = Offset To Offset + rawImageOut.Width - 1
-                rawImageOut.data(p) = rawImageIn.data(i)
-
-                p = p + 1
-            Next
-            Offset += rawImageIn.Width
-        Next
-    End Sub
-
-
-
-
-    Private Sub MakeHistogram()
+    Public Sub MakeHistogram()
         ReDim Histogram(HistBin)
 
 
-        For i = 0 To rawImageSampled.Size - 1
+        For i = 0 To rawImage.Size - 1 Step 4
 
-            Histogram(rawImageSampled.data(i)) += 1
+
+            Histogram(rawImage.data(i) / Camera.CCMAtrix) += 1
 
         Next
 
@@ -367,6 +93,8 @@ Public Class ImageDisplay
         Histogram(0) = Histogram(1)
     End Sub
     Public Sub SetIbIc()
+
+
         MakeHistogram()
         Dim Hmax As Integer = 0
         Dim HCum(HistBin) As Integer
@@ -388,30 +116,19 @@ Public Class ImageDisplay
         ic = i * 1.5
         If ic > HistBin Then ic = HistBin
 
+
         For i = 0 To ic
             If Histogram(i) > HCumMin Then Exit For
         Next
         ib = i
 
 
+        Camera.SetMatrix(255 / ic)
+
+
     End Sub
 
-    Public Function CoolBright(ByRef ByteImage As Byte()) As Byte()
 
-        Dim length As Integer = ByteImage.Length
-        Dim ByteImageStretched(length - 1) As Byte
-        Dim c As Integer
-        Dim p As Integer = 0
-        If ib = ic Then ib = 0 : ic = 255
-        For i = 0 To length - 1
-            c = (ByteImage(i) - ib) / (ic - ib) * 255
-            If c < 0 Then c = 0
-            If c > 255 Then c = 255
-            ByteImageStretched(i) = c
-        Next
-
-        Return ByteImageStretched
-    End Function
 
 
 

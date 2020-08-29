@@ -73,10 +73,11 @@ Public Class FastBMP
     End Sub
 
 
-    Public Sub MakeNewFromBytes(bytes As Byte())
+    Public Sub MakeFromBytes(bytes As Byte())
         Me.bytes = bytes
+
         byteToBitmap(bytes, bmp)
-        GR = Graphics.FromImage(bmp)
+        'GR = Graphics.FromImage(bmp)
     End Sub
     Public Sub RefreshROI()
         Reset()
@@ -184,7 +185,7 @@ End Class
 
 
 Module Bitmaps
-    Public Sub byteToBitmap(bytes() As Byte, bmp As Bitmap)
+    Public Sub byteToBitmap(bytes() As Byte, ByRef bmp As Bitmap)
         Dim rect As Rectangle = New Rectangle(0, 0, bmp.Width, bmp.Height)
         Dim bmpData As BitmapData = bmp.LockBits(rect, ImageLockMode.ReadWrite, bmp.PixelFormat)
         ' Copy the RGB values back to the bitmap
@@ -195,6 +196,22 @@ Module Bitmaps
             bmp.Palette = GetGrayScalePalette()
         End If
     End Sub
+
+
+    Public Function byteToBitmap(bytes() As Byte, width As Integer, height As Integer)
+        Dim bmp = New Bitmap(width, height, Imaging.PixelFormat.Format24bppRgb)
+        Dim rect As Rectangle = New Rectangle(0, 0, bmp.Width, bmp.Height)
+        Dim bmpData As BitmapData = bmp.LockBits(rect, ImageLockMode.ReadWrite, bmp.PixelFormat)
+        ' Copy the RGB values back to the bitmap
+        Runtime.InteropServices.Marshal.Copy(bytes, 0, bmpData.Scan0, bmpData.Stride * bmp.Height)
+        ' Unlock the bits.
+        bmp.UnlockBits(bmpData)
+        If bmp.PixelFormat = PixelFormat.Format8bppIndexed Then
+            bmp.Palette = GetGrayScalePalette()
+        End If
+        Return bmp
+    End Function
+
 
     Public Function BitmapToBytes(bmp As Bitmap, ByRef bytes() As Byte) As Integer
         Dim rect As Rectangle = New Rectangle(0, 0, bmp.Width, bmp.Height)
