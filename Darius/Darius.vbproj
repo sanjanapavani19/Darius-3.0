@@ -202,7 +202,7 @@
     <Compile Include="SettingStructure.vb" />
     <Compile Include="Shared.vb" />
     <Compile Include="StackImage.vb" />
-    <Compile Include="TileStructure.vb" />
+    <Compile Include="Pyramids.vb" />
     <Compile Include="TrackingStructure.vb" />
     <Compile Include="XimeaColor.vb" />
     <Compile Include="XimeaCropped.vb" />

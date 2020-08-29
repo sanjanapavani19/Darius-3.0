@@ -2,7 +2,7 @@
 Imports System.Threading
 Imports BitMiracle.LibTiff.Classic
 
-Public Class TileStructure
+Public Class Pyramids
     Structure TileStructure
         Dim X, Y As Integer
         Dim width, height As Integer
@@ -17,7 +17,7 @@ Public Class TileStructure
 
     Dim stride As Integer
     Public pages, page As Integer
-    Dim address As String
+    Public address As String
     Dim tiff As Tiff
     Dim tsx, tsy As Integer
     Dim index, ii, indexYoffset, indexXoffset As Integer
@@ -27,12 +27,14 @@ Public Class TileStructure
     Dim XX, YY As Integer
     Dim bytes As Byte()
     Dim compress As Integer
-    Dim Tile As TileStructure
+
+    Public Tile As TileStructure
     Public Sub New(X As Integer, Y As Integer, bmpWidth As Integer, bmpHeight As Integer, pages As Integer, page As Integer, address As String, compression As Integer)
 
         Me.pages = pages
         Me.X = X
         Me.Y = Y
+        Me.address = address
         Tile.X = 8
         Tile.Y = 8
 
@@ -69,7 +71,9 @@ Public Class TileStructure
 
         Ready = True
     End Sub
-
+    Public Sub Open()
+        tiff = Tiff.Open(address, "r")
+    End Sub
     Public Sub SaveTile(XX As Integer, YY As Integer, bytesin As Byte())
 
 
@@ -108,6 +112,7 @@ Public Class TileStructure
                 Next
 
                 tiff.WriteEncodedTile(Tile.index, Tile.bytes, Tile.bytes.Length)
+
                 Tile.index += 1
 
             Next
@@ -115,10 +120,29 @@ Public Class TileStructure
         Next
 
         Array.Clear(Tile.bytes, 0, Tile.bytes.Length())
+
         Ready = True
 
     End Sub
+    Public Sub AssemblePyramid(ByRef Pyramid() As Pyramids)
+        ' zero page is already made.
+        tiff.WriteDirectory()
+        For p = 1 To pages - 1
+            Pyramid(p).Open()
 
+            SetTiff(p, Pyramid(p).Tile)
+            ReDim Tile.bytes(Pyramid(p).Tile.width * Pyramid(p).Tile.height * 3 - 1)
+            For Tileindex = 0 To Pyramid(p).Tile.numbers - 1
+                Pyramid(p).tiff.ReadEncodedTile(Tileindex, Tile.bytes, 0, Tile.bytes.Length)
+                tiff.WriteEncodedTile(Tileindex, Tile.bytes, Tile.bytes.Length)
+            Next
+            tiff.WriteDirectory()
+        Next
+        tiff.Close()
+
+
+
+    End Sub
     Public Sub Close()
         tiff.WriteDirectory()
         tiff.Close()
@@ -145,4 +169,26 @@ Public Class TileStructure
         tiff.SetField(TiffTag.TILELENGTH, Tile.height)
         tiff.SetField(TiffTag.PAGENUMBER, page, pages)
     End Sub
+
+    Private Sub SetTiff(page As Integer, ByRef Tile As TileStructure)
+        Dim PIXEL_WIDTH As Integer = X * Tile.width * Tile.X
+        Dim PIXEL_HEIGHT As Integer = Y * Tile.height * Tile.Y
+
+        tiff.SetField(TiffTag.IMAGEWIDTH, PIXEL_WIDTH)
+        tiff.SetField(TiffTag.IMAGELENGTH, PIXEL_HEIGHT)
+        tiff.SetField(TiffTag.COMPRESSION, Compression.NONE)
+
+        'tiff.SetField(TiffTag.JPEGQUALITY, compress)
+        tiff.SetField(TiffTag.PHOTOMETRIC, Photometric.RGB)
+        tiff.SetField(TiffTag.ROWSPERSTRIP, PIXEL_HEIGHT)
+        tiff.SetField(TiffTag.XRESOLUTION, 96)
+        tiff.SetField(TiffTag.YRESOLUTION, 96)
+        tiff.SetField(TiffTag.BITSPERSAMPLE, 8)
+        tiff.SetField(TiffTag.SAMPLESPERPIXEL, 3)
+        tiff.SetField(TiffTag.PLANARCONFIG, PlanarConfig.CONTIG)
+        tiff.SetField(TiffTag.TILEWIDTH, Tile.width)
+        tiff.SetField(TiffTag.TILELENGTH, Tile.height)
+        tiff.SetField(TiffTag.PAGENUMBER, page, pages)
+    End Sub
+
 End Class

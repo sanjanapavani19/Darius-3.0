@@ -51,7 +51,6 @@ Partial Class Form1
         Me.Label6 = New System.Windows.Forms.Label()
         Me.Label5 = New System.Windows.Forms.Label()
         Me.Button7 = New System.Windows.Forms.Button()
-        Me.Button5 = New System.Windows.Forms.Button()
         Me.TextBox4 = New System.Windows.Forms.TextBox()
         Me.TextBox5 = New System.Windows.Forms.TextBox()
         Me.TextBox6 = New System.Windows.Forms.TextBox()
@@ -153,7 +152,7 @@ Partial Class Form1
         Me.GroupBox3.Controls.Add(Me.Button_top)
         Me.GroupBox3.Controls.Add(Me.Button_left)
         Me.GroupBox3.Controls.Add(Me.Button_right)
-        Me.GroupBox3.Location = New System.Drawing.Point(1257, 580)
+        Me.GroupBox3.Location = New System.Drawing.Point(1167, 528)
         Me.GroupBox3.Name = "GroupBox3"
         Me.GroupBox3.Size = New System.Drawing.Size(195, 208)
         Me.GroupBox3.TabIndex = 106
@@ -258,10 +257,10 @@ Partial Class Form1
         Me.TabControl_Settings.Controls.Add(Me.TabPage12)
         Me.TabControl_Settings.Controls.Add(Me.TabPage2)
         Me.TabControl_Settings.Controls.Add(Me.TabPage5)
-        Me.TabControl_Settings.Location = New System.Drawing.Point(1257, 809)
+        Me.TabControl_Settings.Location = New System.Drawing.Point(1186, 742)
         Me.TabControl_Settings.Name = "TabControl_Settings"
         Me.TabControl_Settings.SelectedIndex = 0
-        Me.TabControl_Settings.Size = New System.Drawing.Size(449, 255)
+        Me.TabControl_Settings.Size = New System.Drawing.Size(449, 203)
         Me.TabControl_Settings.TabIndex = 111
         '
         'TabPage13
@@ -278,7 +277,6 @@ Partial Class Form1
         Me.TabPage13.Controls.Add(Me.Label6)
         Me.TabPage13.Controls.Add(Me.Label5)
         Me.TabPage13.Controls.Add(Me.Button7)
-        Me.TabPage13.Controls.Add(Me.Button5)
         Me.TabPage13.Controls.Add(Me.TextBox4)
         Me.TabPage13.Controls.Add(Me.TextBox5)
         Me.TabPage13.Controls.Add(Me.TextBox6)
@@ -292,7 +290,7 @@ Partial Class Form1
         Me.TabPage13.Controls.Add(Me.Label1)
         Me.TabPage13.Location = New System.Drawing.Point(4, 25)
         Me.TabPage13.Name = "TabPage13"
-        Me.TabPage13.Size = New System.Drawing.Size(441, 226)
+        Me.TabPage13.Size = New System.Drawing.Size(441, 174)
         Me.TabPage13.TabIndex = 3
         Me.TabPage13.Text = "Stage"
         '
@@ -406,22 +404,12 @@ Partial Class Form1
         '
         'Button7
         '
-        Me.Button7.Location = New System.Drawing.Point(39, 145)
+        Me.Button7.Location = New System.Drawing.Point(20, 145)
         Me.Button7.Name = "Button7"
         Me.Button7.Size = New System.Drawing.Size(121, 23)
         Me.Button7.TabIndex = 47
         Me.Button7.Text = "Go Zero"
         Me.Button7.UseVisualStyleBackColor = True
-        '
-        'Button5
-        '
-        Me.Button5.Location = New System.Drawing.Point(154, 179)
-        Me.Button5.Name = "Button5"
-        Me.Button5.Size = New System.Drawing.Size(121, 23)
-        Me.Button5.TabIndex = 46
-        Me.Button5.Text = "Predictive focus  off"
-        Me.Button5.UseVisualStyleBackColor = True
-        Me.Button5.Visible = False
         '
         'TextBox4
         '
@@ -461,7 +449,7 @@ Partial Class Form1
         '
         'Button10
         '
-        Me.Button10.Location = New System.Drawing.Point(27, 179)
+        Me.Button10.Location = New System.Drawing.Point(274, 145)
         Me.Button10.Name = "Button10"
         Me.Button10.Size = New System.Drawing.Size(121, 23)
         Me.Button10.TabIndex = 39
@@ -471,7 +459,7 @@ Partial Class Form1
         '
         'Button9
         '
-        Me.Button9.Location = New System.Drawing.Point(166, 145)
+        Me.Button9.Location = New System.Drawing.Point(147, 145)
         Me.Button9.Name = "Button9"
         Me.Button9.Size = New System.Drawing.Size(121, 23)
         Me.Button9.TabIndex = 38
@@ -642,9 +630,9 @@ Partial Class Form1
         'Button11
         '
         Me.Button11.Enabled = False
-        Me.Button11.Location = New System.Drawing.Point(219, 145)
+        Me.Button11.Location = New System.Drawing.Point(177, 145)
         Me.Button11.Name = "Button11"
-        Me.Button11.Size = New System.Drawing.Size(133, 28)
+        Me.Button11.Size = New System.Drawing.Size(133, 23)
         Me.Button11.TabIndex = 138
         Me.Button11.Text = "Load FlatField"
         Me.Button11.UseVisualStyleBackColor = True
@@ -653,7 +641,7 @@ Partial Class Form1
         '
         Me.Button3.Location = New System.Drawing.Point(38, 145)
         Me.Button3.Name = "Button3"
-        Me.Button3.Size = New System.Drawing.Size(133, 28)
+        Me.Button3.Size = New System.Drawing.Size(133, 23)
         Me.Button3.TabIndex = 137
         Me.Button3.Text = "Acquire FlatField"
         Me.Button3.UseVisualStyleBackColor = True
@@ -875,7 +863,7 @@ Partial Class Form1
         '
         'Button15
         '
-        Me.Button15.Location = New System.Drawing.Point(132, 133)
+        Me.Button15.Location = New System.Drawing.Point(133, 117)
         Me.Button15.Name = "Button15"
         Me.Button15.Size = New System.Drawing.Size(75, 23)
         Me.Button15.TabIndex = 6
@@ -884,7 +872,7 @@ Partial Class Form1
         '
         'Button14
         '
-        Me.Button14.Location = New System.Drawing.Point(42, 133)
+        Me.Button14.Location = New System.Drawing.Point(41, 117)
         Me.Button14.Name = "Button14"
         Me.Button14.Size = New System.Drawing.Size(75, 23)
         Me.Button14.TabIndex = 5
@@ -1164,7 +1152,7 @@ Partial Class Form1
         Me.PictureBox_Preview.BackColor = System.Drawing.Color.Black
         Me.PictureBox_Preview.Location = New System.Drawing.Point(1257, 101)
         Me.PictureBox_Preview.Name = "PictureBox_Preview"
-        Me.PictureBox_Preview.Size = New System.Drawing.Size(400, 134)
+        Me.PictureBox_Preview.Size = New System.Drawing.Size(600, 134)
         Me.PictureBox_Preview.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom
         Me.PictureBox_Preview.TabIndex = 124
         Me.PictureBox_Preview.TabStop = False
@@ -1339,7 +1327,6 @@ Partial Class Form1
     Friend WithEvents ToolStripStatusLabel1 As ToolStripStatusLabel
     Friend WithEvents ToolStripStatusLabel2 As ToolStripStatusLabel
     Friend WithEvents ToolStripStatusLabel3 As ToolStripStatusLabel
-    Friend WithEvents Button5 As Button
     Friend WithEvents Button1 As Button
     Friend WithEvents Label4 As Label
     Friend WithEvents Button3 As Button

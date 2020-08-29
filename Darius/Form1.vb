@@ -92,8 +92,10 @@ Public Class Form1
 
         GroupBox3.Left = PictureBox_Preview.Left
         GroupBox3.Top = PictureBox_Preview.Top + PictureBox_Preview.Height + d
-        TabControl_Settings.Top = GroupBox3.Top + GroupBox3.Height + d
-        TabControl_Settings.Left = GroupBox3.Left
+        TabControl_Settings.Top = GroupBox3.Top
+        TabControl_Settings.Left = GroupBox3.Left + GroupBox3.Width + d
+        Chart1.Left = GroupBox3.Left
+        Chart1.Top = GroupBox3.Top + GroupBox3.Height + d
         TextBoxGain.Text = Setting.Gett("Gain")
         TextBox_GainB.Text = Setting.Gett("GainB")
         TextBox_GainG.Text = Setting.Gett("GainG")
@@ -448,9 +450,9 @@ Public Class Form1
 
 
     Private Sub Button_Scan_Click(sender As Object, e As EventArgs) Handles Button_Scan.Click
-        SaveFileDialog1.DefaultExt = ".tif"
+        'SaveFileDialog1.DefaultExt = ".tif"
         If SaveFileDialog1.ShowDialog = DialogResult.Cancel Then Exit Sub
-        SaveFileDialog1.AddExtension = True
+        '  SaveFileDialog1.AddExtension = True
 
         Dim watch As Stopwatch
         watch = New Stopwatch
@@ -488,12 +490,12 @@ Public Class Form1
         Dim Axis As String = ""
         Dim watch As New Stopwatch
 
-        Dim Tiles(3) As TileStructure
+        Dim Pyramid(3) As Pyramids
 
-        Tiles(0) = New TileStructure(X, y, Camera.W, Camera.H, 4, 0, Address, 100)
-        Tiles(1) = New TileStructure(X, y, Camera.W, Camera.H, 4, 1, Address, 100)
-        Tiles(2) = New TileStructure(X, y, Camera.W, Camera.H, 4, 2, Address, 100)
-        Tiles(3) = New TileStructure(X, y, Camera.W, Camera.H, 4, 3, Address, 100)
+        Pyramid(0) = New Pyramids(X, y, Camera.W, Camera.H, 4, 0, Address, 100)
+        Pyramid(1) = New Pyramids(X, y, Camera.W, Camera.H, 4, 1, Address + "1", 100)
+        Pyramid(2) = New Pyramids(X, y, Camera.W, Camera.H, 4, 2, Address + "2", 100)
+        Pyramid(3) = New Pyramids(X, y, Camera.W, Camera.H, 4, 3, Address + "3", 100)
 
         Dim ColorBytes(Camera.W * Camera.H * 3 - 1)
 
@@ -573,7 +575,7 @@ Public Class Form1
                 Do Until Camera.ready
 
                 Loop
-                Do Until Tiles(0).Ready
+                Do Until Pyramid(0).Ready And Pyramid(1).Ready And Pyramid(2).Ready And Pyramid(3).Ready
 
                 Loop
 
@@ -587,12 +589,12 @@ Public Class Form1
 
 
                 If direction > 0 Then
-                    For i = 0 To Tiles(0).pages - 1
-                        Tiles(i).SaveTile(loop_x - 1, loop_y - 1, (Camera.Bytes))
+                    For i = 0 To Pyramid(0).pages - 1
+                        Pyramid(i).SaveTile(loop_x - 1, loop_y - 1, (Camera.Bytes))
                     Next
                 Else
-                    For i = 0 To Tiles(0).pages - 1
-                        Tiles(i).SaveTile(X - loop_x, loop_y - 1, (Camera.Bytes))
+                    For i = 0 To Pyramid(0).pages - 1
+                        Pyramid(i).SaveTile(X - loop_x, loop_y - 1, (Camera.Bytes))
                     Next
                 End If
                 'byteToBitmap(Camera.Bytes, Display.Bmp)
@@ -614,12 +616,16 @@ Public Class Form1
 
         Stage.MoveRelative(Stage.Xaxe, TravelX)
         Stage.MoveRelative(Stage.Yaxe, -TravelY)
-        Do Until Tiles(0).Ready
+        Do Until Pyramid(0).Ready And Pyramid(1).Ready And Pyramid(2).Ready And Pyramid(3).Ready
 
         Loop
-        For i = 0 To Tiles(0).pages - 1
-            Tiles(i).Close()
+        For i = 1 To Pyramid(0).pages - 1
+            Pyramid(i).Close()
         Next
+
+
+        Pyramid(0).AssemblePyramid({Pyramid(0), Pyramid(1), Pyramid(2), Pyramid(3)})
+
         'MakeMontage(X, Y, Bmp, True)
 1:
         Pbar.Value = 0

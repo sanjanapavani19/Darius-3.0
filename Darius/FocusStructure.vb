@@ -224,7 +224,7 @@ Public Class FocusStructure
 
         For zz = 0 To Nimg - 1
             CM(zz) = FT.FindCenterOfMass3(BinnedImage(zz))
-            SaveSinglePageTiff("C:\test\POS- " + zz.ToString + "-" + Pos(zz).ToString + "CM- " + CM(zz).ToString + ".tif", BinnedImage(zz), Camera.Wbinned, Camera.Hbinned)
+            '  SaveSinglePageTiff("C:\test\POS- " + zz.ToString + "-" + Pos(zz).ToString + "CM- " + CM(zz).ToString + ".tif", BinnedImage(zz), Camera.Wbinned, Camera.Hbinned)
 
         Next
 
