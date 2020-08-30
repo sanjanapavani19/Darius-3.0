@@ -87,12 +87,13 @@ Public Class XimeaColor
 
     End Sub
     Public Sub SetMatrix(CCMAtrix As Single)
-        Me.CCMAtrix = CCMAtrix
+
         If CCMAtrix > 8 Then CCMAtrix = 8
         If CCMAtrix < 1 Then CCMAtrix = 1
         cam.SetParam(PRM.CC_MATRIX_00, CCMAtrix)
         cam.SetParam(PRM.CC_MATRIX_11, CCMAtrix)
         cam.SetParam(PRM.CC_MATRIX_22, CCMAtrix)
+        Me.CCMAtrix = CCMAtrix
     End Sub
     Public Sub ResetMatrix()
         cam.SetParam(PRM.CC_MATRIX_00, 1)

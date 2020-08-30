@@ -87,7 +87,7 @@ Public Class Form1
 
 
         PictureBox_Preview.Left = TabControl1.Left + TabControl1.Width + d
-        PictureBox_Preview.Top = TabControl1.Top
+        PictureBox_Preview.Top = TabControl1.Top + TabControl1.ItemSize.Height
 
 
         GroupBox3.Left = PictureBox_Preview.Left
@@ -450,9 +450,9 @@ Public Class Form1
 
 
     Private Sub Button_Scan_Click(sender As Object, e As EventArgs) Handles Button_Scan.Click
-        'SaveFileDialog1.DefaultExt = ".tif"
+        SaveFileDialog1.DefaultExt = ".tif"
         If SaveFileDialog1.ShowDialog = DialogResult.Cancel Then Exit Sub
-        '  SaveFileDialog1.AddExtension = True
+        SaveFileDialog1.AddExtension = True
 
         Dim watch As Stopwatch
         watch = New Stopwatch
@@ -625,6 +625,12 @@ Public Class Form1
 
 
         Pyramid(0).AssemblePyramid({Pyramid(0), Pyramid(1), Pyramid(2), Pyramid(3)})
+
+
+        For i = 1 To Pyramid(0).pages - 1
+            If File.Exists(Pyramid(i).address) Then Kill(Pyramid(i).address)
+        Next
+
 
         'MakeMontage(X, Y, Bmp, True)
 1:

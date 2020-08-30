@@ -137,6 +137,7 @@ Public Class Pyramids
                 tiff.WriteEncodedTile(Tileindex, Tile.bytes, Tile.bytes.Length)
             Next
             tiff.WriteDirectory()
+            Pyramid(p).Close()
         Next
         tiff.Close()
 
