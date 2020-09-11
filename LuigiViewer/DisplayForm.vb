@@ -1,5 +1,5 @@
 ﻿Imports System
-Public Class Form1
+Public Class DisplayForm
     Dim Pyramid As New PyramidalTiff(Nothing, 0, 0, False, False)
     Dim sharpenCheck As Boolean = False
     Dim autoWhiteCheck As Boolean = False
@@ -10,10 +10,25 @@ Public Class Form1
     Private oldMapLocation As Point = Point.Empty 'Maplocation of previous mouse click
     Private MouseDownPoint As Point = Point.Empty 'Location in the X and Y direction of the mouse pointer when the left button is clicked
 
-    Public Sub New()
+    Public Sub New(Address As String)
         ' This call is required by the designer.
         InitializeComponent()
 
+        Dim temp As New PyramidalTiff(Address, PictureBox1.Height, PictureBox1.Width, sharpenCheck, autoWhiteCheck)
+        cantMove = True 'Can't move if we load a new picture
+        MapLocation.X = 0
+        MapLocation.Y = 0
+        Pyramid = temp
+        pictureLoaded = True
+        PictureBox1.SizeMode = PictureBoxSizeMode.Zoom
+        If pictureLoaded Then 'Updates picturebox if there's a picture loaded
+            If sharpenCheck Then
+                PictureBox1.Image = New Bitmap(Pyramid.map)
+                Pyramid.unsharpFilter.applyMask(PictureBox1.Image)
+            Else
+                PictureBox1.Image = Pyramid.map
+            End If
+        End If
     End Sub
 
     Private Sub PictureBox1_MouseDown(sender As Object, e As MouseEventArgs) Handles PictureBox1.MouseDown 'When the left mouse button is clicked and the picture is dragged, new tile groups are loaded as needed

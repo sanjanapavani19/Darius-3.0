@@ -121,11 +121,11 @@
   <ItemGroup>
     <Compile Include="FastBitmap.vb" />
     <Compile Include="Filters.vb" />
-    <Compile Include="Form1.vb">
+    <Compile Include="DisplayForm.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Form1.Designer.vb">
-      <DependentUpon>Form1.vb</DependentUpon>
+    <Compile Include="DisplayForm.Designer.vb">
+      <DependentUpon>DisplayForm.vb</DependentUpon>
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="mainForm.Designer.vb">
@@ -152,8 +152,8 @@
     <Compile Include="PyramidalTiff.vb" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Form1.resx">
-      <DependentUpon>Form1.vb</DependentUpon>
+    <EmbeddedResource Include="DisplayForm.resx">
+      <DependentUpon>DisplayForm.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>

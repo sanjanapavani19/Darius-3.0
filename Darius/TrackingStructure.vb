@@ -92,6 +92,16 @@ Public Class TrackingStructure
             Dots(4).InitialY = Dots(4).Rect.Y
 
 
+            Dots(5).Rect = New Rectangle(Rect.Left + Rect.Width / 4, Rect.Top + Rect.Height / 4, Cursor.Width, Cursor.Height)
+            Dots(5).InitialX = Dots(4).Rect.X
+            Dots(5).InitialY = Dots(4).Rect.Y
+
+
+
+            Dots(6).Rect = New Rectangle(Rect.Left + Rect.Width * (3 / 4), Rect.Top + Rect.Height * (3 / 4), Cursor.Width, Cursor.Height)
+            Dots(6).InitialX = Dots(4).Rect.X
+            Dots(6).InitialY = Dots(4).Rect.Y
+
             IsMade = True
         End Sub
 

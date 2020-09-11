@@ -69,7 +69,7 @@ Partial Class Form1
         Me.Button2.Name = "Button2"
         Me.Button2.Size = New System.Drawing.Size(84, 36)
         Me.Button2.TabIndex = 6
-        Me.Button2.Text = "White Balance"
+        Me.Button2.Text = "Refresh White Balance"
         Me.Button2.UseVisualStyleBackColor = True
         '
         'TrackBar1

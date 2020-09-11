@@ -253,12 +253,17 @@
     <None Include="Media\home.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\Image1.bmp" />
     <Content Include="SCI Version.txt" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\IMSLs\IMSLs.csproj">
       <Project>{8b2e38d5-6577-4229-89e4-d1cc9b8fc3c8}</Project>
       <Name>IMSLs</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\LuigiViewer\LuigiViewer.vbproj">
+      <Project>{86f5c1c3-9590-4944-8f1d-2b11ea34e45a}</Project>
+      <Name>LuigiViewer</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />

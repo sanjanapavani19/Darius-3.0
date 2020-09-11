@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
-Partial Class Form1
+Partial Class DisplayForm
     Inherits System.Windows.Forms.Form
 
     'Form overrides dispose to clean up the component list.
@@ -22,7 +22,7 @@ Partial Class Form1
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Form1))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(DisplayForm))
         Me.PictureBox1 = New System.Windows.Forms.PictureBox()
         Me.CheckBox1 = New System.Windows.Forms.CheckBox()
         Me.CheckBox2 = New System.Windows.Forms.CheckBox()
@@ -69,7 +69,7 @@ Partial Class Form1
         Me.Button2.Name = "Button2"
         Me.Button2.Size = New System.Drawing.Size(84, 36)
         Me.Button2.TabIndex = 6
-        Me.Button2.Text = "White Balance"
+        Me.Button2.Text = "Refresh White Balance"
         Me.Button2.UseVisualStyleBackColor = True
         '
         'TrackBar1

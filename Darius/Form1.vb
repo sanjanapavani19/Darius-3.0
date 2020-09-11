@@ -21,6 +21,7 @@ Public Class Form1
     Dim panel As Integer
     Dim Focusing As Boolean
     Dim Filenames() As String
+    Dim Scanning As Boolean
     Dim fileN As Integer
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -43,6 +44,7 @@ Public Class Form1
             Display = New ImageDisplay(Camera.W, Camera.H, Chart1)
         End If
         Stage = New ZaberNew(Setting.Gett("FOVX"), Setting.Gett("FOVX") * Camera.H / Camera.W)
+
 
 
         TextBoxGain.Text = Setting.Gett("Gain")
@@ -96,11 +98,16 @@ Public Class Form1
         TabControl_Settings.Left = GroupBox3.Left + GroupBox3.Width + d
         Chart1.Left = GroupBox3.Left
         Chart1.Top = GroupBox3.Top + GroupBox3.Height + d
+
         TextBoxGain.Text = Setting.Gett("Gain")
         TextBox_GainB.Text = Setting.Gett("GainB")
         TextBox_GainG.Text = Setting.Gett("GainG")
         TextBox_GainR.Text = Setting.Gett("GainR")
         ListBox1.Left = PictureBox_Preview.Width + PictureBox_Preview.Left + d
+        ListBox1.Top = PictureBox_Preview.Top
+        Button_GIMP.Left = ListBox1.Left
+        Button_Luigi.Left = Button_GIMP.Left + Button_GIMP.Width
+        PictureBox2.Left = Button_Luigi.Left - (PictureBox2.Width / 2 - Button_Luigi.Width / 2)
     End Sub
 
     Public Sub ChangeExposure()
@@ -450,6 +457,7 @@ Public Class Form1
 
 
     Private Sub Button_Scan_Click(sender As Object, e As EventArgs) Handles Button_Scan.Click
+        If Scanning Then Scanning = False : Button_Scan.Text = "Scan" : Exit Sub
         SaveFileDialog1.DefaultExt = ".tif"
         If SaveFileDialog1.ShowDialog = DialogResult.Cancel Then Exit Sub
         SaveFileDialog1.AddExtension = True
@@ -458,8 +466,10 @@ Public Class Form1
         watch = New Stopwatch
         watch.Start()
         CheckBoxLED.Checked = True
+        Scanning = True
+        Button_Scan.Text = "Cancel"
         FastScan(TextBoxX.Text, TextBoxY.Text, 0.00, SaveFileDialog1.FileName)
-        CheckBoxLED.Checked = False
+        If Scanning = False Then GoTo 2
         watch.Stop()
         MsgBox("Scanned in " + (watch.ElapsedMilliseconds / 1000).ToString + " s")
 
@@ -467,6 +477,10 @@ Public Class Form1
         ReDim Preserve Filenames(fileN)
         Filenames(fileN) = SaveFileDialog1.FileName
         fileN += 1
+2:
+        Scanning = False
+        If Scanning = True Then CheckBoxLED.Checked = False Else CheckBoxLED.Checked = True
+        Button_Scan.Text = "Scan"
     End Sub
 
     Public Sub FastScan(X As Integer, y As Integer, overlap As Single, Address As String)
@@ -517,7 +531,7 @@ Public Class Form1
                 Dim imgtest(Camera.Wbinned * Camera.Hbinned - 1) As Byte
                 Camera.Capture()
                 SaveSinglePageTiff("c:\temp\" + i.ToString + ".tif", Camera.Bytes, Camera.W, Camera.H)
-
+                If Scanning = False Then GoTo 1
 
             Next
             A = Fit.Main(vx, vy, 1000, 0.0001)
@@ -555,7 +569,7 @@ Public Class Form1
         For loop_y = 1 To y
             For loop_x = 1 To X
                 Pbar.Increment(1)
-
+                If Scanning = False Then GoTo 1
                 Camera.Capture_Threaded()
                 Thread.Sleep(Camera.exp * 1.2)
 
@@ -614,8 +628,7 @@ Public Class Form1
 
         Next
 
-        Stage.MoveRelative(Stage.Xaxe, TravelX)
-        Stage.MoveRelative(Stage.Yaxe, -TravelY)
+
         Do Until Pyramid(0).Ready And Pyramid(1).Ready And Pyramid(2).Ready And Pyramid(3).Ready
 
         Loop
@@ -634,6 +647,8 @@ Public Class Form1
 
         'MakeMontage(X, Y, Bmp, True)
 1:
+        Stage.MoveRelative(Stage.Xaxe, TravelX)
+        Stage.MoveRelative(Stage.Yaxe, -TravelY)
         Pbar.Value = 0
         'Camera.SetPolicyToUNSafe()
         'Camera.Flatfield(0)
@@ -845,7 +860,7 @@ Public Class Form1
 
 
 
-    Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
+    Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button_GIMP.Click
 
 
         Try
@@ -1040,6 +1055,21 @@ Public Class Form1
     Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
         Display.MakeHistogram()
         Display.PlotHistogram()
+    End Sub
+
+    Private Sub Button5_Click(sender As Object, e As EventArgs)
+
+    End Sub
+
+    Private Sub Button18_Click(sender As Object, e As EventArgs) Handles Button_Luigi.Click
+        Try
+            Dim viewer As New LuigiViewer.DisplayForm(Filenames(ListBox1.SelectedIndex))
+            viewer.Show()
+
+        Catch
+            MsgBox("No image file is found", MsgBoxStyle.Critical)
+        End Try
+
     End Sub
 End Class
 
