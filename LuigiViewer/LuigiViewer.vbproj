@@ -155,6 +155,9 @@
     <EmbeddedResource Include="DisplayForm.resx">
       <DependentUpon>DisplayForm.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="mainForm.resx">
+      <DependentUpon>mainForm.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.vb</LastGenOutput>

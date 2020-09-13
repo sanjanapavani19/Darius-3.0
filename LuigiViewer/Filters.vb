@@ -14,7 +14,7 @@ Public Class whiteBalance 'Auto White Balancing
     End Structure
 
     Public Sub New()
-        percentage = {0.005, 0.01, 0.015, 0.02, 0.025, 0.03}
+        percentage = {0.002, 0.004, 0.006, 0.008, 0.01, 0.012}
     End Sub
 
     'Check the status of updateBalanced

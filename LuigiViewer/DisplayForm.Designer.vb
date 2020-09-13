@@ -58,16 +58,16 @@ Partial Class DisplayForm
         Me.CheckBox2.AutoSize = True
         Me.CheckBox2.Location = New System.Drawing.Point(1026, 720)
         Me.CheckBox2.Name = "CheckBox2"
-        Me.CheckBox2.Size = New System.Drawing.Size(96, 17)
+        Me.CheckBox2.Size = New System.Drawing.Size(125, 17)
         Me.CheckBox2.TabIndex = 5
-        Me.CheckBox2.Text = "White Balance"
+        Me.CheckBox2.Text = "Apply White Balance"
         Me.CheckBox2.UseVisualStyleBackColor = True
         '
         'Button2
         '
-        Me.Button2.Location = New System.Drawing.Point(1128, 709)
+        Me.Button2.Location = New System.Drawing.Point(1148, 709)
         Me.Button2.Name = "Button2"
-        Me.Button2.Size = New System.Drawing.Size(84, 36)
+        Me.Button2.Size = New System.Drawing.Size(134, 36)
         Me.Button2.TabIndex = 6
         Me.Button2.Text = "Refresh White Balance"
         Me.Button2.UseVisualStyleBackColor = True
@@ -97,7 +97,7 @@ Partial Class DisplayForm
         Me.TextBox1.Size = New System.Drawing.Size(232, 20)
         Me.TextBox1.TabIndex = 10
         '
-        'Form1
+        'DisplayForm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
@@ -110,7 +110,7 @@ Partial Class DisplayForm
         Me.Controls.Add(Me.CheckBox1)
         Me.Controls.Add(Me.PictureBox1)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
-        Me.Name = "Form1"
+        Me.Name = "DisplayForm"
         Me.Text = "Luigi's Viewer"
         CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.TrackBar1, System.ComponentModel.ISupportInitialize).EndInit()

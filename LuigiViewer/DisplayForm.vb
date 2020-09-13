@@ -9,7 +9,14 @@ Public Class DisplayForm
     Private MapLocation As Point = Point.Empty 'Location in the X and Y direction of the loaded picture
     Private oldMapLocation As Point = Point.Empty 'Maplocation of previous mouse click
     Private MouseDownPoint As Point = Point.Empty 'Location in the X and Y direction of the mouse pointer when the left button is clicked
+    Public Sub New()
 
+        ' This call is required by the designer.
+        InitializeComponent()
+
+        ' Add any initialization after the InitializeComponent() call.
+
+    End Sub
     Public Sub New(Address As String)
         ' This call is required by the designer.
         InitializeComponent()

@@ -233,7 +233,7 @@ Public Class TrackingStructure
                 End If
             Next
 
-            If Not (ROI.Dots(0).IsMoved Or ROI.Dots(1).IsMoved Or ROI.Dots(2).IsMoved Or ROI.Dots(3).IsMoved Or ROI.Dots(4).IsMoved) Then
+            If Not (ROI.Dots(0).IsMoved Or ROI.Dots(1).IsMoved Or ROI.Dots(2).IsMoved Or ROI.Dots(3).IsMoved Or ROI.Dots(4).IsMoved Or ROI.Dots(5).IsMoved Or ROI.Dots(6).IsMoved) Then
                 ROI.IsMoved = True
                 ROI.Move(e.X - ROI.ClickX, e.Y - ROI.ClickY)
             End If

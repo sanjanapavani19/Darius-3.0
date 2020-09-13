@@ -478,8 +478,8 @@ Public Class Form1
         Filenames(fileN) = SaveFileDialog1.FileName
         fileN += 1
 2:
-        Scanning = False
         If Scanning = True Then CheckBoxLED.Checked = False Else CheckBoxLED.Checked = True
+        Scanning = False
         Button_Scan.Text = "Scan"
     End Sub
 
@@ -513,7 +513,7 @@ Public Class Form1
 
         Dim ColorBytes(Camera.W * Camera.H * 3 - 1)
 
-        Dim Fit As New Plannar_fit
+        Dim Fit As New Polynomial_fit
         Dim A(4) As Double
         ReDim FocusMap(X, y)
         If Tracking.ROI.IsMade Then
