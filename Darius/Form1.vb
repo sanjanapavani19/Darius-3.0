@@ -369,7 +369,7 @@ Public Class Form1
     End Sub
 
     Public Sub Acquire()
-        ExitLive()
+        ExitLive() : Camera.ResetMatrix()
 
         Dim bmp As New Bitmap(Camera.captureBmp)
         SaveFileDialog1.DefaultExt = ".jpg"
@@ -394,6 +394,7 @@ Public Class Form1
         End If
 
         GoLive()
+        Display.AdjustBrightness()
 
     End Sub
 
@@ -995,7 +996,7 @@ Public Class Form1
         Tracking.Update()
     End Sub
 
-    Private Sub Button16_Click(sender As Object, e As EventArgs) Handles Button16.Click
+    Private Sub Button16_Click(sender As Object, e As EventArgs)
         Tracking = New TrackingStructure(PreScan.PictureBox1)
         Tracking.Update()
         Tracking.UpdateBmp(Preview.Bmp)
@@ -1083,7 +1084,7 @@ Public Class Form1
 
     End Sub
 
-    Private Sub Label4_Click(sender As Object, e As EventArgs) Handles Label4.Click
+    Private Sub Label4_Click(sender As Object, e As EventArgs)
 
     End Sub
 
