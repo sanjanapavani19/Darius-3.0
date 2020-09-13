@@ -52,6 +52,7 @@ Public Class Form1
 
 
         If Camera.status Then
+
             CollagenImage = New StackImage(Camera.W, Camera.H, 4, Imaging.PixelFormat.Format32bppArgb)
             ReDim Concatenate(Camera.W, Camera.H, 5)
 
@@ -62,6 +63,7 @@ Public Class Form1
             LEDcontroller.SetRelays(1, True)
             LEDcontroller.SetRelays(2, False)
 
+            PictureBox_Preview.Width = TabControl2.Width - 20
             Tracking = New TrackingStructure(PictureBox_Preview)
             Tracking.Update()
             ArrangeControls(10)
@@ -87,27 +89,35 @@ Public Class Form1
         TabControl1.Width = Display.Width * scale + 2 * d
         TabControl1.Height = Display.Height * scale + 2 * d
 
+        TabControl2.Left = TabControl1.Width + d
+        TabControl2.Width = Me.Width - TabControl1.Width - d
 
-        PictureBox_Preview.Left = TabControl1.Left + TabControl1.Width + d
-        PictureBox_Preview.Top = TabControl1.Top + TabControl1.ItemSize.Height
+        PictureBox_Preview.Left = d
+        PictureBox_Preview.Top = d
+
 
 
         GroupBox3.Left = PictureBox_Preview.Left
         GroupBox3.Top = PictureBox_Preview.Top + PictureBox_Preview.Height + d
-        TabControl_Settings.Top = GroupBox3.Top
-        TabControl_Settings.Left = GroupBox3.Left + GroupBox3.Width + d
-        Chart1.Left = GroupBox3.Left
-        Chart1.Top = GroupBox3.Top + GroupBox3.Height + d
-
+        TabControl_Settings.Top = d
+        TabControl_Settings.Left = d + d
+        Chart1.Left = GroupBox3.Left + GroupBox3.Width + d
+        Chart1.Top = GroupBox3.Top
+        Chart1.Height = GroupBox3.Height
         TextBoxGain.Text = Setting.Gett("Gain")
         TextBox_GainB.Text = Setting.Gett("GainB")
         TextBox_GainG.Text = Setting.Gett("GainG")
         TextBox_GainR.Text = Setting.Gett("GainR")
-        ListBox1.Left = PictureBox_Preview.Width + PictureBox_Preview.Left + d
-        ListBox1.Top = PictureBox_Preview.Top
-        Button_GIMP.Left = ListBox1.Left
-        Button_Luigi.Left = Button_GIMP.Left + Button_GIMP.Width
-        PictureBox2.Left = Button_Luigi.Left - (PictureBox2.Width / 2 - Button_Luigi.Width / 2)
+        ListBox1.Left = Chart1.Left + Chart1.Width + d
+        ListBox1.Top = GroupBox3.Top
+        ListBox1.Height = GroupBox3.Height
+        Button_GIMP.Left = ListBox1.Left + ListBox1.Width + d
+        Button_GIMP.Top = ListBox1.Top
+        Button_Luigi.Left = Button_GIMP.Left
+        Button_Luigi.Top = Button_GIMP.Top + Button_GIMP.Height
+
+        Button_Sedeen.Left = Button_GIMP.Left
+        Button_Sedeen.Top = Button_Luigi.Top + Button_Luigi.Height
     End Sub
 
     Public Sub ChangeExposure()
@@ -484,7 +494,8 @@ Public Class Form1
     End Sub
 
     Public Sub FastScan(X As Integer, y As Integer, overlap As Single, Address As String)
-        If Camera.busy Then ExitLive()
+
+        If Camera.busy Then ExitLive() : Camera.ResetMatrix()
 
         'Camera.SetPolicyToSafe()
         Dim TravelX, TravelY As Single
@@ -559,8 +570,8 @@ Public Class Form1
 
 
         Stage.SetAcceleration(Stage.Zaxe, AutoFocus.Zacceleration)
-        If Tracking.ROI.IsMade Then Tracking.MovetoROIEdge()
-        Stage.MoveAbsolute(Stage.Zaxe, Fit.ComputeE({Stage.X, Stage.Y}, A))
+        If Tracking.ROI.IsMade Then Tracking.MovetoROIEdge() : Stage.MoveAbsolute(Stage.Zaxe, Fit.ComputeE({Stage.X, Stage.Y}, A))
+
 
 
 
@@ -585,7 +596,7 @@ Public Class Form1
                     End If
                 End If
 
-                Stage.MoveAbsolute(Stage.Zaxe, Fit.ComputeE({Stage.X, Stage.Y}, A))
+                If Tracking.ROI.IsMade Then Stage.MoveAbsolute(Stage.Zaxe, Fit.ComputeE({Stage.X, Stage.Y}, A))
                 Do Until Camera.ready
 
                 Loop
@@ -655,7 +666,7 @@ Public Class Form1
         'Camera.SetDataMode(Colortype.Grey)
         Stage.SetAcceleration(Stage.Zaxe, Stage.Zacc)
         GoLive()
-
+        Display.AdjustBrightness()
 
 
     End Sub
@@ -1066,6 +1077,19 @@ Public Class Form1
             Dim viewer As New LuigiViewer.DisplayForm(Filenames(ListBox1.SelectedIndex))
             viewer.Show()
 
+        Catch
+            MsgBox("No image file is found", MsgBoxStyle.Critical)
+        End Try
+
+    End Sub
+
+    Private Sub Label4_Click(sender As Object, e As EventArgs) Handles Label4.Click
+
+    End Sub
+
+    Private Sub Button_Sedeen_Click(sender As Object, e As EventArgs) Handles Button_Sedeen.Click
+        Try
+            Process.Start("C:\Program Files\Sedeen Viewer\sedeen.exe", Chr(34) + Filenames(ListBox1.SelectedIndex) + Chr(34))
         Catch
             MsgBox("No image file is found", MsgBoxStyle.Critical)
         End Try

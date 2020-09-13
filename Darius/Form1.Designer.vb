@@ -23,13 +23,18 @@ Partial Class Form1
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Form1))
         Dim ChartArea3 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
         Dim Legend3 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
         Dim Series7 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
         Dim Series8 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
         Dim Series9 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Form1))
         Me.GroupBox3 = New System.Windows.Forms.GroupBox()
+        Me.Button_Home = New System.Windows.Forms.Button()
+        Me.Button_bottom = New System.Windows.Forms.Button()
+        Me.Button_top = New System.Windows.Forms.Button()
+        Me.Button_left = New System.Windows.Forms.Button()
+        Me.Button_right = New System.Windows.Forms.Button()
         Me.Button_adjustBrightness = New System.Windows.Forms.Button()
         Me.RadioButton_zoom_out = New System.Windows.Forms.RadioButton()
         Me.RadioButton_zoom_in = New System.Windows.Forms.RadioButton()
@@ -96,7 +101,9 @@ Partial Class Form1
         Me.Button17 = New System.Windows.Forms.Button()
         Me.TabControl1 = New System.Windows.Forms.TabControl()
         Me.TabPage3 = New System.Windows.Forms.TabPage()
+        Me.PictureBox0 = New System.Windows.Forms.PictureBox()
         Me.TabPage4 = New System.Windows.Forms.TabPage()
+        Me.PictureBox1 = New System.Windows.Forms.PictureBox()
         Me.Button_Brightfield_Acquire = New System.Windows.Forms.Button()
         Me.OpenFileDialog1 = New System.Windows.Forms.OpenFileDialog()
         Me.SaveFileDialog1 = New System.Windows.Forms.SaveFileDialog()
@@ -120,16 +127,12 @@ Partial Class Form1
         Me.TextBoxY = New System.Windows.Forms.TextBox()
         Me.TextBoxX = New System.Windows.Forms.TextBox()
         Me.Timer1 = New System.Windows.Forms.Timer(Me.components)
-        Me.PictureBox2 = New System.Windows.Forms.PictureBox()
         Me.Button_Luigi = New System.Windows.Forms.Button()
         Me.PictureBox_Preview = New System.Windows.Forms.PictureBox()
-        Me.PictureBox0 = New System.Windows.Forms.PictureBox()
-        Me.PictureBox1 = New System.Windows.Forms.PictureBox()
-        Me.Button_Home = New System.Windows.Forms.Button()
-        Me.Button_bottom = New System.Windows.Forms.Button()
-        Me.Button_top = New System.Windows.Forms.Button()
-        Me.Button_left = New System.Windows.Forms.Button()
-        Me.Button_right = New System.Windows.Forms.Button()
+        Me.TabControl2 = New System.Windows.Forms.TabControl()
+        Me.TabPage6 = New System.Windows.Forms.TabPage()
+        Me.TabPage7 = New System.Windows.Forms.TabPage()
+        Me.Button_Sedeen = New System.Windows.Forms.Button()
         Me.GroupBox3.SuspendLayout()
         Me.TabControl_Settings.SuspendLayout()
         Me.TabPage13.SuspendLayout()
@@ -139,13 +142,15 @@ Partial Class Form1
         Me.TabPage5.SuspendLayout()
         Me.TabControl1.SuspendLayout()
         Me.TabPage3.SuspendLayout()
+        CType(Me.PictureBox0, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.TabPage4.SuspendLayout()
+        CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.Chart1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.StatusStrip1.SuspendLayout()
-        CType(Me.PictureBox2, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.PictureBox_Preview, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.PictureBox0, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.TabControl2.SuspendLayout()
+        Me.TabPage6.SuspendLayout()
+        Me.TabPage7.SuspendLayout()
         Me.SuspendLayout()
         '
         'GroupBox3
@@ -155,12 +160,69 @@ Partial Class Form1
         Me.GroupBox3.Controls.Add(Me.Button_top)
         Me.GroupBox3.Controls.Add(Me.Button_left)
         Me.GroupBox3.Controls.Add(Me.Button_right)
-        Me.GroupBox3.Location = New System.Drawing.Point(1167, 528)
+        Me.GroupBox3.Location = New System.Drawing.Point(36, 188)
         Me.GroupBox3.Name = "GroupBox3"
-        Me.GroupBox3.Size = New System.Drawing.Size(195, 208)
+        Me.GroupBox3.Size = New System.Drawing.Size(165, 170)
         Me.GroupBox3.TabIndex = 106
         Me.GroupBox3.TabStop = False
         Me.GroupBox3.Text = "XYZ"
+        '
+        'Button_Home
+        '
+        Me.Button_Home.BackgroundImage = CType(resources.GetObject("Button_Home.BackgroundImage"), System.Drawing.Image)
+        Me.Button_Home.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom
+        Me.Button_Home.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.Button_Home.ForeColor = System.Drawing.SystemColors.Control
+        Me.Button_Home.Location = New System.Drawing.Point(57, 61)
+        Me.Button_Home.Margin = New System.Windows.Forms.Padding(0)
+        Me.Button_Home.Name = "Button_Home"
+        Me.Button_Home.Size = New System.Drawing.Size(53, 47)
+        Me.Button_Home.TabIndex = 40
+        Me.Button_Home.UseVisualStyleBackColor = True
+        '
+        'Button_bottom
+        '
+        Me.Button_bottom.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer))
+        Me.Button_bottom.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.Button_bottom.Image = CType(resources.GetObject("Button_bottom.Image"), System.Drawing.Image)
+        Me.Button_bottom.Location = New System.Drawing.Point(62, 119)
+        Me.Button_bottom.Name = "Button_bottom"
+        Me.Button_bottom.Size = New System.Drawing.Size(40, 40)
+        Me.Button_bottom.TabIndex = 39
+        Me.Button_bottom.UseVisualStyleBackColor = True
+        '
+        'Button_top
+        '
+        Me.Button_top.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer))
+        Me.Button_top.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.Button_top.Image = CType(resources.GetObject("Button_top.Image"), System.Drawing.Image)
+        Me.Button_top.Location = New System.Drawing.Point(61, 16)
+        Me.Button_top.Name = "Button_top"
+        Me.Button_top.Size = New System.Drawing.Size(40, 40)
+        Me.Button_top.TabIndex = 38
+        Me.Button_top.UseVisualStyleBackColor = True
+        '
+        'Button_left
+        '
+        Me.Button_left.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer))
+        Me.Button_left.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.Button_left.Image = CType(resources.GetObject("Button_left.Image"), System.Drawing.Image)
+        Me.Button_left.Location = New System.Drawing.Point(8, 62)
+        Me.Button_left.Name = "Button_left"
+        Me.Button_left.Size = New System.Drawing.Size(40, 40)
+        Me.Button_left.TabIndex = 37
+        Me.Button_left.UseVisualStyleBackColor = True
+        '
+        'Button_right
+        '
+        Me.Button_right.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer))
+        Me.Button_right.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.Button_right.Image = CType(resources.GetObject("Button_right.Image"), System.Drawing.Image)
+        Me.Button_right.Location = New System.Drawing.Point(113, 62)
+        Me.Button_right.Name = "Button_right"
+        Me.Button_right.Size = New System.Drawing.Size(40, 40)
+        Me.Button_right.TabIndex = 36
+        Me.Button_right.UseVisualStyleBackColor = True
         '
         'Button_adjustBrightness
         '
@@ -203,7 +265,7 @@ Partial Class Form1
         Me.TabControl_Settings.Controls.Add(Me.TabPage12)
         Me.TabControl_Settings.Controls.Add(Me.TabPage2)
         Me.TabControl_Settings.Controls.Add(Me.TabPage5)
-        Me.TabControl_Settings.Location = New System.Drawing.Point(1186, 742)
+        Me.TabControl_Settings.Location = New System.Drawing.Point(26, 119)
         Me.TabControl_Settings.Name = "TabControl_Settings"
         Me.TabControl_Settings.SelectedIndex = 0
         Me.TabControl_Settings.Size = New System.Drawing.Size(449, 203)
@@ -909,6 +971,16 @@ Partial Class Form1
         Me.TabPage3.Text = "White Dwarf"
         Me.TabPage3.UseVisualStyleBackColor = True
         '
+        'PictureBox0
+        '
+        Me.PictureBox0.BackColor = System.Drawing.Color.Black
+        Me.PictureBox0.Location = New System.Drawing.Point(6, 6)
+        Me.PictureBox0.Name = "PictureBox0"
+        Me.PictureBox0.Size = New System.Drawing.Size(1024, 1024)
+        Me.PictureBox0.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom
+        Me.PictureBox0.TabIndex = 2
+        Me.PictureBox0.TabStop = False
+        '
         'TabPage4
         '
         Me.TabPage4.Controls.Add(Me.PictureBox1)
@@ -918,6 +990,15 @@ Partial Class Form1
         Me.TabPage4.TabIndex = 2
         Me.TabPage4.Text = "FiBi"
         Me.TabPage4.UseVisualStyleBackColor = True
+        '
+        'PictureBox1
+        '
+        Me.PictureBox1.BackColor = System.Drawing.Color.Black
+        Me.PictureBox1.Location = New System.Drawing.Point(6, 6)
+        Me.PictureBox1.Name = "PictureBox1"
+        Me.PictureBox1.Size = New System.Drawing.Size(966, 946)
+        Me.PictureBox1.TabIndex = 2
+        Me.PictureBox1.TabStop = False
         '
         'Button_Brightfield_Acquire
         '
@@ -937,13 +1018,14 @@ Partial Class Form1
         Me.Chart1.BackColor = System.Drawing.Color.Transparent
         ChartArea3.AxisX.MajorGrid.Enabled = False
         ChartArea3.AxisX.MajorTickMark.Enabled = False
+        ChartArea3.AxisY.LabelStyle.Enabled = False
         ChartArea3.AxisY.MajorGrid.Enabled = False
         ChartArea3.BackColor = System.Drawing.Color.Transparent
         ChartArea3.Name = "ChartArea1"
         Me.Chart1.ChartAreas.Add(ChartArea3)
         Legend3.Name = "Legend1"
         Me.Chart1.Legends.Add(Legend3)
-        Me.Chart1.Location = New System.Drawing.Point(1458, 580)
+        Me.Chart1.Location = New System.Drawing.Point(249, 217)
         Me.Chart1.Name = "Chart1"
         Series7.ChartArea = "ChartArea1"
         Series7.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Area
@@ -1021,7 +1103,7 @@ Partial Class Form1
         '
         Me.Button1.Location = New System.Drawing.Point(1448, 2)
         Me.Button1.Name = "Button1"
-        Me.Button1.Size = New System.Drawing.Size(100, 43)
+        Me.Button1.Size = New System.Drawing.Size(100, 35)
         Me.Button1.TabIndex = 130
         Me.Button1.Text = "Clear"
         Me.Button1.UseVisualStyleBackColor = True
@@ -1029,7 +1111,7 @@ Partial Class Form1
         'Label4
         '
         Me.Label4.AutoSize = True
-        Me.Label4.Location = New System.Drawing.Point(1753, 40)
+        Me.Label4.Location = New System.Drawing.Point(1752, 22)
         Me.Label4.Name = "Label4"
         Me.Label4.Size = New System.Drawing.Size(39, 13)
         Me.Label4.TabIndex = 136
@@ -1040,7 +1122,7 @@ Partial Class Form1
         '
         Me.Button6.Location = New System.Drawing.Point(1554, 2)
         Me.Button6.Name = "Button6"
-        Me.Button6.Size = New System.Drawing.Size(100, 43)
+        Me.Button6.Size = New System.Drawing.Size(100, 35)
         Me.Button6.TabIndex = 137
         Me.Button6.Text = "Preview"
         Me.Button6.UseVisualStyleBackColor = True
@@ -1060,24 +1142,24 @@ Partial Class Form1
         'ListBox1
         '
         Me.ListBox1.FormattingEnabled = True
-        Me.ListBox1.Location = New System.Drawing.Point(1663, 101)
+        Me.ListBox1.Location = New System.Drawing.Point(572, 34)
         Me.ListBox1.Name = "ListBox1"
-        Me.ListBox1.Size = New System.Drawing.Size(180, 251)
+        Me.ListBox1.Size = New System.Drawing.Size(163, 251)
         Me.ListBox1.TabIndex = 139
         '
         'Button_GIMP
         '
-        Me.Button_GIMP.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Button_GIMP.Location = New System.Drawing.Point(1663, 358)
+        Me.Button_GIMP.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Button_GIMP.Location = New System.Drawing.Point(543, 345)
         Me.Button_GIMP.Name = "Button_GIMP"
-        Me.Button_GIMP.Size = New System.Drawing.Size(90, 90)
+        Me.Button_GIMP.Size = New System.Drawing.Size(50, 50)
         Me.Button_GIMP.TabIndex = 140
         Me.Button_GIMP.Text = "GIMP"
         Me.Button_GIMP.UseVisualStyleBackColor = True
         '
         'Button16
         '
-        Me.Button16.Location = New System.Drawing.Point(1672, 35)
+        Me.Button16.Location = New System.Drawing.Point(1660, 14)
         Me.Button16.Name = "Button16"
         Me.Button16.Size = New System.Drawing.Size(75, 23)
         Me.Button16.TabIndex = 142
@@ -1130,125 +1212,84 @@ Partial Class Form1
         'Timer1
         '
         '
-        'PictureBox2
-        '
-        Me.PictureBox2.Image = CType(resources.GetObject("PictureBox2.Image"), System.Drawing.Image)
-        Me.PictureBox2.Location = New System.Drawing.Point(1710, 454)
-        Me.PictureBox2.Name = "PictureBox2"
-        Me.PictureBox2.Size = New System.Drawing.Size(174, 169)
-        Me.PictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage
-        Me.PictureBox2.TabIndex = 147
-        Me.PictureBox2.TabStop = False
-        '
         'Button_Luigi
         '
         Me.Button_Luigi.BackgroundImage = CType(resources.GetObject("Button_Luigi.BackgroundImage"), System.Drawing.Image)
         Me.Button_Luigi.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
         Me.Button_Luigi.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Button_Luigi.Location = New System.Drawing.Point(1756, 358)
+        Me.Button_Luigi.Location = New System.Drawing.Point(599, 345)
         Me.Button_Luigi.Name = "Button_Luigi"
-        Me.Button_Luigi.Size = New System.Drawing.Size(90, 90)
+        Me.Button_Luigi.Size = New System.Drawing.Size(50, 50)
         Me.Button_Luigi.TabIndex = 146
         Me.Button_Luigi.UseVisualStyleBackColor = True
         '
         'PictureBox_Preview
         '
         Me.PictureBox_Preview.BackColor = System.Drawing.Color.Black
-        Me.PictureBox_Preview.Location = New System.Drawing.Point(1257, 101)
+        Me.PictureBox_Preview.Location = New System.Drawing.Point(16, 34)
         Me.PictureBox_Preview.Name = "PictureBox_Preview"
         Me.PictureBox_Preview.Size = New System.Drawing.Size(550, 134)
         Me.PictureBox_Preview.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom
         Me.PictureBox_Preview.TabIndex = 124
         Me.PictureBox_Preview.TabStop = False
         '
-        'PictureBox0
+        'TabControl2
         '
-        Me.PictureBox0.BackColor = System.Drawing.Color.Black
-        Me.PictureBox0.Location = New System.Drawing.Point(6, 6)
-        Me.PictureBox0.Name = "PictureBox0"
-        Me.PictureBox0.Size = New System.Drawing.Size(1024, 1024)
-        Me.PictureBox0.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom
-        Me.PictureBox0.TabIndex = 2
-        Me.PictureBox0.TabStop = False
+        Me.TabControl2.Controls.Add(Me.TabPage6)
+        Me.TabControl2.Controls.Add(Me.TabPage7)
+        Me.TabControl2.Location = New System.Drawing.Point(1101, 43)
+        Me.TabControl2.Name = "TabControl2"
+        Me.TabControl2.SelectedIndex = 0
+        Me.TabControl2.Size = New System.Drawing.Size(768, 977)
+        Me.TabControl2.TabIndex = 148
         '
-        'PictureBox1
+        'TabPage6
         '
-        Me.PictureBox1.BackColor = System.Drawing.Color.Black
-        Me.PictureBox1.Location = New System.Drawing.Point(6, 6)
-        Me.PictureBox1.Name = "PictureBox1"
-        Me.PictureBox1.Size = New System.Drawing.Size(966, 946)
-        Me.PictureBox1.TabIndex = 2
-        Me.PictureBox1.TabStop = False
+        Me.TabPage6.Controls.Add(Me.Button_Sedeen)
+        Me.TabPage6.Controls.Add(Me.PictureBox_Preview)
+        Me.TabPage6.Controls.Add(Me.ListBox1)
+        Me.TabPage6.Controls.Add(Me.Button_Luigi)
+        Me.TabPage6.Controls.Add(Me.Button_GIMP)
+        Me.TabPage6.Controls.Add(Me.GroupBox3)
+        Me.TabPage6.Controls.Add(Me.Chart1)
+        Me.TabPage6.Location = New System.Drawing.Point(4, 22)
+        Me.TabPage6.Name = "TabPage6"
+        Me.TabPage6.Padding = New System.Windows.Forms.Padding(3)
+        Me.TabPage6.Size = New System.Drawing.Size(760, 951)
+        Me.TabPage6.TabIndex = 0
+        Me.TabPage6.Text = "Preview"
+        Me.TabPage6.UseVisualStyleBackColor = True
         '
-        'Button_Home
+        'TabPage7
         '
-        Me.Button_Home.BackgroundImage = CType(resources.GetObject("Button_Home.BackgroundImage"), System.Drawing.Image)
-        Me.Button_Home.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom
-        Me.Button_Home.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.Button_Home.ForeColor = System.Drawing.SystemColors.Control
-        Me.Button_Home.Location = New System.Drawing.Point(68, 74)
-        Me.Button_Home.Margin = New System.Windows.Forms.Padding(0)
-        Me.Button_Home.Name = "Button_Home"
-        Me.Button_Home.Size = New System.Drawing.Size(53, 47)
-        Me.Button_Home.TabIndex = 40
-        Me.Button_Home.UseVisualStyleBackColor = True
+        Me.TabPage7.Controls.Add(Me.TabControl_Settings)
+        Me.TabPage7.Location = New System.Drawing.Point(4, 22)
+        Me.TabPage7.Name = "TabPage7"
+        Me.TabPage7.Padding = New System.Windows.Forms.Padding(3)
+        Me.TabPage7.Size = New System.Drawing.Size(504, 356)
+        Me.TabPage7.TabIndex = 1
+        Me.TabPage7.Text = "Settings"
+        Me.TabPage7.UseVisualStyleBackColor = True
         '
-        'Button_bottom
+        'Button_Sedeen
         '
-        Me.Button_bottom.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer))
-        Me.Button_bottom.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.Button_bottom.Image = CType(resources.GetObject("Button_bottom.Image"), System.Drawing.Image)
-        Me.Button_bottom.Location = New System.Drawing.Point(73, 132)
-        Me.Button_bottom.Name = "Button_bottom"
-        Me.Button_bottom.Size = New System.Drawing.Size(40, 40)
-        Me.Button_bottom.TabIndex = 39
-        Me.Button_bottom.UseVisualStyleBackColor = True
-        '
-        'Button_top
-        '
-        Me.Button_top.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer))
-        Me.Button_top.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.Button_top.Image = CType(resources.GetObject("Button_top.Image"), System.Drawing.Image)
-        Me.Button_top.Location = New System.Drawing.Point(72, 29)
-        Me.Button_top.Name = "Button_top"
-        Me.Button_top.Size = New System.Drawing.Size(40, 40)
-        Me.Button_top.TabIndex = 38
-        Me.Button_top.UseVisualStyleBackColor = True
-        '
-        'Button_left
-        '
-        Me.Button_left.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer))
-        Me.Button_left.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.Button_left.Image = CType(resources.GetObject("Button_left.Image"), System.Drawing.Image)
-        Me.Button_left.Location = New System.Drawing.Point(19, 75)
-        Me.Button_left.Name = "Button_left"
-        Me.Button_left.Size = New System.Drawing.Size(40, 40)
-        Me.Button_left.TabIndex = 37
-        Me.Button_left.UseVisualStyleBackColor = True
-        '
-        'Button_right
-        '
-        Me.Button_right.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer))
-        Me.Button_right.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.Button_right.Image = CType(resources.GetObject("Button_right.Image"), System.Drawing.Image)
-        Me.Button_right.Location = New System.Drawing.Point(124, 75)
-        Me.Button_right.Name = "Button_right"
-        Me.Button_right.Size = New System.Drawing.Size(40, 40)
-        Me.Button_right.TabIndex = 36
-        Me.Button_right.UseVisualStyleBackColor = True
+        Me.Button_Sedeen.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Button_Sedeen.Location = New System.Drawing.Point(572, 450)
+        Me.Button_Sedeen.Name = "Button_Sedeen"
+        Me.Button_Sedeen.Size = New System.Drawing.Size(50, 50)
+        Me.Button_Sedeen.TabIndex = 147
+        Me.Button_Sedeen.Text = "Sedeen"
+        Me.Button_Sedeen.UseVisualStyleBackColor = True
         '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1905, 1061)
-        Me.Controls.Add(Me.PictureBox2)
-        Me.Controls.Add(Me.Button_Luigi)
+        Me.Controls.Add(Me.TabControl2)
         Me.Controls.Add(Me.Label9)
         Me.Controls.Add(Me.TextBox_exposure)
         Me.Controls.Add(Me.Button16)
-        Me.Controls.Add(Me.Button_GIMP)
-        Me.Controls.Add(Me.ListBox1)
         Me.Controls.Add(Me.CheckBoxLED)
         Me.Controls.Add(Me.Button6)
         Me.Controls.Add(Me.Button_Brightfield_Acquire)
@@ -1259,15 +1300,11 @@ Partial Class Form1
         Me.Controls.Add(Me.TextBoxX)
         Me.Controls.Add(Me.Pbar)
         Me.Controls.Add(Me.Button_Scan)
-        Me.Controls.Add(Me.PictureBox_Preview)
         Me.Controls.Add(Me.Button4)
-        Me.Controls.Add(Me.Chart1)
         Me.Controls.Add(Me.TabControl1)
-        Me.Controls.Add(Me.TabControl_Settings)
         Me.Controls.Add(Me.RadioButton_zoom_out)
         Me.Controls.Add(Me.RadioButton_zoom_in)
         Me.Controls.Add(Me.Button_adjustBrightness)
-        Me.Controls.Add(Me.GroupBox3)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Name = "Form1"
         Me.Text = "Darius"
@@ -1285,14 +1322,16 @@ Partial Class Form1
         Me.TabPage5.ResumeLayout(False)
         Me.TabControl1.ResumeLayout(False)
         Me.TabPage3.ResumeLayout(False)
+        CType(Me.PictureBox0, System.ComponentModel.ISupportInitialize).EndInit()
         Me.TabPage4.ResumeLayout(False)
+        CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.Chart1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.StatusStrip1.ResumeLayout(False)
         Me.StatusStrip1.PerformLayout()
-        CType(Me.PictureBox2, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.PictureBox_Preview, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.PictureBox0, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.TabControl2.ResumeLayout(False)
+        Me.TabPage6.ResumeLayout(False)
+        Me.TabPage7.ResumeLayout(False)
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -1397,5 +1436,8 @@ Partial Class Form1
     Friend WithEvents TextBox15 As TextBox
     Friend WithEvents Timer1 As Timer
     Friend WithEvents Button_Luigi As Button
-    Friend WithEvents PictureBox2 As PictureBox
+    Friend WithEvents TabControl2 As TabControl
+    Friend WithEvents TabPage6 As TabPage
+    Friend WithEvents TabPage7 As TabPage
+    Friend WithEvents Button_Sedeen As Button
 End Class

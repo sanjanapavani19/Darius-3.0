@@ -131,7 +131,8 @@ Public Class ZaberNew
 
     Public Sub MoveRelativeAsync(ByRef Axis As Device, R As Single)
         Axis.MoveRelativeAsync(R, Units.Length_Millimetres)
-
+        UpdatePositions()
+        Tracking.Update()
     End Sub
 
     Public Sub UpdatePositions()
