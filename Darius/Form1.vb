@@ -63,9 +63,6 @@ Public Class Form1
             LEDcontroller.SetRelays(1, True)
             LEDcontroller.SetRelays(2, False)
 
-            PictureBox_Preview.Width = TabControl2.Width - 20
-            Tracking = New TrackingStructure(PictureBox_Preview)
-            Tracking.Update()
             ArrangeControls(10)
 
         End If
@@ -75,7 +72,7 @@ Public Class Form1
 
 
     Sub ArrangeControls(d As Integer)
-        Dim scale As Single = 0.33
+        Dim scale As Single = 0.34
 
         PictureBox0.Width = Display.Width * scale
         PictureBox0.Height = Display.Height * scale
@@ -85,17 +82,24 @@ Public Class Form1
         PictureBox1.Height = Display.Height * scale
         PictureBox1.SizeMode = PictureBoxSizeMode.Zoom
 
+        PictureBox0.Top = d
+        PictureBox0.Left = d
+
+        PictureBox1.Top = d
+        PictureBox1.Left = d
 
         TabControl1.Width = Display.Width * scale + 2 * d
         TabControl1.Height = Display.Height * scale + 2 * d
 
         TabControl2.Left = TabControl1.Width + d
-        TabControl2.Width = Me.Width - TabControl1.Width - d
-
+        TabControl2.Width = Me.ClientSize.Width - TabControl1.Width - d
+        TabControl2.Height = TabControl1.Height
         PictureBox_Preview.Left = d
         PictureBox_Preview.Top = d
+        PictureBox_Preview.Width = TabControl2.Width - 2 * d
 
-
+        Tracking = New TrackingStructure(PictureBox_Preview)
+        Tracking.Update()
 
         GroupBox3.Left = PictureBox_Preview.Left
         GroupBox3.Top = PictureBox_Preview.Top + PictureBox_Preview.Height + d
@@ -996,14 +1000,7 @@ Public Class Form1
         Tracking.Update()
     End Sub
 
-    Private Sub Button16_Click(sender As Object, e As EventArgs)
-        Tracking = New TrackingStructure(PreScan.PictureBox1)
-        Tracking.Update()
-        Tracking.UpdateBmp(Preview.Bmp)
-        PreScan.ShowDialog()
-        Tracking = New TrackingStructure(PictureBox_Preview)
-        Tracking.Update()
-    End Sub
+
 
     Private Sub Button17_Click(sender As Object, e As EventArgs) Handles Button17.Click
 

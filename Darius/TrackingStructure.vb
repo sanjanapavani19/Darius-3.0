@@ -118,7 +118,7 @@ Public Class TrackingStructure
         Public Sub Move(Dx As Integer, Dy As Integer)
             Rect.X = InitialX + Dx
             Rect.Y = InitialY + Dy
-            Form1.Label4.Text = Dx.ToString
+
 
             For i = 0 To numDots - 1
                 Dots(i).Move(Dx, Dy)

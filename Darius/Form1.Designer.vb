@@ -24,11 +24,11 @@ Partial Class Form1
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Form1))
-        Dim ChartArea4 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
-        Dim Legend4 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
-        Dim Series10 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
-        Dim Series11 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
-        Dim Series12 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
+        Dim ChartArea8 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
+        Dim Legend8 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
+        Dim Series22 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
+        Dim Series23 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
+        Dim Series24 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
         Me.GroupBox3 = New System.Windows.Forms.GroupBox()
         Me.Button_Home = New System.Windows.Forms.Button()
         Me.Button_bottom = New System.Windows.Forms.Button()
@@ -224,9 +224,9 @@ Partial Class Form1
         '
         'Button_adjustBrightness
         '
-        Me.Button_adjustBrightness.Location = New System.Drawing.Point(143, 7)
+        Me.Button_adjustBrightness.Location = New System.Drawing.Point(126, 10)
         Me.Button_adjustBrightness.Name = "Button_adjustBrightness"
-        Me.Button_adjustBrightness.Size = New System.Drawing.Size(100, 35)
+        Me.Button_adjustBrightness.Size = New System.Drawing.Size(100, 29)
         Me.Button_adjustBrightness.TabIndex = 108
         Me.Button_adjustBrightness.Text = "Adjust Brightness"
         Me.Button_adjustBrightness.UseVisualStyleBackColor = True
@@ -235,7 +235,7 @@ Partial Class Form1
         '
         Me.RadioButton_zoom_out.Appearance = System.Windows.Forms.Appearance.Button
         Me.RadioButton_zoom_out.Font = New System.Drawing.Font("Microsoft Sans Serif", 21.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.RadioButton_zoom_out.Location = New System.Drawing.Point(1071, -1)
+        Me.RadioButton_zoom_out.Location = New System.Drawing.Point(997, 2)
         Me.RadioButton_zoom_out.Name = "RadioButton_zoom_out"
         Me.RadioButton_zoom_out.Size = New System.Drawing.Size(43, 43)
         Me.RadioButton_zoom_out.TabIndex = 110
@@ -248,7 +248,7 @@ Partial Class Form1
         Me.RadioButton_zoom_in.Appearance = System.Windows.Forms.Appearance.Button
         Me.RadioButton_zoom_in.AutoSize = True
         Me.RadioButton_zoom_in.Font = New System.Drawing.Font("Microsoft Sans Serif", 21.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.RadioButton_zoom_in.Location = New System.Drawing.Point(1032, -1)
+        Me.RadioButton_zoom_in.Location = New System.Drawing.Point(958, 2)
         Me.RadioButton_zoom_in.Name = "RadioButton_zoom_in"
         Me.RadioButton_zoom_in.Size = New System.Drawing.Size(43, 43)
         Me.RadioButton_zoom_in.TabIndex = 109
@@ -1000,9 +1000,9 @@ Partial Class Form1
         '
         'Button_Brightfield_Acquire
         '
-        Me.Button_Brightfield_Acquire.Location = New System.Drawing.Point(319, 6)
+        Me.Button_Brightfield_Acquire.Location = New System.Drawing.Point(305, 10)
         Me.Button_Brightfield_Acquire.Name = "Button_Brightfield_Acquire"
-        Me.Button_Brightfield_Acquire.Size = New System.Drawing.Size(75, 35)
+        Me.Button_Brightfield_Acquire.Size = New System.Drawing.Size(75, 29)
         Me.Button_Brightfield_Acquire.TabIndex = 3
         Me.Button_Brightfield_Acquire.Text = "Acquire"
         Me.Button_Brightfield_Acquire.UseVisualStyleBackColor = True
@@ -1014,60 +1014,60 @@ Partial Class Form1
         'Chart1
         '
         Me.Chart1.BackColor = System.Drawing.Color.Transparent
-        ChartArea4.AxisX.MajorGrid.Enabled = False
-        ChartArea4.AxisX.MajorTickMark.Enabled = False
-        ChartArea4.AxisY.LabelStyle.Enabled = False
-        ChartArea4.AxisY.MajorGrid.Enabled = False
-        ChartArea4.BackColor = System.Drawing.Color.Transparent
-        ChartArea4.Name = "ChartArea1"
-        Me.Chart1.ChartAreas.Add(ChartArea4)
-        Legend4.Name = "Legend1"
-        Me.Chart1.Legends.Add(Legend4)
+        ChartArea8.AxisX.MajorGrid.Enabled = False
+        ChartArea8.AxisX.MajorTickMark.Enabled = False
+        ChartArea8.AxisY.LabelStyle.Enabled = False
+        ChartArea8.AxisY.MajorGrid.Enabled = False
+        ChartArea8.BackColor = System.Drawing.Color.Transparent
+        ChartArea8.Name = "ChartArea1"
+        Me.Chart1.ChartAreas.Add(ChartArea8)
+        Legend8.Name = "Legend1"
+        Me.Chart1.Legends.Add(Legend8)
         Me.Chart1.Location = New System.Drawing.Point(249, 217)
         Me.Chart1.Name = "Chart1"
-        Series10.ChartArea = "ChartArea1"
-        Series10.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Area
-        Series10.IsVisibleInLegend = False
-        Series10.Legend = "Legend1"
-        Series10.Name = "Series1"
-        Series11.ChartArea = "ChartArea1"
-        Series11.IsVisibleInLegend = False
-        Series11.Legend = "Legend1"
-        Series11.Name = "Series2"
-        Series12.ChartArea = "ChartArea1"
-        Series12.IsVisibleInLegend = False
-        Series12.Legend = "Legend1"
-        Series12.Name = "Series3"
-        Me.Chart1.Series.Add(Series10)
-        Me.Chart1.Series.Add(Series11)
-        Me.Chart1.Series.Add(Series12)
+        Series22.ChartArea = "ChartArea1"
+        Series22.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Area
+        Series22.IsVisibleInLegend = False
+        Series22.Legend = "Legend1"
+        Series22.Name = "Series1"
+        Series23.ChartArea = "ChartArea1"
+        Series23.IsVisibleInLegend = False
+        Series23.Legend = "Legend1"
+        Series23.Name = "Series2"
+        Series24.ChartArea = "ChartArea1"
+        Series24.IsVisibleInLegend = False
+        Series24.Legend = "Legend1"
+        Series24.Name = "Series3"
+        Me.Chart1.Series.Add(Series22)
+        Me.Chart1.Series.Add(Series23)
+        Me.Chart1.Series.Add(Series24)
         Me.Chart1.Size = New System.Drawing.Size(317, 122)
         Me.Chart1.TabIndex = 120
         Me.Chart1.Text = "Chart1"
         '
         'Button4
         '
-        Me.Button4.Location = New System.Drawing.Point(244, 6)
+        Me.Button4.Location = New System.Drawing.Point(228, 10)
         Me.Button4.Name = "Button4"
-        Me.Button4.Size = New System.Drawing.Size(75, 35)
+        Me.Button4.Size = New System.Drawing.Size(75, 29)
         Me.Button4.TabIndex = 121
         Me.Button4.Text = "AutoFocus"
         Me.Button4.UseVisualStyleBackColor = True
         '
         'Button_Scan
         '
-        Me.Button_Scan.Location = New System.Drawing.Point(453, 6)
+        Me.Button_Scan.Location = New System.Drawing.Point(382, 10)
         Me.Button_Scan.Name = "Button_Scan"
-        Me.Button_Scan.Size = New System.Drawing.Size(75, 35)
+        Me.Button_Scan.Size = New System.Drawing.Size(75, 29)
         Me.Button_Scan.TabIndex = 125
         Me.Button_Scan.Text = "Scan"
         Me.Button_Scan.UseVisualStyleBackColor = True
         '
         'Pbar
         '
-        Me.Pbar.Location = New System.Drawing.Point(606, 9)
+        Me.Pbar.Location = New System.Drawing.Point(532, 10)
         Me.Pbar.Name = "Pbar"
-        Me.Pbar.Size = New System.Drawing.Size(420, 26)
+        Me.Pbar.Size = New System.Drawing.Size(420, 29)
         Me.Pbar.TabIndex = 126
         '
         'StatusStrip1
@@ -1099,7 +1099,7 @@ Partial Class Form1
         '
         'Button1
         '
-        Me.Button1.Location = New System.Drawing.Point(1448, 6)
+        Me.Button1.Location = New System.Drawing.Point(1448, 10)
         Me.Button1.Name = "Button1"
         Me.Button1.Size = New System.Drawing.Size(100, 35)
         Me.Button1.TabIndex = 130
@@ -1108,7 +1108,7 @@ Partial Class Form1
         '
         'Button6
         '
-        Me.Button6.Location = New System.Drawing.Point(1554, 6)
+        Me.Button6.Location = New System.Drawing.Point(1554, 10)
         Me.Button6.Name = "Button6"
         Me.Button6.Size = New System.Drawing.Size(100, 35)
         Me.Button6.TabIndex = 137
@@ -1120,7 +1120,7 @@ Partial Class Form1
         Me.CheckBoxLED.AutoSize = True
         Me.CheckBoxLED.Checked = True
         Me.CheckBoxLED.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.CheckBoxLED.Location = New System.Drawing.Point(400, 15)
+        Me.CheckBoxLED.Location = New System.Drawing.Point(1048, 17)
         Me.CheckBoxLED.Name = "CheckBoxLED"
         Me.CheckBoxLED.Size = New System.Drawing.Size(47, 17)
         Me.CheckBoxLED.TabIndex = 138
@@ -1132,7 +1132,7 @@ Partial Class Form1
         Me.ListBox1.FormattingEnabled = True
         Me.ListBox1.Location = New System.Drawing.Point(572, 34)
         Me.ListBox1.Name = "ListBox1"
-        Me.ListBox1.Size = New System.Drawing.Size(163, 251)
+        Me.ListBox1.Size = New System.Drawing.Size(153, 251)
         Me.ListBox1.TabIndex = 139
         '
         'Button_GIMP
@@ -1147,18 +1147,19 @@ Partial Class Form1
         '
         'TextBox_exposure
         '
-        Me.TextBox_exposure.Font = New System.Drawing.Font("Microsoft Sans Serif", 14.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.TextBox_exposure.Location = New System.Drawing.Point(69, 9)
+        Me.TextBox_exposure.BorderStyle = System.Windows.Forms.BorderStyle.None
+        Me.TextBox_exposure.Font = New System.Drawing.Font("Microsoft Sans Serif", 15.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.TextBox_exposure.Location = New System.Drawing.Point(65, 13)
         Me.TextBox_exposure.Name = "TextBox_exposure"
-        Me.TextBox_exposure.Size = New System.Drawing.Size(69, 29)
+        Me.TextBox_exposure.Size = New System.Drawing.Size(55, 24)
         Me.TextBox_exposure.TabIndex = 143
-        Me.TextBox_exposure.Text = "10"
+        Me.TextBox_exposure.Text = "300"
         Me.TextBox_exposure.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
         'Label9
         '
         Me.Label9.AutoSize = True
-        Me.Label9.Location = New System.Drawing.Point(12, 17)
+        Me.Label9.Location = New System.Drawing.Point(12, 19)
         Me.Label9.Name = "Label9"
         Me.Label9.Size = New System.Drawing.Size(51, 13)
         Me.Label9.TabIndex = 144
@@ -1169,7 +1170,7 @@ Partial Class Form1
         Me.TextBoxY.BorderStyle = System.Windows.Forms.BorderStyle.None
         Me.TextBoxY.Font = New System.Drawing.Font("Calibri", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.TextBoxY.ForeColor = System.Drawing.SystemColors.ControlDarkDark
-        Me.TextBoxY.Location = New System.Drawing.Point(570, 13)
+        Me.TextBoxY.Location = New System.Drawing.Point(496, 14)
         Me.TextBoxY.Name = "TextBoxY"
         Me.TextBoxY.Size = New System.Drawing.Size(30, 20)
         Me.TextBoxY.TabIndex = 90
@@ -1181,7 +1182,7 @@ Partial Class Form1
         Me.TextBoxX.BorderStyle = System.Windows.Forms.BorderStyle.None
         Me.TextBoxX.Font = New System.Drawing.Font("Calibri", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.TextBoxX.ForeColor = System.Drawing.SystemColors.ControlDarkDark
-        Me.TextBoxX.Location = New System.Drawing.Point(534, 13)
+        Me.TextBoxX.Location = New System.Drawing.Point(460, 14)
         Me.TextBoxX.Name = "TextBoxX"
         Me.TextBoxX.Size = New System.Drawing.Size(30, 20)
         Me.TextBoxX.TabIndex = 89
@@ -1216,7 +1217,7 @@ Partial Class Form1
         '
         Me.TabControl2.Controls.Add(Me.TabPage6)
         Me.TabControl2.Controls.Add(Me.TabPage7)
-        Me.TabControl2.Location = New System.Drawing.Point(1101, 43)
+        Me.TabControl2.Location = New System.Drawing.Point(1101, 47)
         Me.TabControl2.Name = "TabControl2"
         Me.TabControl2.SelectedIndex = 0
         Me.TabControl2.Size = New System.Drawing.Size(768, 977)
