@@ -1,19 +1,22 @@
 Imports MathNet.Numerics
 Public Class FocusStructure
     Public Range As Single
+    Dim MicroRange As Single
     Public Nimg As Single
     Public bin As Integer
     Dim Steps, MicroSteps As Single
     ' For speed calibration of the stage 
-    Dim Sx(19), sy(19) As Double
-    Dim Cx(), Cy() As Double
+
     'focus point
     Public Z0 As Single
     Dim readout As Single
     Public Zacceleration As Single = 3000
     Dim exp As Single
     'One is for camera Cpline  one is for stage spline
-    Dim Spline, Cpline As Interpolation.LinearSpline
+    Dim Sx(19), sy(19) As Double
+    Dim MicroSx(19), MicroSy(19) As Double
+    Dim Cx(), Cy() As Double
+    Dim MicroSpline, Spline, Cpline As Interpolation.LinearSpline
     Dim BinnedImage()() As Byte
     Dim FT As ExtendedDepth5
     Public Sub New(Range As Single, Steps As Single, bin As Integer)
@@ -35,7 +38,7 @@ Public Class FocusStructure
         Try
             ReadS()
             ReadC()
-
+            ReadS2()
         Catch ex As Exception
 
         End Try
@@ -58,12 +61,15 @@ Public Class FocusStructure
         '      Range = Int(Range / Nimg * stage.ZMMtoSteps) * Nimg / stage.ZMMtoSteps
 
     End Sub
+
+
+
     Public Sub Calibrate(ByRef pbar As ProgressBar)
         pbar.Maximum = 19
         Initialize()
         For s = 0 To 19
-            Stage.SetSpeed(Stage.Zaxe, (s + 1) / 2)
-            sy(s) = (s + 1) / 2
+            Stage.SetSpeed(Stage.Zaxe, (s + 1) / 4)
+            sy(s) = (s + 1) / 4
             Dim watch As New Stopwatch
             watch.Start()
             Stage.MoveRelative(Stage.Zaxe, Range)
@@ -75,12 +81,27 @@ Public Class FocusStructure
         Next
         Spline = Interpolate.Linear(Sx, sy)
         WriteS()
-
-
+        '-------------------------------------Microsteps=--------------------------------------
+        MicroRange = Steps * 2
+        For s = 0 To 19
+            Stage.SetSpeed(Stage.Zaxe, (s + 1) / 10)
+            Microsy(s) = (s + 1) / 10
+            Dim watch As New Stopwatch
+            watch.Start()
+            Stage.MoveRelative(Stage.Zaxe, MicroRange)
+            watch.Stop()
+            MicroSx(s) = watch.ElapsedMilliseconds
+            Stage.MoveRelative(Stage.Zaxe, -MicroRange)
+            pbar.Value = s
+            Application.DoEvents()
+        Next
+        MicroSpline = Interpolate.Linear(MicroSx, Microsy)
+        WriteS2()
+        '----------------------------------Camera--------------------------------------------------
         ReDim BinnedImage(0)(Camera.Wbinned * Camera.Hbinned - 1)
         Dim tc As Integer = 0
-        pbar.Maximum = 300
-        For t = 1 To 300 Step 10
+        pbar.Maximum = 500
+        For t = 1 To 500 Step 10
             Camera.SetExposure(t / bin, False)
             ReDim Preserve Cx(tc)
             Cx(tc) = t
@@ -99,11 +120,20 @@ Public Class FocusStructure
             Application.DoEvents()
         Next
         Cpline = Interpolate.Linear(Cx, Cy)
+
         WriteC()
         pbar.Value = 0
         Release()
     End Sub
+    Sub WriteS2()
+        Dim fn As Integer = FreeFile()
+        FileOpen(fn, "MicroStage.txt", OpenMode.Output)
+        For i = 0 To sy.GetUpperBound(0)
+            PrintLine(fn, MicroSx(i), Microsy(i))
+        Next
+        FileClose(fn)
 
+    End Sub
     Sub WriteS()
         Dim fn As Integer = FreeFile()
         FileOpen(fn, "stage.txt", OpenMode.Output)
@@ -121,7 +151,6 @@ Public Class FocusStructure
         Next
         FileClose(fn)
     End Sub
-
 
     Sub ReadC()
         Dim fn As Integer = FreeFile()
@@ -153,6 +182,22 @@ Public Class FocusStructure
         FileClose(fn)
         Spline = Interpolate.Linear(Sx, sy)
     End Sub
+
+    Sub ReadS2()
+        Dim fn As Integer = FreeFile()
+        FileOpen(fn, "MicroStage.txt", OpenMode.Input)
+        Dim i As Integer
+        Do Until (EOF(fn))
+            ReDim Preserve MicroSx(i)
+            ReDim Preserve Microsy(i)
+            Input(fn, MicroSx(i))
+            Input(fn, Microsy(i))
+            i += 1
+        Loop
+        FileClose(fn)
+        MicroSpline = Interpolate.Linear(MicroSx, Microsy)
+    End Sub
+
 
     Public Function Analyze() As Single
 
@@ -188,36 +233,16 @@ Public Class FocusStructure
         Form1.Chart1.Series(1).Points.Clear()
 
 
-
-
         Dim Speed As Double = Spline.Interpolate(Cpline.Interpolate(Camera.exp) * Nimg)
-
         Stage.SetSpeed(Stage.Zaxe, Speed)
-        'Stage.SetSweptZ(Range)
-
-
         Stage.MoveRelativeAsync(Stage.Zaxe, Range)
-        'Stage.MoveRelative(Stage.Zaxe, Range)
+
 
         For zz = 0 To Nimg - 1
-            'If zz > 0 Then Stage.MoveRelative(Stage.Zaxe, Steps) ' The first time should be acquired with no movement 
 
-
-            'Dim Thread1 As New System.Threading.Thread(AddressOf Stage.UpdateZPositions)
-            'Thread1.Start()
-            'Stage.UpdateZPositions()
-            'Pos1(zz) = Stage.Z
             Camera.Capture(BinnedImage(zz))
             Stage.UpdateZPositions()
             Pos(zz) = Stage.Z
-
-            '
-            'Application.DoEvents()
-            'If zz > 0 Then
-            '    If CM(zz) > CM(zz - 1) Then decline = 0
-            'End If
-            'If CM(zz) < CM.Max Then decline += 1
-            'If decline = 5 Then Exit For
 
         Next
 
@@ -225,7 +250,6 @@ Public Class FocusStructure
         For zz = 0 To Nimg - 1
             CM(zz) = FT.FindCenterOfMass3(BinnedImage(zz))
             '  SaveSinglePageTiff("C:\test\POS- " + zz.ToString + "-" + Pos(zz).ToString + "CM- " + CM(zz).ToString + ".tif", BinnedImage(zz), Camera.Wbinned, Camera.Hbinned)
-
         Next
 
 
@@ -243,7 +267,7 @@ Public Class FocusStructure
         'Igo one step further to start the focus from there.
 
         'Stage.MoveRelative(Stage.Zaxe, -Steps * (decline + 2))
-        Stage.MoveAbsolute(Stage.Zaxe, focus - 0.15)
+        Stage.MoveAbsolute(Stage.Zaxe, focus - Steps)
         Camera.Capture(BinnedImage(0))
         Camera.Capture(BinnedImage(0))
 

@@ -24,11 +24,11 @@ Partial Class Form1
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Form1))
-        Dim ChartArea8 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
-        Dim Legend8 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
-        Dim Series22 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
-        Dim Series23 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
-        Dim Series24 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
+        Dim ChartArea9 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
+        Dim Legend9 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
+        Dim Series25 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
+        Dim Series26 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
+        Dim Series27 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
         Me.GroupBox3 = New System.Windows.Forms.GroupBox()
         Me.Button_Home = New System.Windows.Forms.Button()
         Me.Button_bottom = New System.Windows.Forms.Button()
@@ -949,10 +949,12 @@ Partial Class Form1
         '
         'TabControl1
         '
+        Me.TabControl1.Alignment = System.Windows.Forms.TabAlignment.Left
         Me.TabControl1.Controls.Add(Me.TabPage3)
         Me.TabControl1.Controls.Add(Me.TabPage4)
         Me.TabControl1.ItemSize = New System.Drawing.Size(71, 15)
         Me.TabControl1.Location = New System.Drawing.Point(0, 47)
+        Me.TabControl1.Multiline = True
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
         Me.TabControl1.Size = New System.Drawing.Size(1099, 1000)
@@ -961,10 +963,10 @@ Partial Class Form1
         'TabPage3
         '
         Me.TabPage3.Controls.Add(Me.PictureBox0)
-        Me.TabPage3.Location = New System.Drawing.Point(4, 19)
+        Me.TabPage3.Location = New System.Drawing.Point(19, 4)
         Me.TabPage3.Name = "TabPage3"
         Me.TabPage3.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage3.Size = New System.Drawing.Size(1091, 977)
+        Me.TabPage3.Size = New System.Drawing.Size(1076, 992)
         Me.TabPage3.TabIndex = 1
         Me.TabPage3.Text = "White Dwarf"
         Me.TabPage3.UseVisualStyleBackColor = True
@@ -982,9 +984,9 @@ Partial Class Form1
         'TabPage4
         '
         Me.TabPage4.Controls.Add(Me.PictureBox1)
-        Me.TabPage4.Location = New System.Drawing.Point(4, 19)
+        Me.TabPage4.Location = New System.Drawing.Point(19, 4)
         Me.TabPage4.Name = "TabPage4"
-        Me.TabPage4.Size = New System.Drawing.Size(1091, 977)
+        Me.TabPage4.Size = New System.Drawing.Size(1076, 992)
         Me.TabPage4.TabIndex = 2
         Me.TabPage4.Text = "FiBi"
         Me.TabPage4.UseVisualStyleBackColor = True
@@ -1014,33 +1016,33 @@ Partial Class Form1
         'Chart1
         '
         Me.Chart1.BackColor = System.Drawing.Color.Transparent
-        ChartArea8.AxisX.MajorGrid.Enabled = False
-        ChartArea8.AxisX.MajorTickMark.Enabled = False
-        ChartArea8.AxisY.LabelStyle.Enabled = False
-        ChartArea8.AxisY.MajorGrid.Enabled = False
-        ChartArea8.BackColor = System.Drawing.Color.Transparent
-        ChartArea8.Name = "ChartArea1"
-        Me.Chart1.ChartAreas.Add(ChartArea8)
-        Legend8.Name = "Legend1"
-        Me.Chart1.Legends.Add(Legend8)
+        ChartArea9.AxisX.MajorGrid.Enabled = False
+        ChartArea9.AxisX.MajorTickMark.Enabled = False
+        ChartArea9.AxisY.LabelStyle.Enabled = False
+        ChartArea9.AxisY.MajorGrid.Enabled = False
+        ChartArea9.BackColor = System.Drawing.Color.Transparent
+        ChartArea9.Name = "ChartArea1"
+        Me.Chart1.ChartAreas.Add(ChartArea9)
+        Legend9.Name = "Legend1"
+        Me.Chart1.Legends.Add(Legend9)
         Me.Chart1.Location = New System.Drawing.Point(249, 217)
         Me.Chart1.Name = "Chart1"
-        Series22.ChartArea = "ChartArea1"
-        Series22.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Area
-        Series22.IsVisibleInLegend = False
-        Series22.Legend = "Legend1"
-        Series22.Name = "Series1"
-        Series23.ChartArea = "ChartArea1"
-        Series23.IsVisibleInLegend = False
-        Series23.Legend = "Legend1"
-        Series23.Name = "Series2"
-        Series24.ChartArea = "ChartArea1"
-        Series24.IsVisibleInLegend = False
-        Series24.Legend = "Legend1"
-        Series24.Name = "Series3"
-        Me.Chart1.Series.Add(Series22)
-        Me.Chart1.Series.Add(Series23)
-        Me.Chart1.Series.Add(Series24)
+        Series25.ChartArea = "ChartArea1"
+        Series25.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Area
+        Series25.IsVisibleInLegend = False
+        Series25.Legend = "Legend1"
+        Series25.Name = "Series1"
+        Series26.ChartArea = "ChartArea1"
+        Series26.IsVisibleInLegend = False
+        Series26.Legend = "Legend1"
+        Series26.Name = "Series2"
+        Series27.ChartArea = "ChartArea1"
+        Series27.IsVisibleInLegend = False
+        Series27.Legend = "Legend1"
+        Series27.Name = "Series3"
+        Me.Chart1.Series.Add(Series25)
+        Me.Chart1.Series.Add(Series26)
+        Me.Chart1.Series.Add(Series27)
         Me.Chart1.Size = New System.Drawing.Size(317, 122)
         Me.Chart1.TabIndex = 120
         Me.Chart1.Text = "Chart1"
