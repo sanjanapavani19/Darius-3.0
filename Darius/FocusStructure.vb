@@ -23,6 +23,9 @@ Public Class FocusStructure
 
         Me.Range = Range
         Me.Steps = Steps
+
+        MicroRange = Steps * 2
+        MicroSteps = Steps / 10
         Nimg = 100
         Me.bin = bin
 
@@ -82,7 +85,7 @@ Public Class FocusStructure
         Spline = Interpolate.Linear(Sx, sy)
         WriteS()
         '-------------------------------------Microsteps=--------------------------------------
-        MicroRange = Steps * 2
+
         For s = 0 To 19
             Stage.SetSpeed(Stage.Zaxe, (s + 1) / 10)
             Microsy(s) = (s + 1) / 10
@@ -267,40 +270,71 @@ Public Class FocusStructure
         'Igo one step further to start the focus from there.
 
         'Stage.MoveRelative(Stage.Zaxe, -Steps * (decline + 2))
-        Stage.MoveAbsolute(Stage.Zaxe, focus - Steps)
+        Stage.MoveAbsolute(Stage.Zaxe, focus - 2 * Steps)
         Camera.Capture(BinnedImage(0))
         Camera.Capture(BinnedImage(0))
 
-        Nimg = 100
-        MicroSteps = Steps / 10
+
+        Nimg = MicroRange / MicroSteps
+
         ReDim CM(Nimg - 1)
         ReDim Pos(Nimg - 1)
         decline = 0
         Form1.Chart1.Series(0).Points.Clear()
         Form1.Chart1.Series(1).Points.Clear()
+
+        Speed = MicroSpline.Interpolate(Cpline.Interpolate(Camera.exp) * Nimg)
+        Stage.SetSpeed(Stage.Zaxe, Speed)
+        Stage.MoveRelativeAsync(Stage.Zaxe, MicroRange)
+
+
         For zz = 0 To Nimg - 1
-            If zz > 0 Then Stage.MoveRelative(Stage.Zaxe, MicroSteps) ' The first time should be acquired with no movement 
+
+            Camera.Capture(BinnedImage(zz))
+            Stage.UpdateZPositions()
             Pos(zz) = Stage.Z
-            Camera.Capture(BinnedImage(0))
-            CM(zz) = FT.FindCenterOfMass3(BinnedImage(0))
-            '  SaveSinglePageTiff("C:\temp\2nd\POS- " + zz.ToString + Pos(zz).ToString + "CM- " + CM(zz).ToString + ".tif", BinnedImage(0), Camera.Wbinned, Camera.Hbinned)
-            Form1.Chart1.Series(1).Points.AddXY(Int((zz * MicroSteps) * 1000), CM(zz))
-            Application.DoEvents()
-            If zz > 0 Then
-                If CM(zz) > CM(zz - 1) Then decline = 0
-            End If
-            If CM(zz) < CM.Max Then decline += 1
-            If decline = 5 Then Exit For
+
+        Next
+        Stage.SetSpeed(Stage.Zaxe, 48)
+
+        For zz = 0 To Nimg - 1
+            CM(zz) = FT.FindCenterOfMass3(BinnedImage(zz))
+            '    SaveSinglePageTiff("C:\test\2nd\POS- " + zz.ToString + "-" + Pos(zz).ToString + "CM- " + CM(zz).ToString + ".tif", BinnedImage(zz), Camera.Wbinned, Camera.Hbinned)
         Next
 
-        Form1.Chart1.Series(0).Points.Clear()
-        Form1.Chart1.Series(1).Points.Clear()
 
         CmXMax = CM.Max
+
         For zz = 0 To Nimg - 1
-            If CM(zz) = CmXMax Then focus = Pos(zz)
+            If CM(zz) = CmXMax Then focus = Pos(zz) : zzMax = zz
+            Form1.Chart1.Series(1).Points.AddXY(Pos(zz), CM(zz))
+            Application.DoEvents()
         Next
-        Stage.MoveAbsolute(Stage.Zaxe, focus)
+        Stage.MoveAbsolute(Stage.Zaxe, focus - MicroSteps)
+
+        'For zz = 0 To Nimg - 1
+        '    If zz > 0 Then Stage.MoveRelative(Stage.Zaxe, MicroSteps) ' The first time should be acquired with no movement 
+        '    Pos(zz) = Stage.Z
+        '    Camera.Capture(BinnedImage(0))
+        '    CM(zz) = FT.FindCenterOfMass3(BinnedImage(0))
+        '    '  SaveSinglePageTiff("C:\temp\2nd\POS- " + zz.ToString + Pos(zz).ToString + "CM- " + CM(zz).ToString + ".tif", BinnedImage(0), Camera.Wbinned, Camera.Hbinned)
+        '    Form1.Chart1.Series(1).Points.AddXY(Int((zz * MicroSteps) * 1000), CM(zz))
+        '    Application.DoEvents()
+        '    If zz > 0 Then
+        '        If CM(zz) > CM(zz - 1) Then decline = 0
+        '    End If
+        '    If CM(zz) < CM.Max Then decline += 1
+        '    If decline = 5 Then Exit For
+        'Next
+
+        'Form1.Chart1.Series(0).Points.Clear()
+        'Form1.Chart1.Series(1).Points.Clear()
+
+        'CmXMax = CM.Max
+        'For zz = 0 To Nimg - 1
+        '    If CM(zz) = CmXMax Then focus = Pos(zz)
+        'Next
+        'Stage.MoveAbsolute(Stage.Zaxe, focus)
         focus = Stage.Z
 
 

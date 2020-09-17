@@ -50,25 +50,35 @@ Public Class ZaberNew
         SetAcceleration(Zaxe, Zacc)
 
     End Sub
-    Public Sub MoveRelative(ByRef Axis As Device, R As Single)
-        Watch.Reset()
+    Public Sub MoveRelative(ByRef Axis As Device, R As Single, Optional update As Boolean = True)
+
         Try
 
             Axis.MoveRelative(R, Units.Length_Millimetres)
-            UpdatePositions()
-            Tracking.Update()
+            If update Then
+                UpdatePositions()
+                Tracking.Update()
+            End If
         Catch ex As Exception
 
         End Try
 
     End Sub
 
-
-    Public Sub MoveAbsolute(ByRef Axis As Device, R As Single)
-        Try
-            Axis.MoveAbsolute(R, Units.Length_Millimetres)
+    Public Sub MoveRelativeAsync(ByRef Axis As Device, R As Single, Optional update As Boolean = True)
+        Axis.MoveRelativeAsync(R, Units.Length_Millimetres)
+        If update Then
             UpdatePositions()
             Tracking.Update()
+        End If
+    End Sub
+    Public Sub MoveAbsolute(ByRef Axis As Device, R As Single, Optional update As Boolean = True)
+        Try
+            Axis.MoveAbsolute(R, Units.Length_Millimetres)
+            If update Then
+                UpdatePositions()
+                Tracking.Update()
+            End If
         Catch ex As Exception
 
         End Try
@@ -129,11 +139,7 @@ Public Class ZaberNew
 
     End Sub
 
-    Public Sub MoveRelativeAsync(ByRef Axis As Device, R As Single)
-        Axis.MoveRelativeAsync(R, Units.Length_Millimetres)
-        UpdatePositions()
-        Tracking.Update()
-    End Sub
+
 
     Public Sub UpdatePositions()
         X = Xaxe.GetPosition(Units.Length_Millimetres)

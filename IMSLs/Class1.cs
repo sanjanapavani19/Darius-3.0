@@ -105,7 +105,21 @@ public class Polynomial_fit : NonlinearRegression.IFunction
 
         NonlinearRegression.IFunction fcn = new Polynomial_fit();
         // GenerateData();
-        double[] coef = regression.Solve(fcn);
+        double[] coef = new double[nparm];
+        try
+        {
+
+            coef = regression.Solve(fcn);
+        }
+        catch (Exception)
+        {
+
+            for (int j = 0; j < nparm; j++)
+            {
+                coef[j] = 0;
+            }
+
+        }
 
         Console.Out.WriteLine
         ("The computed regression coefficients are {" + coef[0] + ", "

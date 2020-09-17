@@ -17,7 +17,7 @@ Public Class Form1
     Dim AutoFocus As FocusStructure
     Dim Slideloaded As Boolean
     Dim LinearUnmixing As LinearUnmixingStructure
-    Dim FocusMap(,) As Single
+
     Dim panel As Integer
     Dim Focusing As Boolean
     Dim Filenames() As String
@@ -531,7 +531,12 @@ Public Class Form1
 
         Dim Fit As New Polynomial_fit
         Dim A(4) As Double
-        ReDim FocusMap(X, y)
+
+        If A.Sum = 0 Then
+            MsgBox("Predicytive focus couldn't be estimated. TryCast moving your points inside the tissue.")
+            Scanning = False : GoTo 1
+        End If
+
         If Tracking.ROI.IsMade Then
 
 
@@ -557,19 +562,7 @@ Public Class Form1
             Dim X0 As Single = Stage.X
             Dim Y0 As Single = Stage.Y
 
-            For j = 1 To y
-                For i = 1 To X
-                    If j Mod 2 = 0 Then
 
-                        ' FocusMap(i, j) = -(A * (X0 + (i - 1) * -AdjustedStepX) + B * (Y0 + (j - 1) * AdjustedStepY) + D) / C
-                        FocusMap(i, j) = Fit.ComputeE({(X0 + (i - 1) * -AdjustedStepX), (Y0 + (j - 1) * AdjustedStepY)}, A)
-                    Else
-                        'FocusMap(i, j) = -(A * (X0 + (X - i) * -AdjustedStepX) + B * (Y0 + (j - 1) * AdjustedStepY) + D) / C
-                        FocusMap(i, j) = Fit.ComputeE({X0 + (X - i - 1) * -AdjustedStepX, Y0 + (j - 1) * AdjustedStepY}, A)
-                    End If
-
-                Next
-            Next
 
         End If
 
@@ -592,16 +585,16 @@ Public Class Form1
 
                 'Moves while it generates the preview and others.
                 If loop_x < X Then
-                    Stage.MoveRelative(Stage.Xaxe, -AdjustedStepX * direction) : Axis = "X"
+                    Stage.MoveRelative(Stage.Xaxe, -AdjustedStepX * direction, False) : Axis = "X"
                     TravelX += AdjustedStepX * direction
                 Else
                     If loop_y < y Then
-                        Stage.MoveRelative(Stage.Yaxe, AdjustedStepY) : Axis = "y"
+                        Stage.MoveRelative(Stage.Yaxe, AdjustedStepY, False) : Axis = "y"
                         TravelY += AdjustedStepY
                     End If
                 End If
 
-                If Tracking.ROI.IsMade Then Stage.MoveAbsolute(Stage.Zaxe, Fit.ComputeE({Stage.X, Stage.Y}, A))
+                If Tracking.ROI.IsMade Then Stage.MoveAbsolute(Stage.Zaxe, Fit.ComputeE({Stage.X, Stage.Y}, A), False)
                 Do Until Camera.ready
 
                 Loop
