@@ -163,6 +163,7 @@ Public Class TrackingStructure
     Dim X, Y As Single
     Dim XX, YY, ZZ As Single
     Public Shared Cursor As Button
+
     Public Scanned() As Button
 
     Public Sub New(ByRef Pb As PictureBox)
@@ -368,28 +369,30 @@ Public Class TrackingStructure
         XX = Stage.X
         YY = Stage.Y
         ZZ = Stage.Z
+
+
         '   ZZ = stage.GetPosition(stage.Zport)
 
         Form1.ToolStripStatusLabel1.Text = "X: " + XX.ToString
-            Form1.ToolStripStatusLabel2.Text = "Y: " + YY.ToString
-            Form1.ToolStripStatusLabel3.Text = "Z: " + ZZ.ToString
-            ' Now conversion 
+        Form1.ToolStripStatusLabel2.Text = "Y: " + YY.ToString
+        Form1.ToolStripStatusLabel3.Text = "Z: " + ZZ.ToString
+        ' Now conversion 
 
-            X = ConvertCoordinatetoPixels(XX, YY).X
-            Y = ConvertCoordinatetoPixels(XX, YY).Y
+        X = ConvertCoordinatetoPixels(XX, YY).X
+        Y = ConvertCoordinatetoPixels(XX, YY).Y
 
 
-            '  If X <> RecentX Or Y <> RecentY Then
+        '  If X <> RecentX Or Y <> RecentY Then
 
-            Cursor.Top = Y - Cursor.Height / 2
-            Cursor.Left = X - Cursor.Width / 2
+        Cursor.Top = Y - Cursor.Height / 2
+        Cursor.Left = X - Cursor.Width / 2
         '   End If
 
         ROI.Refresh()
 
         RecentX = X
-            RecentY = Y
-        End Sub
+        RecentY = Y
+    End Sub
 
     Private Function ConvertCoordinatetoPixels(XX As Single, YY As Single) As Point
             Dim P As New Point

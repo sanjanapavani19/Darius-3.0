@@ -266,7 +266,7 @@ Partial Class Form1
         Me.TabControl_Settings.Location = New System.Drawing.Point(26, 119)
         Me.TabControl_Settings.Name = "TabControl_Settings"
         Me.TabControl_Settings.SelectedIndex = 0
-        Me.TabControl_Settings.Size = New System.Drawing.Size(449, 203)
+        Me.TabControl_Settings.Size = New System.Drawing.Size(523, 347)
         Me.TabControl_Settings.TabIndex = 111
         '
         'TabPage13
@@ -296,7 +296,7 @@ Partial Class Form1
         Me.TabPage13.Controls.Add(Me.Label1)
         Me.TabPage13.Location = New System.Drawing.Point(4, 25)
         Me.TabPage13.Name = "TabPage13"
-        Me.TabPage13.Size = New System.Drawing.Size(441, 174)
+        Me.TabPage13.Size = New System.Drawing.Size(515, 318)
         Me.TabPage13.TabIndex = 3
         Me.TabPage13.Text = "Stage"
         '

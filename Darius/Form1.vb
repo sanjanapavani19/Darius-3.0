@@ -532,10 +532,7 @@ Public Class Form1
         Dim Fit As New Polynomial_fit
         Dim A(4) As Double
 
-        If A.Sum = 0 Then
-            MsgBox("Predicytive focus couldn't be estimated. TryCast moving your points inside the tissue.")
-            Scanning = False : GoTo 1
-        End If
+
 
         If Tracking.ROI.IsMade Then
 
@@ -555,8 +552,12 @@ Public Class Form1
                 If Scanning = False Then GoTo 1
 
             Next
-            A = Fit.Main(vx, vy, 1000, 0.0001)
 
+            A = Fit.Main(vx, vy, 1000, 0.0000001)
+            If A.Sum = 0 Then
+                MsgBox("Predicytive focus couldn't be estimated. TryCast moving your points inside the tissue.")
+                Scanning = False : GoTo 1
+            End If
 
             Tracking.MovetoROIEdge()
             Dim X0 As Single = Stage.X
@@ -568,7 +569,11 @@ Public Class Form1
 
 
         Stage.SetAcceleration(Stage.Zaxe, AutoFocus.Zacceleration)
-        If Tracking.ROI.IsMade Then Tracking.MovetoROIEdge() : Stage.MoveAbsolute(Stage.Zaxe, Fit.ComputeE({Stage.X, Stage.Y}, A))
+        If Tracking.ROI.IsMade Then
+            Tracking.MovetoROIEdge()
+            Stage.MoveAbsolute(Stage.Zaxe, Fit.ComputeE({Stage.X, Stage.Y}, A))
+
+        End If
 
 
 
@@ -586,11 +591,15 @@ Public Class Form1
                 'Moves while it generates the preview and others.
                 If loop_x < X Then
                     Stage.MoveRelative(Stage.Xaxe, -AdjustedStepX * direction, False) : Axis = "X"
-                    TravelX += AdjustedStepX * direction
+                    Stage.X += -AdjustedStepX * direction
+                    TravelX += -AdjustedStepX * direction
+
                 Else
                     If loop_y < y Then
                         Stage.MoveRelative(Stage.Yaxe, AdjustedStepY, False) : Axis = "y"
+                        Stage.Y += AdjustedStepY
                         TravelY += AdjustedStepY
+
                     End If
                 End If
 

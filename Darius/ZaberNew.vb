@@ -70,6 +70,8 @@ Public Class ZaberNew
         If update Then
             UpdatePositions()
             Tracking.Update()
+        Else
+
         End If
     End Sub
     Public Sub MoveAbsolute(ByRef Axis As Device, R As Single, Optional update As Boolean = True)
