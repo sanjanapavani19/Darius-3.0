@@ -25,6 +25,13 @@ Public Class ZaberNew
 
     End Sub
 
+    Public Sub SetFOV(FOVX As Single, FOVY As Single)
+        Me.FOVX = FOVX
+        Me.FOVY = FOVY
+        Setting.Sett("FOVX", FOVX)
+        Setting.Sett("FOVY", FOVY)
+    End Sub
+
     Public Sub Home()
         Xaxe.Home()
         Yaxe.Home()

@@ -17,6 +17,7 @@ Public Class TrackingStructure
             Public InitialX, InitialY As Integer
             Public IsMoved As Boolean
             Public Grabbed As Boolean
+
             Public Sub Move(Dx As Integer, Dy As Integer)
                 Rect.X = InitialX + Dx
                 Rect.Y = InitialY + Dy
@@ -32,6 +33,7 @@ Public Class TrackingStructure
         Public IsMoved As Boolean
         Public Dots() As DotsStructure
         Public numDots As Integer
+        Public ActiveDot As Integer
         Public pen As New Pen(Brushes.White, 2)
         Public InitialX, InitialY As Integer
         Public ClickX, ClickY, width, height As Integer
@@ -347,6 +349,14 @@ Public Class TrackingStructure
         Stage.MoveAbsolute(Stage.Yaxe, ConvertPixeltoCoordinateY(ROI.Dots(i).Rect.Y + Cursor.Height / 2))
     End Sub
 
+    Public Sub MovetoNextDots()
+
+        Stage.MoveAbsolute(Stage.Xaxe, ConvertPixeltoCoordinateX(ROI.Dots(ROI.ActiveDot).Rect.X + Cursor.Width / 2))
+        Stage.MoveAbsolute(Stage.Yaxe, ConvertPixeltoCoordinateY(ROI.Dots(ROI.ActiveDot).Rect.Y + Cursor.Height / 2))
+        ROI.ActiveDot += 1
+        If ROI.ActiveDot = ROI.numDots Then ROI.ActiveDot = 0
+
+    End Sub
 
     Public Sub Enable()
         T.Enabled = True

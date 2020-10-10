@@ -11,13 +11,11 @@ Public Class Form1
     Public Display As ImageDisplay
     Public LEDcontroller As Relay
     Dim IsDragging As Boolean
-    Dim CollagenImage As StackImage
-    Dim Concatenate As Single(,,)
     Dim Imagetype As ImagetypeEnum
     Dim AutoFocus As FocusStructure
     Dim Slideloaded As Boolean
     Dim LinearUnmixing As LinearUnmixingStructure
-
+    Dim StopAlign As Boolean
     Dim panel As Integer
     Dim Focusing As Boolean
     Dim Filenames() As String
@@ -25,11 +23,6 @@ Public Class Form1
     Dim fileN As Integer
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        'Dim vx() As Single = {17.036356, 31.4184856, 12.8087683, 31.370985, 17.0838566, 35.74095, 12.90377, 35.8359528, 14.5188036, 33.9834137}
-        'Dim vy() As Single = {10.8271627, 10.9771814, 10.72715, 10.7571545, 10.7371511}
-        'Dim fit As New Polynomial_fit
-        'Dim A(4) As Double
-        'A = fit.Main(vx, vy, 1000, 0.001)
 
         Preview = New PreviewStructure
         TextBox_PrevieEXp.Text = Setting.Gett("PREVIEWEXP")
@@ -43,7 +36,9 @@ Public Class Form1
             AutoFocus = New FocusStructure(2, 0.1, 4)
             Display = New ImageDisplay(Camera.W, Camera.H, Chart1)
         End If
-        Stage = New ZaberNew(Setting.Gett("FOVX"), Setting.Gett("FOVX") * Camera.H / Camera.W)
+        Stage = New ZaberNew(Setting.Gett("FOVX"), Setting.Gett("FOVY"))
+        TextBox_FOVX.Text = Stage.FOVX
+        TextBox_FOVY.Text = Stage.FOVY
 
 
 
@@ -53,8 +48,6 @@ Public Class Form1
 
         If Camera.status Then
 
-            CollagenImage = New StackImage(Camera.W, Camera.H, 4, Imaging.PixelFormat.Format32bppArgb)
-            ReDim Concatenate(Camera.W, Camera.H, 5)
 
             Camera.SetFlatField("ff.tif", "dark.tif")
 
@@ -305,24 +298,6 @@ Public Class Form1
         End If
     End Sub
 
-
-
-    Private Sub Button_Save_Click(sender As Object, e As EventArgs)
-        If SaveFileDialog1.ShowDialog() = DialogResult.Cancel Then Exit Sub
-
-        Dim filename As String = Path.GetFileName(SaveFileDialog1.FileName)
-        Dim Dirname As String = SaveFileDialog1.FileName
-        Directory.CreateDirectory(Dirname)
-        CollagenImage.Bitmp(0).bmp.Save(Dirname & "\Brighfield-" & filename & ".jpg")
-        CollagenImage.Bitmp(1).bmp.Save(Dirname & "\Fluorescent-" & filename & ".jpg")
-        ' it resets the unmixing to original ....
-        'CollagenImage.Bitmp(2).Reset()
-        'CollagenImage.Bitmp(2).bmp.Save(Dirname & "\Unmixed-" & filename & ".jpg")
-        'CollagenImage.Bitmp(3).bmp.Save(Dirname & "\Overlaid-" & filename & ".jpg")
-
-        'SaveMultipageTiff(Dirname & "\Concatenate-" & filename & ".tif", Concatenate)
-
-    End Sub
 
     Private Sub GroupBox1_Enter(sender As Object, e As EventArgs)
 
@@ -704,11 +679,6 @@ Public Class Form1
 
 
 
-    Private Sub Button10_Click(sender As Object, e As EventArgs) Handles Button10.Click
-        DoAutoFocus(0)
-    End Sub
-
-
 
     Private Sub TextBox4_KeyDown(sender As Object, e As KeyEventArgs) Handles TextBox4.KeyDown
         If e.KeyCode = Keys.Return Then
@@ -1042,7 +1012,7 @@ Public Class Form1
         If Focusing = True Then Exit Sub
         Focusing = True
         Dim speed As Single
-        If Control.ModifierKeys = Keys.Control Then speed = 50 Else speed = 5
+        If Control.ModifierKeys = Keys.Control Then speed = 20 Else speed = 5
 
         'If XYZ.name = "NewPort" Then
         If e.Delta > 0 Then
@@ -1094,6 +1064,64 @@ Public Class Form1
             MsgBox("No image file is found", MsgBoxStyle.Critical)
         End Try
 
+    End Sub
+
+    Private Sub Button2_Click_1(sender As Object, e As EventArgs) Handles Button2.Click
+
+        Tracking.MovetoNextDots()
+
+    End Sub
+
+    Private Sub TextBox_FOVX_TextChanged(sender As Object, e As EventArgs) Handles TextBox_FOVX.TextChanged
+
+    End Sub
+
+    Private Sub TextBox_FOVX_KeyDown(sender As Object, e As KeyEventArgs) Handles TextBox_FOVX.KeyDown, TextBox_FOVY.KeyDown
+        If e.KeyCode = Keys.Return Then
+            Stage.SetFOV(TextBox_FOVX.Text, TextBox_FOVY.Text)
+        End If
+    End Sub
+
+    Private Sub Button5_Click_1(sender As Object, e As EventArgs) Handles Button5.Click
+        If Camera.busy Then ExitLive()
+        StopAlign = False
+        Dim Montage As New Bitmap(Camera.W * 4, Camera.H * 4)
+        Dim BMParray(3) As Bitmap
+        For i = 0 To 3
+            BMParray(i) = New Bitmap(Camera.W, Camera.H)
+        Next
+
+        Dim croppedsize As Integer = TextBox9.Text
+
+        Dim cropped As New Bitmap(croppedsize, croppedsize)
+        Dim g As Graphics
+        g = Graphics.FromImage(Montage)
+
+
+        For i = 0 To 3
+            If i = 1 Then Stage.MoveRelative(Stage.Xaxe, Stage.FOVX)
+            If i = 2 Then Stage.MoveRelative(Stage.Yaxe, Stage.FOVY)
+            If i = 3 Then Stage.MoveRelative(Stage.Zaxe, -Stage.FOVX)
+
+
+            BMParray(i) = New Bitmap(Camera.captureBmp)
+
+            If i = 0 Then g.DrawImage(BMParray(i), New Point(0, 0))
+            If i = 1 Then g.DrawImage(BMParray(i), New Point(Camera.W, 0))
+            If i = 2 Then g.DrawImage(BMParray(i), New Point(Camera.W, Camera.H))
+            If i = 3 Then g.DrawImage(BMParray(i), New Point(0, Camera.H))
+            Application.DoEvents()
+
+        Next
+        Stage.MoveRelative(Stage.Yaxe, -Stage.FOVY)
+        cropped = Montage.Clone(New Rectangle(Camera.W - croppedsize / 2, Camera.H - croppedsize / 2, croppedsize, croppedsize), Imaging.PixelFormat.Format24bppRgb)
+        PictureBox0.Image = cropped
+
+    End Sub
+
+    Private Sub Button10_Click(sender As Object, e As EventArgs) Handles Button10.Click
+        StopAlign = True
+        If Not Camera.busy Then GoLive()
     End Sub
 End Class
 

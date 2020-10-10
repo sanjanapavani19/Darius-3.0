@@ -193,6 +193,12 @@
     </Compile>
     <Compile Include="Preview.vb" />
     <Compile Include="Relay.vb" />
+    <Compile Include="Scanning.Designer.vb">
+      <DependentUpon>Scanning.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Scanning.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="SettingStructure.vb" />
     <Compile Include="Shared.vb" />
     <Compile Include="StackImage.vb" />
@@ -213,6 +219,9 @@
       <LastGenOutput>Resources.Designer.vb</LastGenOutput>
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Scanning.resx">
+      <DependentUpon>Scanning.vb</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

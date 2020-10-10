@@ -25,6 +25,7 @@ Public Class XimeaColor
     Public ExposureChanged As Boolean
     Public MatrixResetRequested As Boolean
     Public MatrixResetChanged As Boolean
+    Public Cropped As Boolean
     Public Dostop As Boolean
 
 
@@ -66,7 +67,7 @@ Public Class XimeaColor
             timeout = 5000
             busy = False
             status = True
-            'SetROI(0, 0, 100, 100)
+            'SetROI((3384 - 2048) / 2, (2708 - 2048) / 2, 2048, 2048)
             SetBinning(False, 1)
             '------------------------------------------------------------
             cam.StartAcquisition()
@@ -83,7 +84,7 @@ Public Class XimeaColor
         cam.SetParam(PRM.HEIGHT, Height)
         cam.SetParam(PRM.OFFSET_X, X)
         cam.SetParam(PRM.OFFSET_Y, Y)
-
+        Cropped = True
 
     End Sub
     Public Sub SetMatrix(CCMAtrix As Single)
@@ -113,22 +114,42 @@ Public Class XimeaColor
 
     End Sub
     Public Sub SetBinning(yes As Boolean, size As Integer)
-        If yes Then
 
-            cam.SetParam(PRM.DOWNSAMPLING, size)
-            cam.SetParam(PRM.DOWNSAMPLING_TYPE, BINNING_MODE.SUM)
-            Wbinned = cam.GetParamInt(PRM.WIDTH)
-            Hbinned = cam.GetParamInt(PRM.HEIGHT)
+        If Cropped Then
+            If yes Then
+                Wbinned = cam.GetParamInt(PRM.WIDTH)
+                Hbinned = cam.GetParamInt(PRM.HEIGHT)
+                BmpRef = New Bitmap(Wbinned, Hbinned, Imaging.PixelFormat.Format24bppRgb)
+                ReDim Bytes(Wbinned * Hbinned - 1)
 
-            BmpRef = New Bitmap(Wbinned, Hbinned, Imaging.PixelFormat.Format24bppRgb)
-            ReDim Bytes(Wbinned * Hbinned - 1)
+
+            Else
+                W = cam.GetParamInt(PRM.WIDTH)
+                H = cam.GetParamInt(PRM.HEIGHT)
+                BmpRef = New Bitmap(W, H, Imaging.PixelFormat.Format24bppRgb)
+                ReDim Bytes(W * H * 3 - 1)
+            End If
+
+
 
         Else
-            cam.SetParam(PRM.DOWNSAMPLING, 1)
-            W = cam.GetParamInt(PRM.WIDTH)
-            H = cam.GetParamInt(PRM.HEIGHT)
-            BmpRef = New Bitmap(W, H, Imaging.PixelFormat.Format24bppRgb)
-            ReDim Bytes(W * H * 3 - 1)
+            If yes Then
+
+                cam.SetParam(PRM.DOWNSAMPLING, size)
+                cam.SetParam(PRM.DOWNSAMPLING_TYPE, BINNING_MODE.SUM)
+                Wbinned = cam.GetParamInt(PRM.WIDTH)
+                Hbinned = cam.GetParamInt(PRM.HEIGHT)
+                BmpRef = New Bitmap(Wbinned, Hbinned, Imaging.PixelFormat.Format24bppRgb)
+                ReDim Bytes(Wbinned * Hbinned - 1)
+
+            Else
+                cam.SetParam(PRM.DOWNSAMPLING, 1)
+                W = cam.GetParamInt(PRM.WIDTH)
+                H = cam.GetParamInt(PRM.HEIGHT)
+                BmpRef = New Bitmap(W, H, Imaging.PixelFormat.Format24bppRgb)
+                ReDim Bytes(W * H * 3 - 1)
+            End If
+
         End If
     End Sub
     Public Sub SetPolicyToSafe()
@@ -159,7 +180,8 @@ Public Class XimeaColor
 
 
     Public Sub SetFlatField(filename As String, bfilename As String)
-        cam.SetParam(PRM.FFC_FLAT_FIELD_FILE_NAME, filename)
+        If Cropped Then ffsetup=False:Exit Sub
+            cam.SetParam(PRM.FFC_FLAT_FIELD_FILE_NAME, filename)
         cam.SetParam(PRM.FFC_DARK_FIELD_FILE_NAME, bfilename)
         cam.SetParam(PRM.FFC, 1)
         FFsetup = True
