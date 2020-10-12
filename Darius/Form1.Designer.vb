@@ -40,6 +40,10 @@ Partial Class Form1
         Me.RadioButton_zoom_in = New System.Windows.Forms.RadioButton()
         Me.TabControl_Settings = New System.Windows.Forms.TabControl()
         Me.TabPage13 = New System.Windows.Forms.TabPage()
+        Me.Label16 = New System.Windows.Forms.Label()
+        Me.TextBox16 = New System.Windows.Forms.TextBox()
+        Me.Button10 = New System.Windows.Forms.Button()
+        Me.Button5 = New System.Windows.Forms.Button()
         Me.TextBox_FOVY = New System.Windows.Forms.TextBox()
         Me.Label15 = New System.Windows.Forms.Label()
         Me.TextBox_FOVX = New System.Windows.Forms.TextBox()
@@ -135,8 +139,7 @@ Partial Class Form1
         Me.PictureBox_Preview = New System.Windows.Forms.PictureBox()
         Me.Button_Luigi = New System.Windows.Forms.Button()
         Me.TabPage7 = New System.Windows.Forms.TabPage()
-        Me.Button5 = New System.Windows.Forms.Button()
-        Me.Button10 = New System.Windows.Forms.Button()
+        Me.Button16 = New System.Windows.Forms.Button()
         Me.GroupBox3.SuspendLayout()
         Me.TabControl_Settings.SuspendLayout()
         Me.TabPage13.SuspendLayout()
@@ -278,6 +281,8 @@ Partial Class Form1
         'TabPage13
         '
         Me.TabPage13.BackColor = System.Drawing.Color.WhiteSmoke
+        Me.TabPage13.Controls.Add(Me.Label16)
+        Me.TabPage13.Controls.Add(Me.TextBox16)
         Me.TabPage13.Controls.Add(Me.Button10)
         Me.TabPage13.Controls.Add(Me.Button5)
         Me.TabPage13.Controls.Add(Me.TextBox_FOVY)
@@ -310,6 +315,46 @@ Partial Class Form1
         Me.TabPage13.Size = New System.Drawing.Size(687, 344)
         Me.TabPage13.TabIndex = 3
         Me.TabPage13.Text = "Stage"
+        '
+        'Label16
+        '
+        Me.Label16.AutoSize = True
+        Me.Label16.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label16.Location = New System.Drawing.Point(416, 152)
+        Me.Label16.Name = "Label16"
+        Me.Label16.Size = New System.Drawing.Size(74, 16)
+        Me.Label16.TabIndex = 65
+        Me.Label16.Text = "Cropp Size"
+        '
+        'TextBox16
+        '
+        Me.TextBox16.BorderStyle = System.Windows.Forms.BorderStyle.None
+        Me.TextBox16.Font = New System.Drawing.Font("Calibri", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.TextBox16.ForeColor = System.Drawing.SystemColors.ControlDarkDark
+        Me.TextBox16.Location = New System.Drawing.Point(519, 146)
+        Me.TextBox16.Name = "TextBox16"
+        Me.TextBox16.Size = New System.Drawing.Size(56, 20)
+        Me.TextBox16.TabIndex = 64
+        Me.TextBox16.Text = "400"
+        Me.TextBox16.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        '
+        'Button10
+        '
+        Me.Button10.Location = New System.Drawing.Point(500, 112)
+        Me.Button10.Name = "Button10"
+        Me.Button10.Size = New System.Drawing.Size(75, 23)
+        Me.Button10.TabIndex = 63
+        Me.Button10.Text = "Done!"
+        Me.Button10.UseVisualStyleBackColor = True
+        '
+        'Button5
+        '
+        Me.Button5.Location = New System.Drawing.Point(419, 112)
+        Me.Button5.Name = "Button5"
+        Me.Button5.Size = New System.Drawing.Size(75, 23)
+        Me.Button5.TabIndex = 62
+        Me.Button5.Text = "Test FOV"
+        Me.Button5.UseVisualStyleBackColor = True
         '
         'TextBox_FOVY
         '
@@ -898,6 +943,7 @@ Partial Class Form1
         '
         'TabPage2
         '
+        Me.TabPage2.Controls.Add(Me.Button16)
         Me.TabPage2.Controls.Add(Me.Button15)
         Me.TabPage2.Controls.Add(Me.Button14)
         Me.TabPage2.Controls.Add(Me.Button13)
@@ -1157,18 +1203,18 @@ Partial Class Form1
         '
         'Button1
         '
-        Me.Button1.Location = New System.Drawing.Point(1448, 10)
+        Me.Button1.Location = New System.Drawing.Point(1105, 13)
         Me.Button1.Name = "Button1"
-        Me.Button1.Size = New System.Drawing.Size(100, 35)
+        Me.Button1.Size = New System.Drawing.Size(74, 29)
         Me.Button1.TabIndex = 130
         Me.Button1.Text = "Clear"
         Me.Button1.UseVisualStyleBackColor = True
         '
         'Button6
         '
-        Me.Button6.Location = New System.Drawing.Point(1554, 10)
+        Me.Button6.Location = New System.Drawing.Point(1185, 14)
         Me.Button6.Name = "Button6"
-        Me.Button6.Size = New System.Drawing.Size(100, 35)
+        Me.Button6.Size = New System.Drawing.Size(74, 29)
         Me.Button6.TabIndex = 137
         Me.Button6.Text = "Preview"
         Me.Button6.UseVisualStyleBackColor = True
@@ -1319,23 +1365,14 @@ Partial Class Form1
         Me.TabPage7.Text = "Settings"
         Me.TabPage7.UseVisualStyleBackColor = True
         '
-        'Button5
+        'Button16
         '
-        Me.Button5.Location = New System.Drawing.Point(419, 112)
-        Me.Button5.Name = "Button5"
-        Me.Button5.Size = New System.Drawing.Size(75, 23)
-        Me.Button5.TabIndex = 62
-        Me.Button5.Text = "Test FOV"
-        Me.Button5.UseVisualStyleBackColor = True
-        '
-        'Button10
-        '
-        Me.Button10.Location = New System.Drawing.Point(500, 112)
-        Me.Button10.Name = "Button10"
-        Me.Button10.Size = New System.Drawing.Size(75, 23)
-        Me.Button10.TabIndex = 63
-        Me.Button10.Text = "Done!"
-        Me.Button10.UseVisualStyleBackColor = True
+        Me.Button16.Location = New System.Drawing.Point(363, 28)
+        Me.Button16.Name = "Button16"
+        Me.Button16.Size = New System.Drawing.Size(119, 23)
+        Me.Button16.TabIndex = 7
+        Me.Button16.Text = "Calibrate"
+        Me.Button16.UseVisualStyleBackColor = True
         '
         'Form1
         '
@@ -1498,4 +1535,7 @@ Partial Class Form1
     Friend WithEvents Label4 As Label
     Friend WithEvents Button10 As Button
     Friend WithEvents Button5 As Button
+    Friend WithEvents Label16 As Label
+    Friend WithEvents TextBox16 As TextBox
+    Friend WithEvents Button16 As Button
 End Class

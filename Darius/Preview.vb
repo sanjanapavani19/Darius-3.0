@@ -38,7 +38,7 @@ Public Class PreviewStructure
 
         '   videoSource.SetCameraProperty(CameraControlProperty.Exposure, Form1.Textbox_exposure.Text, CameraControlFlags.Manual)
         '   videoSource.SetCameraProperty(CameraControlProperty.Exposure, 10, CameraControlFlags.Manual)
-
+        V.Start()
     End Sub
 
     Public Function Capture(exposure As Integer, focus As Integer) As Bitmap
@@ -48,16 +48,19 @@ Public Class PreviewStructure
         videoSource.SetCameraProperty(CameraControlProperty.Exposure, exposure, flags)
         videoSource.GetCameraPropertyRange(CameraControlProperty.Focus, minVal, maxVal, stepSize, defaultVal, flags)
 
+        If focus > maxVal Then focus = maxVal
+        If focus < minVal Then focus = minVal
 
         videoSource.GetCameraProperty(CameraControlProperty.Focus, Gfocus, flags)
         videoSource.SetCameraProperty(CameraControlProperty.Focus, focus, CameraControlFlags.Manual)
 
-        V.Start()
 
 
-        Bmpf = New Bitmap(V.GetCurrentVideoFrame)
+
+        bmpf = New Bitmap(V.GetCurrentVideoFrame)
         Bmp = New Bitmap(Bmpf.width, Bmpf.height, System.Drawing.Imaging.PixelFormat.Format24bppRgb)
         Bmp = bmpf.Clone(New Rectangle(0, 0, bmpf.Width, bmpf.Height), System.Drawing.Imaging.PixelFormat.Format24bppRgb)
+
 
         Width = Bmp.Width
         Height = Bmp.Height
@@ -99,69 +102,68 @@ Public Class PreviewStructure
 
 
 
-
         Return Bmp
 
     End Function
 
     Public Function CaptureROI(exposure As Integer, focus As Integer) As Bitmap
-        'Dim flags As CameraControlFlags
-        'Dim minVal, maxVal, stepSize, defaultVal, Pfocus As Integer
+        Dim flags As CameraControlFlags
+        Dim minVal, maxVal, stepSize, defaultVal, Pfocus As Integer
 
 
 
-        'videoSource.SetCameraProperty(CameraControlProperty.Exposure, exposure, flags)
-        'videoSource.GetCameraPropertyRange(CameraControlProperty.Focus, minVal, maxVal, stepSize, defaultVal, flags)
-        'videoSource.GetCameraProperty(CameraControlProperty.Focus, Pfocus, flags)
-        'videoSource.SetCameraProperty(CameraControlProperty.Focus, focus, CameraControlFlags.Manual)
+        videoSource.SetCameraProperty(CameraControlProperty.Exposure, exposure, flags)
+        videoSource.GetCameraPropertyRange(CameraControlProperty.Focus, minVal, maxVal, stepSize, defaultVal, flags)
+        videoSource.GetCameraProperty(CameraControlProperty.Focus, Pfocus, flags)
+        videoSource.SetCameraProperty(CameraControlProperty.Focus, focus, CameraControlFlags.Manual)
 
-        'V.Start()
-
-
-        'Dim Bmpf = New FastBMP(V.GetCurrentVideoFrame)
-        'Bmp = New Bitmap(Bmpf.width, Bmpf.height, System.Drawing.Imaging.PixelFormat.Format24bppRgb)
-        'Bmp = Bmpf.bmp.Clone(New Rectangle(0, 0, Bmpf.width, Bmpf.height), System.Drawing.Imaging.PixelFormat.Format24bppRgb)
-
-        'Width = Bmp.Width
-        'Height = Bmp.Height
-        ''trying the quickPhasor
-        'Dim Phasor As New QuickPhasor(Form1.PictureBox_Phasor.Width, Width, Height)
-        'Phasor.MakeHistogram(Bmpf, True)
-        'Phasor.CreateMask(0, 185, 185)
-        'Dim segmented As New FastBMP(Bmp.Width, Bmp.Height, System.Drawing.Imaging.PixelFormat.Format24bppRgb)
-        'Phasor.Segment(Bmpf, segmented)
-        '' now detecting the rectangle
-        'Dim blobCounter As New AForge.Imaging.BlobCounter
-
-        'blobCounter.FilterBlobs = True
-        'blobCounter.MinHeight = 300
-        'blobCounter.MinWidth = 500
-
-        'blobCounter.ProcessImage(segmented.bmp)
-
-        'Dim blobs As Blob() = blobCounter.GetObjectsInformation()
-
-        'Dim g As Graphics = Graphics.FromImage(segmented.bmp)
-        'g.DrawRectangle(New Pen(Brushes.Red, 0.5), blobs(0).Rectangle)
-        'R = blobs(0).Rectangle
-
-        'Dim CropFilter As New Crop(R)
-        'Bmp = CropFilter.Apply(segmented.bmp)
-        'Dim FlipFilter As New Mirror(True, True)
-        'Bmp = FlipFilter.Apply(Bmp)
-
-        'Setting.Sett("Preview_X", R.X)
-        'Setting.Sett("Preview_Y", R.Y)
-        'Setting.Sett("Preview_W", R.Width)
-        'Setting.Sett("Preview_H", R.Height)
+        V.Start()
 
 
-        'segmented.bmp.Save("C:\test\segmented.jpg")
-        'Phasor.Plot.bmp.Save("C:\test\PhasorPlot.png")
-        'Bmp.Save("C:\test\bmptissue.png")
+        Dim Bmpf = New FastBMP(V.GetCurrentVideoFrame)
+        Bmp = New Bitmap(Bmpf.width, Bmpf.height, System.Drawing.Imaging.PixelFormat.Format24bppRgb)
+        Bmp = Bmpf.bmp.Clone(New Rectangle(0, 0, Bmpf.width, Bmpf.height), System.Drawing.Imaging.PixelFormat.Format24bppRgb)
 
-        'Return Bmp
-        ''Form1.PictureBox_Phasor.Image = Phasor.Plot.bmp
+        Width = Bmp.Width
+        Height = Bmp.Height
+        'trying the quickPhasor
+        Dim Phasor As New QuickPhasor(400, Width, Height)
+        Phasor.MakeHistogram(Bmpf, True)
+        Phasor.CreateMask(0, 185, 185)
+        Dim segmented As New FastBMP(Bmp.Width, Bmp.Height, System.Drawing.Imaging.PixelFormat.Format24bppRgb)
+        Phasor.Segment(Bmpf, segmented)
+        ' now detecting the rectangle
+        Dim blobCounter As New AForge.Imaging.BlobCounter
+
+        blobCounter.FilterBlobs = True
+        blobCounter.MinHeight = 300
+        blobCounter.MinWidth = 500
+
+        blobCounter.ProcessImage(segmented.bmp)
+
+        Dim blobs As Blob() = blobCounter.GetObjectsInformation()
+
+        Dim g As Graphics = Graphics.FromImage(segmented.bmp)
+        g.DrawRectangle(New Pen(Brushes.Red, 0.5), blobs(0).Rectangle)
+        R = blobs(0).Rectangle
+
+        Dim CropFilter As New Crop(R)
+        Bmp = CropFilter.Apply(segmented.bmp)
+        Dim FlipFilter As New Mirror(True, True)
+        Bmp = FlipFilter.Apply(Bmp)
+
+        Setting.Sett("Preview_X", R.X)
+        Setting.Sett("Preview_Y", R.Y)
+        Setting.Sett("Preview_W", R.Width)
+        Setting.Sett("Preview_H", R.Height)
+
+
+        segmented.bmp.Save("C:\test\segmented.jpg")
+        Phasor.Plot.bmp.Save("C:\test\PhasorPlot.png")
+        Bmp.Save("C:\test\bmptissue.png")
+
+        Return Bmp
+        'Form1.PictureBox_Phasor.Image = Phasor.Plot.bmp
 
     End Function
     Public Sub StopPreview()

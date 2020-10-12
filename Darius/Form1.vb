@@ -770,11 +770,11 @@ Public Class Form1
         '    Flatfieldbytes(i) = Flatfield(i) / 25
         'Next
 
-
+        Camera.Capture()
         SaveSinglePageTiff16("ff.tif", Camera.Bytes, Camera.W, Camera.H)
         Camera.SetFlatField("ff.tif", "dark.tif")
-        Camera.Flatfield(0)
-        Camera.SetDataMode(Colortype.Grey)
+
+        Camera.SetDataMode(Colortype.RGB)
         If WasLive Then GoLive()
     End Sub
 
@@ -1091,7 +1091,7 @@ Public Class Form1
             BMParray(i) = New Bitmap(Camera.W, Camera.H)
         Next
 
-        Dim croppedsize As Integer = TextBox9.Text
+        Dim croppedsize As Integer = TextBox16.Text
 
         Dim cropped As New Bitmap(croppedsize, croppedsize)
         Dim g As Graphics
@@ -1099,9 +1099,9 @@ Public Class Form1
 
 
         For i = 0 To 3
-            If i = 1 Then Stage.MoveRelative(Stage.Xaxe, Stage.FOVX)
+            If i = 1 Then Stage.MoveRelative(Stage.Xaxe, -Stage.FOVX)
             If i = 2 Then Stage.MoveRelative(Stage.Yaxe, Stage.FOVY)
-            If i = 3 Then Stage.MoveRelative(Stage.Zaxe, -Stage.FOVX)
+            If i = 3 Then Stage.MoveRelative(Stage.Xaxe, Stage.FOVX)
 
 
             BMParray(i) = New Bitmap(Camera.captureBmp)
@@ -1122,6 +1122,37 @@ Public Class Form1
     Private Sub Button10_Click(sender As Object, e As EventArgs) Handles Button10.Click
         StopAlign = True
         If Not Camera.busy Then GoLive()
+    End Sub
+
+    Private Sub TabPage6_Click(sender As Object, e As EventArgs) Handles TabPage6.Click
+
+    End Sub
+
+    Private Sub Button16_Click(sender As Object, e As EventArgs) Handles Button16.Click
+        'stage.SetSpeed(stage.Zport, 500000)
+        If MsgBox("Load the Calibration slide and hit OK.", MsgBoxStyle.OkCancel) = MsgBoxResult.Cancel Then Exit Sub
+        Stage.MoveAbsolute(Stage.Yaxe, 0)
+        Stage.MoveAbsolute(Stage.Xaxe, 12.5)
+        Stage.MoveAbsolute(Stage.Zaxe, 0)
+        'MsgBox("Load the sample and then hit OK.")
+        Tracking.UpdateBmp(Preview.CaptureROI(TextBox_PrevieEXp.Text, TextBox_PreviewFocus.Text))
+
+        Stage.Go_Middle()
+        'stage.MoveAbsolute(stage.Zaxe, lastZ)
+
+        Tracking.Pbox.Image = Tracking.bmp.bmp
+
+        Slideloaded = True
+        Button_Scan.Enabled = True
+
+        Stage.GoToFocus()
+
+
+
+    End Sub
+
+    Private Sub TextBox_PreviewFocus_TextChanged(sender As Object, e As EventArgs) Handles TextBox_PreviewFocus.TextChanged
+
     End Sub
 End Class
 

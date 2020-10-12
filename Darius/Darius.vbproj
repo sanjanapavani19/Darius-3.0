@@ -192,6 +192,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="Preview.vb" />
+    <Compile Include="QuickPhasor.vb" />
     <Compile Include="Relay.vb" />
     <Compile Include="Scanning.Designer.vb">
       <DependentUpon>Scanning.vb</DependentUpon>
