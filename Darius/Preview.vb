@@ -129,7 +129,7 @@ Public Class PreviewStructure
         'trying the quickPhasor
         Dim Phasor As New QuickPhasor(400, Width, Height)
         Phasor.MakeHistogram(Bmpf, True)
-        Phasor.CreateMask(0, 185, 185)
+        Phasor.CreateMask(0, 175, 175)
         Dim segmented As New FastBMP(Bmp.Width, Bmp.Height, System.Drawing.Imaging.PixelFormat.Format24bppRgb)
         Phasor.Segment(Bmpf, segmented)
         ' now detecting the rectangle
@@ -149,8 +149,7 @@ Public Class PreviewStructure
 
         Dim CropFilter As New Crop(R)
         Bmp = CropFilter.Apply(segmented.bmp)
-        Dim FlipFilter As New Mirror(True, True)
-        Bmp = FlipFilter.Apply(Bmp)
+
 
         Setting.Sett("Preview_X", R.X)
         Setting.Sett("Preview_Y", R.Y)

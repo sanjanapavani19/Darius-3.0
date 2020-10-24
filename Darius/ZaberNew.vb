@@ -50,7 +50,7 @@ Public Class ZaberNew
 
         Xacc = 3000
         Yacc = 3000
-        Zacc = 100
+        Zacc = 3000
 
         SetAcceleration(Xaxe, Xacc)
         SetAcceleration(Yaxe, Yacc)

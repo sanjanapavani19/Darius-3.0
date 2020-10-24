@@ -165,19 +165,19 @@ Public Class TrackingStructure
     Dim X, Y As Single
     Dim XX, YY, ZZ As Single
     Public Shared Cursor As Button
-
+    Dim Xmin, Xmax, Ymin, Ymax, Xrange, Yrange As Single
     Public Scanned() As Button
 
     Public Sub New(ByRef Pb As PictureBox)
+        UpdateCalibration()
+
         Cursor = New Button
-
-
-        Pb.Size = New Size(Pb.Width, Pb.Width * (Setting.Gett("Yrange") / Setting.Gett("Xrange")))
+        Pb.Size = New Size(Pb.Width, Pb.Width * (Yrange / Xrange))
         Pb.SizeMode = PictureBoxSizeMode.StretchImage
         Pbox = Pb
 
-        Cursor.Width = stage.FovX * Pb.Width / Setting.Gett("Xrange")
-        Cursor.Height = Cursor.Width * stage.FovY / stage.FovX
+        Cursor.Width = Stage.FOVX * Pb.Width / Xrange
+        Cursor.Height = Cursor.Width * Stage.FOVY / Stage.FOVX
         Cursor.FlatStyle = FlatStyle.Flat
         Cursor.ForeColor = Color.Yellow
         Cursor.BackColor = Color.Transparent
@@ -194,15 +194,29 @@ Public Class TrackingStructure
         AddHandler Pb.MouseMove, AddressOf MouseMove
 
 
-        '    Pbox.Image = Image.FromFile("C:\2.jpg")
-        Pbox.Size = New Size(Pbox.Width, Pbox.Width * (Setting.Gett("Yrange") / Setting.Gett("Xrange")))
+        Pbox.Size = New Size(Pbox.Width, Pbox.Width * (Yrange / Xrange))
         clear()
 
         T.Interval = 100
         '  Enable()
 
     End Sub
+    Public Sub UpdateCalibration()
 
+
+        Xmin = Setting.Gett("Xmin")
+        Ymin = Setting.Gett("Ymin")
+        Xmax = Setting.Gett("Xmax")
+        Ymax = Setting.Gett("Ymax")
+
+        Xrange = Xmax - Xmin
+        Yrange = Ymax - Ymin
+
+        Setting.Sett("Xrange", Xrange)
+        Setting.Sett("Yrange", Yrange)
+
+
+    End Sub
     Public Sub MouseDown(sender As Object, e As MouseEventArgs)
         ROI.IsDragging = True
         ROI.ClickY = e.Y
@@ -218,7 +232,7 @@ Public Class TrackingStructure
     End Sub
 
     Public Sub MouseMove(sender As Object, e As MouseEventArgs)
-        If ROI.IsDragging And Not ROI.Ismade Then
+        If ROI.IsDragging And Not ROI.IsMade Then
 
             ROI.CorrectROI(e.X - ROI.ClickX, e.Y - ROI.ClickY)
             Pbox.Refresh()
@@ -242,7 +256,7 @@ Public Class TrackingStructure
             End If
 
             ROI.Refresh()
-            End If
+        End If
 
 
     End Sub
@@ -273,9 +287,9 @@ Public Class TrackingStructure
 
 
     Public Sub AddScanned(W As Integer, H As Integer, XX As Single, YY As Single, address As String)
-            Dim index As Integer = Scanned.GetLength(0)
+        Dim index As Integer = Scanned.GetLength(0)
 
-            ReDim Preserve Scanned(index)
+        ReDim Preserve Scanned(index)
         Scanned(index) = New Button With {
         .Width = Cursor.Width * W,
         .Left = ConvertCoordinatetoPixels(XX, YY).X - Cursor.Width / 2,
@@ -288,14 +302,14 @@ Public Class TrackingStructure
             }
 
         AddHandler Scanned(index).Click, AddressOf ScannedClick
-            Pbox.Controls.Add(Scanned(index))
+        Pbox.Controls.Add(Scanned(index))
 
-        End Sub
-        Public Sub ScannedClick(sender As Object, e As EventArgs)
-            If MsgBox(" Do you want to open the image?", MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
-                ' open_Gimp(sender.tag)
-            End If
-        End Sub
+    End Sub
+    Public Sub ScannedClick(sender As Object, e As EventArgs)
+        If MsgBox(" Do you want to open the image?", MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
+            ' open_Gimp(sender.tag)
+        End If
+    End Sub
     Public Sub UpdateBmp(bmpin As Bitmap)
         Tracking.bmp = New FastBMP(bmpin)
         Tracking.Pbox.Image = Tracking.bmp.bmp
@@ -322,16 +336,16 @@ Public Class TrackingStructure
 
     End Sub
 
-        Public Sub GrabCursur()
-            CursurClicked = True
+    Public Sub GrabCursur()
+        CursurClicked = True
 
-        End Sub
+    End Sub
 
-        Public Sub ReleaseCursur(sender As Object, e As MouseEventArgs)
-            CursurClicked = False
+    Public Sub ReleaseCursur(sender As Object, e As MouseEventArgs)
+        CursurClicked = False
 
-        Stage.MoveAbsolute(Stage.Xaxe, (X + e.X - Cursor.Width / 2) * Setting.Gett("Xrange") / Pbox.Width + Setting.Gett("xMin"))
-        Stage.MoveAbsolute(Stage.Yaxe, (Y + e.Y - Cursor.Height / 2) * Setting.Gett("Yrange") / Pbox.Height + Setting.Gett("yMin"))
+        Stage.MoveAbsolute(Stage.Xaxe, (X + e.X - Cursor.Width / 2) * Xrange / Pbox.Width + Xmin)
+        Stage.MoveAbsolute(Stage.Yaxe, (Y + e.Y - Cursor.Height / 2) * Yrange / Pbox.Height + Ymin)
 
     End Sub
     Private Sub Navigate(sender As Object, e As MouseEventArgs) Handles pb.MouseDoubleClick
@@ -368,7 +382,7 @@ Public Class TrackingStructure
 
     Public Sub Update()
 
-        Cursor.Width = Stage.FOVX * Pbox.Width / Setting.Gett("Xrange")
+        Cursor.Width = Stage.FOVX * Pbox.Width / Xrange
         Cursor.Height = Cursor.Width * Stage.FOVY / Stage.FOVX
 
         ' These are in mm
@@ -405,23 +419,23 @@ Public Class TrackingStructure
     End Sub
 
     Private Function ConvertCoordinatetoPixels(XX As Single, YY As Single) As Point
-            Dim P As New Point
-            XX = XX - Setting.Gett("xMin")
-            YY = YY - Setting.Gett("yMin")
-            P.X = Pbox.Width - XX * Pbox.Width / Setting.Gett("Xrange")
-            P.Y = YY * Pbox.Height / Setting.Gett("Yrange")
+        Dim P As New Point
+        XX = XX - Xmin
+        YY = YY - Ymin
+        P.X = Pbox.Width - XX * Pbox.Width / Xrange
+        P.Y = YY * Pbox.Height / Yrange
 
-            Return P
-        End Function
+        Return P
+    End Function
 
-        Public Function ConvertPixeltoCoordinateX(XX As Single) As Single
+    Public Function ConvertPixeltoCoordinateX(XX As Single) As Single
 
-            X = Setting.Gett("Xrange") - XX * Setting.Gett("Xrange") / Pbox.Width + Setting.Gett("xMin")
+        X = Xrange - XX * Xrange / Pbox.Width + Xmin
 
-            Return X
-        End Function
+        Return X
+    End Function
 
-        Public Sub MakeThumbnail(X As Single, y As Single, W As Integer, H As Integer)
+    Public Sub MakeThumbnail(X As Single, y As Single, W As Integer, H As Integer)
         'bmp.Reset()
         'Thumbnail.MakeNew(bmp.width, bmp.height, Imaging.PixelFormat.Format24bppRgb)
         'Thumbnail.GR.DrawImage(bmp.bmp, 0, 0)
@@ -430,10 +444,10 @@ Public Class TrackingStructure
         'Thumbnail.GR.FillRectangle(New SolidBrush(Color.LawnGreen), ConvertCoordinatetoPixels(X, y).X - CInt(Cursor.Width / 2), ConvertCoordinatetoPixels(X, y).Y - CInt(Cursor.Height / 2), Cursor.Width * W, Cursor.Height * H)
 
     End Sub
-        Public Function ConvertPixeltoCoordinateY(yy As Single) As Single
+    Public Function ConvertPixeltoCoordinateY(yy As Single) As Single
 
-            Y = yy * Setting.Gett("Yrange") / Pbox.Height + Setting.Gett("yMin")
+        Y = yy * Yrange / Pbox.Height + Ymin
 
-            Return Y
+        Return Y
         End Function
     End Class

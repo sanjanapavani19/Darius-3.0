@@ -14,7 +14,7 @@ Public Class Form1
     Dim Imagetype As ImagetypeEnum
     Dim AutoFocus As FocusStructure
     Dim Slideloaded As Boolean
-    Dim LinearUnmixing As LinearUnmixingStructure
+
     Dim StopAlign As Boolean
     Dim panel As Integer
     Dim Focusing As Boolean
@@ -750,28 +750,28 @@ Public Class Form1
         CheckBoxLED.Checked = True
         Thread.Sleep(500)
 
-        'Dim Flatfield(Camera.Dim_X * Camera.Dim_Y - 1) As Single
-        'Dim Flatfieldbytes(Camera.Dim_X * Camera.Dim_Y - 1) As Byte
-        'Dim direction As Integer = 1
-        'For y = 1 To 5
-        '    For x = 1 To 5
-        '        Stage.MoveRelative(Stage.Xaxe, direction * Stage.FOVX / 10)
-        '        Camera.Capture()
-        '        For i = 0 To Camera.Dim_X * Camera.Dim_Y - 1
-        '            Flatfield(i) += Camera.Bytes(i)
-        '        Next
-        '    Next
-        '    Stage.MoveRelative(Stage.Yaxe, direction * Stage.FOVY / 10)
-        '    direction *= -1
-        'Next
+        Dim Flatfield(Camera.W * Camera.H - 1) As Single
+        Dim Flatfieldbytes(Camera.W * Camera.H - 1) As Byte
+        Dim direction As Integer = 1
+        For y = 1 To 5
+            For x = 1 To 5
+                Stage.MoveRelative(Stage.Xaxe, direction * Stage.FOVX / 10)
+                Camera.Capture()
+                For i = 0 To Camera.W * Camera.H - 1
+                    Flatfield(i) += Camera.Bytes(i)
+                Next
+            Next
+            Stage.MoveRelative(Stage.Yaxe, direction * Stage.FOVY / 10)
+            direction *= -1
+        Next
 
 
-        'For i = 0 To Camera.Dim_X * Camera.Dim_Y - 1
-        '    Flatfieldbytes(i) = Flatfield(i) / 25
-        'Next
+        For i = 0 To Camera.W * Camera.H - 1
+            Flatfieldbytes(i) = Flatfield(i) / 25
+        Next
 
         Camera.Capture()
-        SaveSinglePageTiff16("ff.tif", Camera.Bytes, Camera.W, Camera.H)
+        SaveSinglePageTiff16("ff.tif", Flatfieldbytes, Camera.W, Camera.H)
         Camera.SetFlatField("ff.tif", "dark.tif")
 
         Camera.SetDataMode(Colortype.RGB)
@@ -960,17 +960,7 @@ Public Class Form1
 
     End Sub
 
-    Private Sub Button14_Click(sender As Object, e As EventArgs) Handles Button14.Click
-        Setting.Sett("Xmin", Stage.X)
-        Tracking = New TrackingStructure(PictureBox_Preview)
-        Tracking.Update()
-    End Sub
 
-    Private Sub Button15_Click(sender As Object, e As EventArgs) Handles Button15.Click
-        Setting.Sett("ymin", Stage.Y)
-        Tracking = New TrackingStructure(PictureBox_Preview)
-        Tracking.Update()
-    End Sub
 
 
 
@@ -1153,6 +1143,103 @@ Public Class Form1
 
     Private Sub TextBox_PreviewFocus_TextChanged(sender As Object, e As EventArgs) Handles TextBox_PreviewFocus.TextChanged
 
+    End Sub
+
+    Private Sub Button18_Click_1(sender As Object, e As EventArgs) Handles Button18.Click
+        'TabControl1.SelectedIndex = 0
+        'TabControl1.SelectedIndex = 0
+
+        ''EO.Move_A(0)
+        'Ximea.exposure = Val(TextBox_exposure.Text)
+        'Ximea.SetExposure(Val(TextBox_exposure.Text))
+        'ExitLive()
+        ''Dim SuperFrmeStack As New Stack
+        '' ReDim SuperFrmeStack.bmp(1)
+        ''SuperFrmeStack.bmp(0) = New Bitmap(Ximea.bmpRef)
+
+        'Ximea.SetImagingFormat(8)
+        'Ximea.SetExposure(Val(TextBox_exposure.Text))
+        'Ximea.TRG_MODE = 3
+        'Ximea.StartAcquisition()
+        'EO.initialDelay = 0
+        'EO.setSleep()
+        'EO.retrn = True
+        'Dim Thread2 As New System.Threading.Thread(AddressOf EO.PiezoScan)
+        'Thread2.Start()
+        'Ximea.capture()
+        'Dim watch As New Stopwatch
+        'watch.Start()
+        'Ximea.bmpRef = EDF.analyze(Ximea.bmpRef)
+        'watch.Stop()
+        ''MsgBox(watch.ElapsedMilliseconds)
+
+        ''SuperFrmeStack.bmp(1) = EDF.SuperFrame.bmpRGB
+        ''SuperFrmeStack.bmp(1) = New Bitmap(Ximea.bmpRef)
+        ''SuperFrmeStack.bmp(3) = New Bitmap(Ximea.bmpRef.Width, Ximea.bmpRef.Height)
+
+        'Ximea.SetImagingFormat(24)
+        ''CoolBright()
+        'Ximea.StopAcquisition()
+        'Muse.imagetype = " <b> DuperFrame </b>, CutOff=  " + EDF.CutOff.ToString
+        'SaveFrame()
+
+        ''SuperFrmeStack.MakeMontage(2, 1)
+        ''SuperFrmeStack.SaveMontage(2, 1, False)
+        '' Ximea.Start()
+    End Sub
+
+    Private Sub Button19_Click(sender As Object, e As EventArgs) Handles Button19.Click
+        ExitLive()
+        Camera.SetDataMode(Colortype.Grey)
+        Dim Eo As New piezo
+        Eo.Move_A(0)
+
+        Dim img(10)(,) As Byte
+
+        Dim watch As New Stopwatch
+        watch.Start()
+        Pbar.Maximum = 11
+        For loop_Z = 0 To 10
+            ReDim img(loop_Z)(Camera.W, Camera.H)
+            Camera.Capture()
+            Array.Copy(Camera.Bytes, img(loop_Z), Camera.Bytes.Length)
+            Pbar.Increment(1)
+            Application.DoEvents()
+            Eo.Move_r(10)
+        Next
+
+        watch.Stop()
+
+        Pbar.Value = 0
+        Eo.Move_A(0)
+        Camera.SetDataMode(Colortype.RGB)
+        GoLive()
+    End Sub
+
+
+
+    Private Sub Button14_Click(sender As Object, e As EventArgs) Handles Button14.Click
+        Setting.Sett("Xmin", Stage.X)
+        Tracking = New TrackingStructure(PictureBox_Preview)
+        Tracking.Update()
+    End Sub
+
+    Private Sub Button15_Click(sender As Object, e As EventArgs) Handles Button15.Click
+        Setting.Sett("ymin", Stage.Y)
+        Tracking = New TrackingStructure(PictureBox_Preview)
+        Tracking.Update()
+    End Sub
+
+    Private Sub Button21_Click(sender As Object, e As EventArgs) Handles Button21.Click
+        Setting.Sett("Xmax", Stage.X)
+        Tracking = New TrackingStructure(PictureBox_Preview)
+        Tracking.Update()
+    End Sub
+
+    Private Sub Button20_Click(sender As Object, e As EventArgs) Handles Button20.Click
+        Setting.Sett("ymax", Stage.Y)
+        Tracking = New TrackingStructure(PictureBox_Preview)
+        Tracking.Update()
     End Sub
 End Class
 

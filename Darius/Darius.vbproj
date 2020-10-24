@@ -156,7 +156,6 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BinaryFileStructure.vb" />
     <Compile Include="Dover.vb" />
     <Compile Include="ExtendedDepth5.vb" />
     <Compile Include="Fast Bitmaps.vb" />
@@ -172,10 +171,7 @@
     <Compile Include="ImageCapture.vb" />
     <Compile Include="ImageDisplay.vb" />
     <Compile Include="ImageDisplayXiq.vb" />
-    <Compile Include="ImageStructure.vb" />
     <Compile Include="LibTiff.vb" />
-    <Compile Include="LinearUnmixingStructure.vb" />
-    <Compile Include="Module1.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -208,6 +204,7 @@
     <Compile Include="XimeaColor.vb" />
     <Compile Include="XimeaCropped.vb" />
     <Compile Include="XimeaXIq.vb" />
+    <Compile Include="Piezo.vb" />
     <Compile Include="Zaber.vb" />
     <Compile Include="ZaberNew.vb" />
   </ItemGroup>
