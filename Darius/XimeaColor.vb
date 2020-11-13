@@ -1,6 +1,8 @@
 ﻿Imports xiApi.NET
 
 Imports System.Windows
+Imports AForge.Imaging
+
 Public Class XimeaColor
     Private cam As New xiCam
 
@@ -8,6 +10,9 @@ Public Class XimeaColor
     Public Name As String
     Public W As Integer
     Public H As Integer
+    Dim ROI As Rectangle
+    Public OriginalW, OriginalH As Integer
+
     Public status As Boolean
     Public FFsetup As Boolean
     Public Wbinned, Hbinned As Integer
@@ -26,6 +31,7 @@ Public Class XimeaColor
     Public MatrixResetRequested As Boolean
     Public MatrixResetChanged As Boolean
     Public Cropped As Boolean
+
     Public Dostop As Boolean
 
 
@@ -64,31 +70,78 @@ Public Class XimeaColor
             SetExposure(exp, True)
             ResetMatrix()
 
+
             timeout = 5000
             busy = False
             status = True
-            'SetROI((3384 - 2048) / 2, (2708 - 2048) / 2, 2048, 2048)
-            SetBinning(False, 1)
-            '------------------------------------------------------------
-            cam.StartAcquisition()
 
+            OriginalW = cam.GetParamInt(PRM.WIDTH)
+            OriginalH = cam.GetParamInt(PRM.HEIGHT)
+
+            SetROI(New Rectangle((OriginalW - 2048) / 2, (OriginalH - 2048) / 2, 2048, 2048))
+            W = cam.GetParamInt(PRM.WIDTH)
+            H = cam.GetParamInt(PRM.HEIGHT)
+
+
+            SetDataMode(Colortype.RGB)
+            status = True
         End If
 
 
 
     End Sub
-    Public Sub SetROI(X As Integer, Y As Integer, Width As Integer, Height As Integer)
+    Public Sub StartAcqusition()
+        cam.StartAcquisition()
+    End Sub
 
+    Public Sub StopAcqusition()
+        cam.StopAcquisition()
+    End Sub
+    Public Sub SetROI()
 
-        cam.SetParam(PRM.WIDTH, Width)
-        cam.SetParam(PRM.HEIGHT, Height)
-        cam.SetParam(PRM.OFFSET_X, X)
-        cam.SetParam(PRM.OFFSET_Y, Y)
+        StopAcqusition()
+        cam.SetParam(PRM.DOWNSAMPLING, 1)
+        cam.SetParam(PRM.OFFSET_X, 0)
+        cam.SetParam(PRM.OFFSET_Y, 0)
+        cam.SetParam(PRM.WIDTH, ROI.Width)
+        cam.SetParam(PRM.HEIGHT, ROI.Height)
+        cam.SetParam(PRM.OFFSET_X, ROI.X)
+        cam.SetParam(PRM.OFFSET_Y, ROI.Y)
+        W = ROI.Width
+        H = ROI.Height
         Cropped = True
+        StartAcqusition()
+    End Sub
+    Public Sub SetROI(ROI As Rectangle)
+        Me.ROI = ROI
+        StopAcqusition()
+        cam.SetParam(PRM.DOWNSAMPLING, 1)
+        cam.SetParam(PRM.OFFSET_X, 0)
+        cam.SetParam(PRM.OFFSET_Y, 0)
+        cam.SetParam(PRM.WIDTH, ROI.Width)
+        cam.SetParam(PRM.HEIGHT, ROI.Height)
+        cam.SetParam(PRM.OFFSET_X, ROI.X)
+        cam.SetParam(PRM.OFFSET_Y, ROI.Y)
+        W = ROI.Width
+        H = ROI.Height
+        Cropped = True
+        StartAcqusition()
+    End Sub
+    Public Sub ReSetROI()
+        StopAcqusition()
+        cam.SetParam(PRM.DOWNSAMPLING, 1)
+        cam.SetParam(PRM.OFFSET_X, 0)
+        cam.SetParam(PRM.OFFSET_Y, 0)
+        cam.SetParam(PRM.WIDTH, OriginalW)
+        cam.SetParam(PRM.HEIGHT, OriginalH)
+        W = OriginalW
+        H = OriginalH
 
+
+        Cropped = False
+        StartAcqusition()
     End Sub
     Public Sub SetMatrix(CCMAtrix As Single)
-
         If CCMAtrix > 8 Then CCMAtrix = 8
         If CCMAtrix < 1 Then CCMAtrix = 1
         cam.SetParam(PRM.CC_MATRIX_00, CCMAtrix)
@@ -102,8 +155,6 @@ Public Class XimeaColor
         cam.SetParam(PRM.CC_MATRIX_22, 1)
         CCMAtrix = 1
     End Sub
-
-
     Public Sub SetColorGain(R As Single, G As Single, B As Single)
         cam.SetParam(PRM.WB_KB, B)
         cam.SetParam(PRM.WB_KG, G)
@@ -114,48 +165,24 @@ Public Class XimeaColor
 
     End Sub
     Public Sub SetBinning(yes As Boolean, size As Integer)
+        If yes Then
 
-        If Cropped Then
-            If yes Then
-                Wbinned = cam.GetParamInt(PRM.WIDTH)
-                Hbinned = cam.GetParamInt(PRM.HEIGHT)
-                BmpRef = New Bitmap(Wbinned, Hbinned, Imaging.PixelFormat.Format24bppRgb)
-                ReDim Bytes(Wbinned * Hbinned - 1)
-
-
-            Else
-                W = cam.GetParamInt(PRM.WIDTH)
-                H = cam.GetParamInt(PRM.HEIGHT)
-                BmpRef = New Bitmap(W, H, Imaging.PixelFormat.Format24bppRgb)
-                ReDim Bytes(W * H * 3 - 1)
-            End If
-
-
-
+            cam.SetParam(PRM.DOWNSAMPLING, size)
+            cam.SetParam(PRM.DOWNSAMPLING_TYPE, BINNING_MODE.SUM)
+            Wbinned = cam.GetParamInt(PRM.WIDTH)
+            Hbinned = cam.GetParamInt(PRM.HEIGHT)
+            BmpRef = New Bitmap(Wbinned, Hbinned, Imaging.PixelFormat.Format24bppRgb)
+            ReDim Bytes(Wbinned * Hbinned - 1)
         Else
-            If yes Then
 
-                cam.SetParam(PRM.DOWNSAMPLING, size)
-                cam.SetParam(PRM.DOWNSAMPLING_TYPE, BINNING_MODE.SUM)
-                Wbinned = cam.GetParamInt(PRM.WIDTH)
-                Hbinned = cam.GetParamInt(PRM.HEIGHT)
-                BmpRef = New Bitmap(Wbinned, Hbinned, Imaging.PixelFormat.Format24bppRgb)
-                ReDim Bytes(Wbinned * Hbinned - 1)
-
-            Else
-                cam.SetParam(PRM.DOWNSAMPLING, 1)
-                W = cam.GetParamInt(PRM.WIDTH)
-                H = cam.GetParamInt(PRM.HEIGHT)
-                BmpRef = New Bitmap(W, H, Imaging.PixelFormat.Format24bppRgb)
-                ReDim Bytes(W * H * 3 - 1)
-            End If
-
+            BmpRef = New Bitmap(W, H, Imaging.PixelFormat.Format24bppRgb)
+            ReDim Bytes(W * H * 3 - 1)
         End If
+
     End Sub
     Public Sub SetPolicyToSafe()
         cam.SetParam(PRM.BUFFER_POLICY, BUFF_POLICY.SAFE)
     End Sub
-
     Public Sub SetPolicyToUNSafe()
         cam.SetParam(PRM.BUFFER_POLICY, BUFF_POLICY.UNSAFE)
     End Sub
@@ -164,8 +191,6 @@ Public Class XimeaColor
         Thread1.Start()
 
     End Sub
-
-
     Public Sub Capture()
         ready = False
         Try
@@ -176,6 +201,17 @@ Public Class XimeaColor
         End Try
 
         ready = True
+    End Sub
+
+    Public Sub Capture(ByRef framein)
+        Try
+            cam.SetParam(PRM.TRG_SOFTWARE, 1)
+            cam.GetImageByteArray(framein, timeout)
+
+        Catch ex As Exception
+
+        End Try
+
     End Sub
 
 
@@ -190,16 +226,7 @@ Public Class XimeaColor
     Public Sub Flatfield(value As Integer)
         cam.SetParam(PRM.FFC, value)
     End Sub
-    Public Sub Capture(ByRef framein)
-        Try
-            cam.SetParam(PRM.TRG_SOFTWARE, 1)
-            cam.GetImageByteArray(framein, timeout)
 
-        Catch ex As Exception
-
-        End Try
-
-    End Sub
 
     'Public Sub CaptureXIMG()
     '    Dim XIimage As xiApi.XI_IMG
@@ -214,32 +241,25 @@ Public Class XimeaColor
     End Function
 
     Public Sub SetDataMode(type As Colortype)
+        'StopAcqusition()
+
         Select Case type
             Case Colortype.RGB
                 cam.SetParam(PRM.IMAGE_DATA_FORMAT, IMG_FORMAT.RGB24)
 
+                BmpRef = New Bitmap(W, H, Imaging.PixelFormat.Format24bppRgb)
                 ReDim Bytes(W * H * 3 - 1)
-
+                SetPolicyToSafe()
             Case Colortype.Grey
                 cam.SetParam(PRM.IMAGE_DATA_FORMAT, IMG_FORMAT.RAW8)
+
+                BmpRef = New Bitmap(W, H, Imaging.PixelFormat.Format8bppIndexed)
                 ReDim Bytes(W * H - 1)
+                SetPolicyToSafe()
         End Select
 
+        'StartAcqusition()
     End Sub
-
-
-
-
-    'Public Sub SetColorGain(R As Integer, G As Integer, B As Integer)
-    '    cam.SetParam(PRM.WB_KB, B)
-    '    cam.SetParam(PRM.WB_KG, G)
-    '    cam.SetParam(PRM.WB_KR, R)
-    '    Setting.Sett("GainB", B)
-    '    Setting.Sett("GainG", G)
-    '    Setting.Sett("GainR", R)
-
-
-    'End Sub
 
     Public Sub setGain(Gai As Single)
         gain = Gai

@@ -39,11 +39,14 @@ Module SharedResources
     Public Setting As New SettingStructure("Settings.xml")
     Public Camera As XimeaColor
     Public Stage As ZaberNew
-
+    Public Piezo As EO
+    Public EDF As ExtendedDepth5
     Public rr(), gg(), bb() As Single
     Public clrs(20) As Color
     Public Preview As PreviewStructure
+    Public Triangle As TriangulationStructure
     Public Tracking As TrackingStructure
+    Public ZEDOF As ZstackStructure
 
     Public Function factorial(ByVal n As Integer) As Integer
         If n <= 1 Then
@@ -196,4 +199,20 @@ Module SharedResources
         Return Image
     End Function
 
+    Public Sub Wait(time As Single)
+        'Dim watch As New Stopwatch
+        'watch.Start()
+        'While watch.ElapsedMilliseconds < time
+        '    Application.DoEvents()
+        'End While
+        'watch.Stop()
+
+        Dim ticks As Long = time * Stopwatch.Frequency / 1000
+        Dim watch As New Stopwatch
+        watch.Start()
+        While watch.ElapsedTicks < ticks
+            Application.DoEvents()
+        End While
+        watch.Stop()
+    End Sub
 End Module

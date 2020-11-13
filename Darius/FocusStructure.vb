@@ -29,9 +29,9 @@ Public Class FocusStructure
         Nimg = 100
         Me.bin = bin
 
-        Camera.SetBinning(True, bin)
-        FT = New ExtendedDepth5(Camera.Wbinned, Camera.Hbinned, 0, False)
-        Camera.SetBinning(False, bin)
+        FT = New ExtendedDepth5(Camera.OriginalW / bin, Camera.OriginalH / bin, 0, False)
+
+
         Select Case bin
             Case 4
                 readout = 27
@@ -56,6 +56,7 @@ Public Class FocusStructure
         exp = Camera.exp
         Camera.SetDataMode(Colortype.Grey)
         Camera.SetExposure(exp / bin, False)
+        Camera.ReSetROI()
         Camera.SetBinning(True, bin)
         ReDim BinnedImage(Nimg - 1)
         Stage.SetAcceleration(Stage.Zaxe, Zacceleration)
@@ -184,6 +185,7 @@ Public Class FocusStructure
         Loop
         FileClose(fn)
         Spline = Interpolate.Linear(Sx, sy)
+
     End Sub
 
     Sub ReadS2()
@@ -348,6 +350,8 @@ Public Class FocusStructure
         If Camera.FFsetup Then Camera.Flatfield(1)
         Camera.SetExposure(exp, False)
         Camera.SetBinning(False, bin)
+        Camera.SetROI()
+
         Stage.SetAcceleration(Stage.Zaxe, Stage.Zacc)
     End Sub
 

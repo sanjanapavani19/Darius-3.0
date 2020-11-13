@@ -186,7 +186,48 @@ Public Class FFTW_VB
 
 
 
+    Public Function DFT2D_MTF(ByVal finput(,) As Single) As Single(,)
 
+        'Copying into a linear array 
+        Dim i As Integer = 0
+        For y = 0 To ny - 1
+            For x = 0 To nx - 1
+                fin(i) = finput(x, y)
+                fin(i + 1) = 0
+                i += 2
+            Next
+        Next
+
+
+        '  Array.Copy(finput, fin, finput.GetUpperBound(0))
+
+        execute(fplan)
+
+        Dim nmax As Integer = nx * ny * 2 - 1
+        'Multiplying the MTF which also includes the Lukosz bound
+        For n = 0 To nmax Step 2
+
+            fin(n) = (fout(n) * MTF(n) - fout(n + 1) * MTF(n + 1))
+            '- is for cmplex conjugate to make the image flipped properly
+            fin(n + 1) = -(fout(n + 1) * MTF(n) + fout(n) * MTF(n + 1))
+        Next
+
+        execute(fplan)
+
+
+        Dim fout2D(nx - 1, ny - 1) As Single
+        i = 0
+        For y = 0 To ny - 1
+            For x = 0 To nx - 1
+                fout2D(x, y) = fout(i)
+
+                i += 2
+            Next
+        Next
+
+
+        Return fout2D
+    End Function
 
     Public Function DFT2D(fin() As Single, nx As Integer, ny As Integer) As Single()
         Dim hin, hout As GCHandle

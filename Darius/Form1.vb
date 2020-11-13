@@ -5,6 +5,7 @@ Imports Microsoft.VisualBasic.Devices
 Imports AForge.Imaging
 Imports System.Threading
 Imports System.Windows.Forms.DataVisualization.Charting
+Imports MathNet.Numerics
 
 Public Class Form1
 
@@ -30,7 +31,9 @@ Public Class Form1
 
         Imagetype = ImagetypeEnum.Brightfield
         Camera = New XimeaColor
-
+        EDF = New ExtendedDepth5(Camera.W, Camera.H, 0.25, False)
+        ZEDOF = New ZstackStructure(Camera.W, Camera.H, 5)
+        'Triangle = New TriangulationStructure(340, 1078, 2600, 700)
         If Camera.status Then
             TextBox_exposure.Text = Camera.exp
             AutoFocus = New FocusStructure(2, 0.1, 4)
@@ -40,7 +43,7 @@ Public Class Form1
         TextBox_FOVX.Text = Stage.FOVX
         TextBox_FOVY.Text = Stage.FOVY
 
-
+        Piezo = New EO(10)
 
         TextBoxGain.Text = Setting.Gett("Gain")
         TextBox_exposure.Text = Setting.Gett("exposure")
@@ -65,7 +68,7 @@ Public Class Form1
 
 
     Sub ArrangeControls(d As Integer)
-        Dim scale As Single = 0.34
+        Dim scale As Single = 0.34 * 2708 / 2048
 
         PictureBox0.Width = Display.Width * scale
         PictureBox0.Height = Display.Height * scale
@@ -80,6 +83,14 @@ Public Class Form1
 
         PictureBox1.Top = d
         PictureBox1.Left = d
+
+
+        PictureBox2.Width = Display.Width * scale
+        PictureBox2.Height = Display.Height * scale
+        PictureBox2.SizeMode = PictureBoxSizeMode.Zoom
+
+        PictureBox2.Top = d
+        PictureBox2.Left = d
 
         TabControl1.Width = Display.Width * scale + 2 * d
         TabControl1.Height = Display.Height * scale + 2 * d
@@ -185,22 +196,22 @@ Public Class Form1
     End Sub
 
     Private Sub Button_right_Click(sender As Object, e As EventArgs) Handles Button_right.Click
-        If Not Camera.busy Then GoLive()
+
         Stage.MoveRelative(Stage.Xaxe, -Stage.FOVX)
     End Sub
 
     Private Sub Button_left_Click(sender As Object, e As EventArgs) Handles Button_left.Click
-        If Not Camera.busy Then GoLive()
+
         Stage.MoveRelative(Stage.Xaxe, Stage.FOVX)
     End Sub
 
     Private Sub Button_top_Click(sender As Object, e As EventArgs) Handles Button_top.Click
-        If Not Camera.busy Then GoLive()
+
         Stage.MoveRelative(Stage.Yaxe, -Stage.FOVY)
     End Sub
 
     Private Sub Button_bottom_Click(sender As Object, e As EventArgs) Handles Button_bottom.Click
-        If Not Camera.busy Then GoLive()
+
         Stage.MoveRelative(Stage.Yaxe, Stage.FOVY)
     End Sub
 
@@ -1002,7 +1013,7 @@ Public Class Form1
         If Focusing = True Then Exit Sub
         Focusing = True
         Dim speed As Single
-        If Control.ModifierKeys = Keys.Control Then speed = 20 Else speed = 5
+        If System.Windows.Forms.Control.ModifierKeys = Keys.Control Then speed = 20 Else speed = 5
 
         'If XYZ.name = "NewPort" Then
         If e.Delta > 0 Then
@@ -1189,30 +1200,41 @@ Public Class Form1
     End Sub
 
     Private Sub Button19_Click(sender As Object, e As EventArgs) Handles Button19.Click
-        ExitLive()
-        Camera.SetDataMode(Colortype.Grey)
-        Dim Eo As New piezo
-        Eo.Move_A(0)
+        If SaveFileDialog1.ShowDialog = DialogResult.Cancel Then Exit Sub
 
-        Dim img(10)(,) As Byte
+        ExitLive()
+
+        Camera.Flatfield(0)
+        Camera.SetDataMode(Colortype.Grey)
+
+
+        Piezo.MoveAbsolute(0)
+        Dim numZ As Integer = 3
+
+        Dim ZupperFrame(numZ - 1)() As Byte
 
         Dim watch As New Stopwatch
-        watch.Start()
+
         Pbar.Maximum = 11
-        For loop_Z = 0 To 10
-            ReDim img(loop_Z)(Camera.W, Camera.H)
+        For loop_Z = 0 To numZ - 1
+            ReDim ZupperFrame(loop_Z)(Camera.W * Camera.H - 1)
             Camera.Capture()
-            Array.Copy(Camera.Bytes, img(loop_Z), Camera.Bytes.Length)
+
+            Buffer.BlockCopy(Camera.Bytes, 0, ZupperFrame(loop_Z), 0, Camera.Bytes.Length)
             Pbar.Increment(1)
             Application.DoEvents()
-            Eo.Move_r(10)
+            Piezo.MoveRelative(15)
         Next
-
-        watch.Stop()
+        SaveJaggedArray(ZupperFrame, Camera.W, Camera.H, SaveFileDialog1.FileName + ".tif")
 
         Pbar.Value = 0
-        Eo.Move_A(0)
+        Piezo.MoveAbsolute(0)
         Camera.SetDataMode(Colortype.RGB)
+
+        Display.BayerInterpolate(EDF.AnalyzeZuper(ZupperFrame), Camera.BmpRef)
+        Camera.BmpRef.Save(SaveFileDialog1.FileName + ".jpg")
+
+
         GoLive()
     End Sub
 
@@ -1240,6 +1262,158 @@ Public Class Form1
         Setting.Sett("ymax", Stage.Y)
         Tracking = New TrackingStructure(PictureBox_Preview)
         Tracking.Update()
+    End Sub
+
+    Private Sub TextBox18_KeyDown(sender As Object, e As KeyEventArgs) Handles TextBox18.KeyDown
+        If e.KeyCode = Keys.Return Then
+            Piezo.MoveRelative(TextBox18.Text)
+        End If
+    End Sub
+
+    Private Sub TextBox17_TextChanged(sender As Object, e As EventArgs) Handles TextBox17.TextChanged
+
+    End Sub
+
+    Private Sub TextBox17_KeyDown(sender As Object, e As KeyEventArgs) Handles TextBox17.KeyDown
+        If e.KeyCode = Keys.Return Then
+            Piezo.MoveAbsolute(TextBox17.Text)
+        End If
+    End Sub
+
+    Private Sub Button22_Click(sender As Object, e As EventArgs) Handles Button22.Click
+
+        If SaveFileDialog1.ShowDialog = DialogResult.Cancel Then Exit Sub
+
+        ExitLive()
+        Camera.StopAcqusition()
+        Camera.Flatfield(0)
+        Camera.SetDataMode(Colortype.Grey)
+        Camera.StartAcqusition()
+
+        Piezo.MoveAbsolute(0)
+        Camera.Capture()
+
+        Piezo.setSleep(Camera.exp)
+
+        Piezo.MakeDelay()
+        Dim Thread2 As New System.Threading.Thread(AddressOf Piezo.Scan)
+        Thread2.Start()
+        'Piezo.Scan()
+        'Camera.Capture_Threaded()
+        Camera.Capture()
+
+        SaveSinglePageTiff(SaveFileDialog1.FileName + ".tif", Camera.Bytes, Camera.W, Camera.H)
+        Piezo.MoveAbsolute(0)
+
+        'Dim BMP As New Bitmap(Camera.W, Camera.H)
+        'Display.BayerInterpolate(Camera.Bytes, BMP)
+        'PictureBox1.Image = BMP
+
+        Camera.SetDataMode(Colortype.RGB)
+        GoLive()
+
+    End Sub
+
+    Private Sub Button23_Click(sender As Object, e As EventArgs) Handles Button23.Click
+        ExitLive()
+        Camera.StopAcqusition()
+        Camera.Flatfield(0)
+        Camera.SetDataMode(Colortype.Grey)
+        Camera.StartAcqusition()
+
+        Piezo.MoveAbsolute(0)
+
+        Piezo.Scan()
+    End Sub
+
+    Private Sub Button24_Click(sender As Object, e As EventArgs) Handles Button24.Click
+        Camera.SetDataMode(Colortype.RGB)
+        GoLive()
+    End Sub
+
+    Private Sub Button25_Click(sender As Object, e As EventArgs) Handles Button25.Click
+        Dim WasLive As Boolean
+        If Camera.busy Then ExitLive() : WasLive = True
+
+        Piezo.Calibrate(Pbar)
+
+        'if camera is stopped because  of this sub then it resumes the live.
+        If WasLive Then GoLive()
+
+    End Sub
+
+    Private Sub CheckBox1_CheckedChanged_1(sender As Object, e As EventArgs) Handles CheckBox1.CheckedChanged
+        If CheckBox1.Checked Then
+            LEDcontroller.SetRelays(3, True)
+        Else
+            LEDcontroller.SetRelays(3, False)
+        End If
+    End Sub
+
+    Private Sub Button26_Click(sender As Object, e As EventArgs) Handles Button26.Click
+        ExitLive()
+        Pbar.Maximum = 200
+        For i = 0 To 200
+            Camera.captureBmp()
+            Camera.BmpRef.Save("C:\temp\Laser line generator Triangulation\" + i.ToString + ".jpg")
+            Stage.MoveRelative(Stage.Zaxe, 0.001)
+            Pbar.Increment(1)
+            Application.DoEvents()
+        Next
+        GoLive()
+        Pbar.Value = 0
+    End Sub
+
+    Private Sub TextBox1_TextChanged(sender As Object, e As EventArgs) Handles TextBox1.TextChanged
+
+    End Sub
+
+    Private Sub Button27_Click(sender As Object, e As EventArgs) Handles Button27.Click
+        ExitLive()
+        Triangle.Initialize()
+        Triangle.Capture(TextBox20.Text, TextBox19.Text)
+        Triangle.release()
+        GoLive()
+
+    End Sub
+
+    Private Sub Button28_Click(sender As Object, e As EventArgs) Handles Button28.Click
+
+
+        ExitLive()
+
+        Piezo.MoveAbsolute(0)
+        Dim numZ As Integer = 5
+
+        Dim ZupperFrame(numZ - 1)() As Byte
+
+        Dim watch As New Stopwatch
+
+        Pbar.Maximum = 11
+        For loop_Z = 0 To numZ - 1
+            ReDim ZupperFrame(loop_Z)(Camera.W * Camera.H * 3 - 1)
+            Camera.Capture()
+
+            Buffer.BlockCopy(Camera.Bytes, 0, ZupperFrame(loop_Z), 0, Camera.Bytes.Length)
+            Pbar.Increment(1)
+            Application.DoEvents()
+            Piezo.MoveRelative(20)
+            'byteToBitmap((ZupperFrame(loop_Z)), Camera.BmpRef)
+            'Camera.BmpRef.Save("c:\temp\oskol\" + loop_Z.ToString + ".jpg")
+        Next
+
+        'SaveJaggedArray(ZupperFrame, Camera.W, Camera.H, SaveFileDialog1.FileName + ".tif")
+
+        Pbar.Value = 0
+        Piezo.MoveAbsolute(0)
+        byteToBitmap(ZEDOF.Process(ZupperFrame), Camera.BmpRef)
+        'Camera.SetDataMode(Colortype.RGB)
+
+        'Display.BayerInterpolate(EDF.AnalyzeZuper(ZupperFrame), Camera.BmpRef)
+        PictureBox2.Image = Camera.BmpRef
+
+
+        GoLive()
     End Sub
 End Class
 

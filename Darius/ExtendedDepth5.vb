@@ -13,6 +13,7 @@ Public Class ExtendedDepth5
         Public bmp As Bitmap
         Public bmpRGB As Bitmap
         Public Bytes() As Single
+        Public TwoDArray(,) As Single
         Public BytesLength As Integer
         Public RGBbytesLength As Integer
         Public bytesR() As Single
@@ -85,7 +86,7 @@ Public Class ExtendedDepth5
     Public Avg As Integer
     Dim Crop As Integer
     Public quality As Qmetrics
-    Dim FFTFocus, FFT, FFTB, FFTGR, FFTGL, FFTR As FFTW_VB
+    Dim FFTFocus, FFT, FFTB, FFTGR, FFTGL, FFTR, Gblure As FFTW_VB
     Public Captured As Boolean
 
     Public Sub New(Width As Integer, height As Integer, cutoffin As Single, PSFloaded As Boolean)
@@ -125,6 +126,10 @@ Public Class ExtendedDepth5
 
         FFT = New FFTW_VB(SuperFrame.DimX, SuperFrame.DimY, MTF)
         FFTFocus = New FFTW_VB(SuperFrame.DimX, SuperFrame.DimY)
+
+        Dim G(0) As Single
+        MakeGaussian(0.005, G)
+        GBlure = New FFTW_VB(SuperFrame.DimX, SuperFrame.DimY, G)
 
         If PSF_Loaded Then
             loadPSF(0.45, 3.8)
@@ -176,7 +181,96 @@ Public Class ExtendedDepth5
 
 
     End Function
+    Public Function AnalyzeZuper(arrayin()() As Byte) As Byte()
+        DuperFrame.Done = False
+        Dim b As Integer = 4
+        Dim DimZ As Integer = arrayin.GetLength(0)
+        Dim SDX(SuperFrame.DimX - 1, SuperFrame.DimY - 1) As Single
+        Dim SDY(SuperFrame.DimX - 1, SuperFrame.DimY - 1) As Single
+        Dim SD(DimZ - 1)(,) As Single
+        ' To accomodate both real and imaginary components
+        Dim SDL(SuperFrame.DimX * SuperFrame.DimY * 2 - 1) As Single
+        Dim MAxSD(SuperFrame.DimX * 2 - 1, SuperFrame.DimY * 2 - 1) As Integer
+        Dim MAxSDSingle(SuperFrame.DimX * 2 - 1, SuperFrame.DimY * 2 - 1) As Single
+        Dim max As Single = 0
+        ReDim SuperFrame.TwoDArray(SuperFrame.DimX - 1, SuperFrame.DimY - 1)
 
+
+        Dim Yoffset As Integer = SuperFrame.DimX * 2
+        Dim MaxSDBMP As New Bitmap(SuperFrame.DimX * 2, SuperFrame.DimY * 2, PixelFormat.Format8bppIndexed)
+        Dim MaxSdbytes(SuperFrame.DimX * 2 * SuperFrame.DimY * 2 - 1) As Byte
+        Dim p As Integer
+        Dim SuperFrameBMP As New FastBMP(SuperFrame.DimX, SuperFrame.DimY, PixelFormat.Format8bppIndexed)
+        Dim Sobel As New SobelEdgeDetector
+        Dim homo As New HomogenityEdgeDetector
+        Dim diff As New DifferenceEdgeDetector
+        Dim cany As New CannyEdgeDetector
+        Dim i As Integer = 0
+        For z = 0 To DimZ - 1
+            ReDim SD(z)(SuperFrame.DimX - 1, SuperFrame.DimY - 1)
+            ' reading the array
+            p = Yoffset
+            i = 0
+            For Y = 0 To SuperFrame.DimY - 1
+                For X = 0 To SuperFrame.DimX - 1
+                    SuperFrame.TwoDArray(X, Y) = arrayin(z)(p)
+                    SuperFrameBMP.bytes(i) = arrayin(z)(p)
+                    p += 2
+                    i += 1
+                Next
+                p = p + Yoffset
+            Next
+            SuperFrameBMP.MakeNewFromBytes()
+            Sobel.ApplyInPlace(SuperFrameBMP.bmp)
+            BitmapToBytes(SuperFrameBMP.bmp, SuperFrameBMP.bytes)
+
+            i = 0
+            For Y = 0 To SuperFrame.DimY - 1
+                For X = 0 To SuperFrame.DimX - 1
+                    SD(z)(X, Y) = SuperFrameBMP.bytes(i)
+                    i += 1
+                Next
+            Next
+
+
+            SD(z) = GBlure.DFT2D_MTF(SD(z))
+
+        Next
+
+        For y = 0 To SuperFrame.DimY - 1
+            For x = 0 To SuperFrame.DimX - 1
+                max = 0
+                For z = 0 To DimZ - 1
+                    If SD(z)(x, y) > max Then max = SD(z)(x, y)
+                Next
+                ' to account for the RGGB bayer pattern
+                For z = 0 To DimZ - 1
+                    If SD(z)(x, y) = max Then
+                        MAxSD(x * 2, y * 2) = z
+                        MAxSD(x * 2 + 1, y * 2 + 1) = z
+                        MAxSD(x * 2 + 1, y * 2) = z
+                        MAxSD(x * 2, y * 2 + 1) = z
+                    End If
+                Next
+            Next
+        Next
+
+
+
+        p = 0
+        For y = 0 To SuperFrame.bmp.Height - 1
+            For x = 0 To SuperFrame.bmp.Width - 1
+                DuperFrame.Bytes(p) = arrayin(MAxSD(x, y))(p)
+                p += 1
+            Next
+        Next
+
+        DuperFrame.Done = True
+        Captured = True
+
+
+        Return DuperFrame.Bytes
+    End Function
     Public Sub GetSingleBytes(bmpin As Bitmap, ByRef ArrayOut As Single())
 
         Dim BytesIn(bmpin.Width * bmpin.Height * 3 - 1) As Byte
@@ -621,7 +715,7 @@ Public Class ExtendedDepth5
         Dim DimX2, DimY2 As Integer
         DimX2 = DimX / 2 - 1
         ' half of row dimension
-        DimY2 = DimY / 2
+        DimY2 = DimY / 2 - 1
         ' half of column dimension
         ' interchange entries in 4 quadrants, 1 <--> 3 and 2 <--> 4
 
@@ -757,5 +851,37 @@ Public Class ExtendedDepth5
     End Sub
 
 
+    Public Sub MakeGaussian(qc As Single, ByRef G() As Single)
+        Dim n As Single
+        qc = qc * SuperFrame.DimX
 
+
+        Dim LG(SuperFrame.DimX - 1, SuperFrame.DimY - 1) As Single
+        For x = 0 To SuperFrame.DimX - 1
+            For y = 0 To SuperFrame.DimY - 1
+                LG(x, y) = Math.Exp((-(x - SuperFrame.DimX / 2) ^ 2 - (y - SuperFrame.DimY / 2) ^ 2) / (2 * qc ^ 2))
+
+            Next
+        Next
+
+        'saveSinglePage32("G.tif", LG)
+        LG = fftshift(LG)
+        'saveSinglePage32("G_shifted.tif", LG)
+        Dim GC(SuperFrame.DimX * SuperFrame.DimY - 1) As Single
+        ReDim G(SuperFrame.DimX * SuperFrame.DimY * 2 - 1)
+
+        Dim p As Integer = 0
+
+
+        For j = 0 To SuperFrame.DimY - 1
+            For i = 0 To SuperFrame.DimX - 1
+                '(SuperFrame.DimX * SuperFrame.DimY) ^ 2 This is to take  into account the required normalization for FFT directions
+                GC(p) = (LG(i, j)) / (SuperFrame.DimX * SuperFrame.DimY) ^ 2
+                G(2 * p) = GC(p)
+                G(2 * p + 1) = 0
+                p = p + 1
+            Next
+        Next
+
+    End Sub
 End Class

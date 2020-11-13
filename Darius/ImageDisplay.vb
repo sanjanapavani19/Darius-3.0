@@ -7,8 +7,7 @@ Public Class ImageDisplay
 
 
     Public Width, Height As Integer
-
-
+    Dim Bayer As AForge.Imaging.Filters.BayerFilter
     Dim rawImage As ByteImage
     Public zoom As Boolean
     Public BmpPreview(10) As FastBMP
@@ -128,7 +127,19 @@ Public Class ImageDisplay
 
     End Sub
 
+    Public Sub BayerInterpolate(rawimage As Byte(), ByRef bmp As Bitmap)
+        Bayer = New Filters.BayerFilter
+        Dim Pattern(1, 1) As Integer
+        Pattern = {{RGB.R, RGB.G}, {RGB.G, RGB.B}}
+        Bayer.BayerPattern = Pattern
+        Dim rawbitmap As New Bitmap(bmp.Width, bmp.Height, Imaging.PixelFormat.Format8bppIndexed)
 
+
+        byteToBitmap(rawimage, rawbitmap)
+        bmp = (Bayer.Apply(rawbitmap))
+
+
+    End Sub
 
 
 

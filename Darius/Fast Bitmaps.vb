@@ -27,7 +27,7 @@ Public Class FastBMP
         format = fmt
         width = W
         height = H
-        GR = Graphics.FromImage(bmp)
+        If fmt <> PixelFormat.Format8bppIndexed Then GR = Graphics.FromImage(bmp)
 
         Dim bmpData As BitmapData = bmp.LockBits(New Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadWrite, bmp.PixelFormat)
         stride = bmpData.Stride
@@ -69,7 +69,7 @@ Public Class FastBMP
 
     Public Sub MakeNewFromBytes()
         byteToBitmap(bytes, bmp)
-        GR = Graphics.FromImage(bmp)
+        If bmp.PixelFormat <> PixelFormat.Format8bppIndexed Then GR = Graphics.FromImage(bmp)
     End Sub
 
 
@@ -179,10 +179,6 @@ Public Class FastBMP
     End Sub
 
 End Class
-
-
-
-
 
 Module Bitmaps
     Public Sub byteToBitmap(bytes() As Byte, ByRef bmp As Bitmap)
