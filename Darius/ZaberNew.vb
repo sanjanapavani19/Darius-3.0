@@ -22,7 +22,8 @@ Public Class ZaberNew
         Me.FOVX = FOVX
         Me.FOVY = FOVY
         Home()
-
+        MoveAbsolute(Xaxe, 11.7, False)
+        MoveAbsolute(Xaxe, 37.6, True)
     End Sub
 
     Public Sub SetFOV(FOVX As Single, FOVY As Single)
@@ -33,9 +34,10 @@ Public Class ZaberNew
     End Sub
 
     Public Sub Home()
+        Zaxe.Home()
         Xaxe.Home()
         Yaxe.Home()
-        Zaxe.Home()
+
         MoveAbsolute(Zaxe, Setting.Gett("ZOFFSET"))
         StorePosition(Zaxe, 1)
 
@@ -46,11 +48,11 @@ Public Class ZaberNew
 
         SetSpeed(Xaxe, 65)
         SetSpeed(Yaxe, 65)
-        SetSpeed(Zaxe, 48)
+        SetSpeed(Zaxe, 25)
 
         Xacc = 3000
         Yacc = 3000
-        Zacc = 3000
+        Zacc = 100
 
         SetAcceleration(Xaxe, Xacc)
         SetAcceleration(Yaxe, Yacc)

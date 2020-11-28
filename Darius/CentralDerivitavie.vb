@@ -14,8 +14,10 @@
     Public Sub AnalyzeX(ByRef fin() As Single, ByRef fout As Single())
         Dim nMax = W * H - 2
         Dim T As Single
+        fout(0) = 0
+        fout(nMax + 1) = 0
         For j = 1 To nMax
-            T = (fin(j - 1) - fin(j + 1)) / fin(j)
+            T = (fin(j - 1) - fin(j + 1)) / (fin(j) + 1)
             fout(j) = T * T
         Next
     End Sub

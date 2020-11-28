@@ -105,7 +105,20 @@ Public Class PreviewStructure
         Return Bmp
 
     End Function
+    Public Function CaptureWhole(exposure As Integer, focus As Integer) As Bitmap
+        Dim flags As CameraControlFlags
+        Dim minVal, maxVal, stepSize, defaultVal, Pfocus As Integer
 
+
+
+        videoSource.SetCameraProperty(CameraControlProperty.Exposure, exposure, flags)
+        videoSource.GetCameraPropertyRange(CameraControlProperty.Focus, minVal, maxVal, stepSize, defaultVal, flags)
+        videoSource.GetCameraProperty(CameraControlProperty.Focus, Pfocus, flags)
+        videoSource.SetCameraProperty(CameraControlProperty.Focus, focus, CameraControlFlags.Manual)
+
+        V.Start()
+        Return V.GetCurrentVideoFrame
+    End Function
     Public Function CaptureROI(exposure As Integer, focus As Integer) As Bitmap
         Dim flags As CameraControlFlags
         Dim minVal, maxVal, stepSize, defaultVal, Pfocus As Integer

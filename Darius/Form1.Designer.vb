@@ -24,11 +24,11 @@ Partial Class Form1
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Form1))
-        Dim ChartArea3 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
-        Dim Legend3 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
-        Dim Series7 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
-        Dim Series8 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
-        Dim Series9 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
+        Dim ChartArea6 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
+        Dim Legend6 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
+        Dim Series16 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
+        Dim Series17 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
+        Dim Series18 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
         Me.GroupBox3 = New System.Windows.Forms.GroupBox()
         Me.Button_Home = New System.Windows.Forms.Button()
         Me.Button_bottom = New System.Windows.Forms.Button()
@@ -120,6 +120,7 @@ Partial Class Form1
         Me.TabPage5 = New System.Windows.Forms.TabPage()
         Me.Button2 = New System.Windows.Forms.Button()
         Me.Button17 = New System.Windows.Forms.Button()
+        Me.Button4 = New System.Windows.Forms.Button()
         Me.TabPage9 = New System.Windows.Forms.TabPage()
         Me.TextBox19 = New System.Windows.Forms.TextBox()
         Me.TextBox20 = New System.Windows.Forms.TextBox()
@@ -130,11 +131,12 @@ Partial Class Form1
         Me.PictureBox0 = New System.Windows.Forms.PictureBox()
         Me.TabPage4 = New System.Windows.Forms.TabPage()
         Me.PictureBox1 = New System.Windows.Forms.PictureBox()
+        Me.TabPage10 = New System.Windows.Forms.TabPage()
+        Me.PictureBox2 = New System.Windows.Forms.PictureBox()
         Me.Button_Brightfield_Acquire = New System.Windows.Forms.Button()
         Me.OpenFileDialog1 = New System.Windows.Forms.OpenFileDialog()
         Me.SaveFileDialog1 = New System.Windows.Forms.SaveFileDialog()
         Me.Chart1 = New System.Windows.Forms.DataVisualization.Charting.Chart()
-        Me.Button4 = New System.Windows.Forms.Button()
         Me.Button_Scan = New System.Windows.Forms.Button()
         Me.Pbar = New System.Windows.Forms.ProgressBar()
         Me.StatusStrip1 = New System.Windows.Forms.StatusStrip()
@@ -162,9 +164,12 @@ Partial Class Form1
         Me.Button22 = New System.Windows.Forms.Button()
         Me.Button19 = New System.Windows.Forms.Button()
         Me.Button18 = New System.Windows.Forms.Button()
+        Me.CheckBox2 = New System.Windows.Forms.CheckBox()
         Me.Button28 = New System.Windows.Forms.Button()
-        Me.TabPage10 = New System.Windows.Forms.TabPage()
-        Me.PictureBox2 = New System.Windows.Forms.PictureBox()
+        Me.Button29 = New System.Windows.Forms.Button()
+        Me.TabPage11 = New System.Windows.Forms.TabPage()
+        Me.Button30 = New System.Windows.Forms.Button()
+        Me.Button31 = New System.Windows.Forms.Button()
         Me.GroupBox3.SuspendLayout()
         Me.TabControl_Settings.SuspendLayout()
         Me.TabPage13.SuspendLayout()
@@ -179,6 +184,8 @@ Partial Class Form1
         CType(Me.PictureBox0, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.TabPage4.SuspendLayout()
         CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.TabPage10.SuspendLayout()
+        CType(Me.PictureBox2, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.Chart1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.StatusStrip1.SuspendLayout()
         Me.TabControl2.SuspendLayout()
@@ -186,8 +193,7 @@ Partial Class Form1
         CType(Me.PictureBox_Preview, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.TabPage7.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
-        Me.TabPage10.SuspendLayout()
-        CType(Me.PictureBox2, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.TabPage11.SuspendLayout()
         Me.SuspendLayout()
         '
         'GroupBox3
@@ -304,6 +310,7 @@ Partial Class Form1
         Me.TabControl_Settings.Controls.Add(Me.TabPage2)
         Me.TabControl_Settings.Controls.Add(Me.TabPage5)
         Me.TabControl_Settings.Controls.Add(Me.TabPage9)
+        Me.TabControl_Settings.Controls.Add(Me.TabPage11)
         Me.TabControl_Settings.Location = New System.Drawing.Point(26, 119)
         Me.TabControl_Settings.Name = "TabControl_Settings"
         Me.TabControl_Settings.SelectedIndex = 0
@@ -1190,6 +1197,7 @@ Partial Class Form1
         '
         Me.TabPage5.Controls.Add(Me.Button2)
         Me.TabPage5.Controls.Add(Me.Button17)
+        Me.TabPage5.Controls.Add(Me.Button4)
         Me.TabPage5.Location = New System.Drawing.Point(4, 25)
         Me.TabPage5.Name = "TabPage5"
         Me.TabPage5.Size = New System.Drawing.Size(687, 344)
@@ -1199,7 +1207,7 @@ Partial Class Form1
         '
         'Button2
         '
-        Me.Button2.Location = New System.Drawing.Point(172, 39)
+        Me.Button2.Location = New System.Drawing.Point(195, 39)
         Me.Button2.Name = "Button2"
         Me.Button2.Size = New System.Drawing.Size(121, 23)
         Me.Button2.TabIndex = 7
@@ -1214,6 +1222,15 @@ Partial Class Form1
         Me.Button17.TabIndex = 6
         Me.Button17.Text = "Calibrate"
         Me.Button17.UseVisualStyleBackColor = True
+        '
+        'Button4
+        '
+        Me.Button4.Location = New System.Drawing.Point(33, 95)
+        Me.Button4.Name = "Button4"
+        Me.Button4.Size = New System.Drawing.Size(75, 23)
+        Me.Button4.TabIndex = 121
+        Me.Button4.Text = "AutoFocus"
+        Me.Button4.UseVisualStyleBackColor = True
         '
         'TabPage9
         '
@@ -1324,13 +1341,32 @@ Partial Class Form1
         Me.PictureBox1.TabIndex = 2
         Me.PictureBox1.TabStop = False
         '
+        'TabPage10
+        '
+        Me.TabPage10.Controls.Add(Me.PictureBox2)
+        Me.TabPage10.Location = New System.Drawing.Point(19, 4)
+        Me.TabPage10.Name = "TabPage10"
+        Me.TabPage10.Size = New System.Drawing.Size(1076, 992)
+        Me.TabPage10.TabIndex = 3
+        Me.TabPage10.Text = "EDOF"
+        Me.TabPage10.UseVisualStyleBackColor = True
+        '
+        'PictureBox2
+        '
+        Me.PictureBox2.BackColor = System.Drawing.Color.Black
+        Me.PictureBox2.Location = New System.Drawing.Point(6, 6)
+        Me.PictureBox2.Name = "PictureBox2"
+        Me.PictureBox2.Size = New System.Drawing.Size(966, 946)
+        Me.PictureBox2.TabIndex = 3
+        Me.PictureBox2.TabStop = False
+        '
         'Button_Brightfield_Acquire
         '
-        Me.Button_Brightfield_Acquire.Location = New System.Drawing.Point(305, 10)
+        Me.Button_Brightfield_Acquire.Location = New System.Drawing.Point(227, 10)
         Me.Button_Brightfield_Acquire.Name = "Button_Brightfield_Acquire"
         Me.Button_Brightfield_Acquire.Size = New System.Drawing.Size(75, 29)
         Me.Button_Brightfield_Acquire.TabIndex = 3
-        Me.Button_Brightfield_Acquire.Text = "Acquire"
+        Me.Button_Brightfield_Acquire.Text = "Save"
         Me.Button_Brightfield_Acquire.UseVisualStyleBackColor = True
         '
         'OpenFileDialog1
@@ -1340,50 +1376,41 @@ Partial Class Form1
         'Chart1
         '
         Me.Chart1.BackColor = System.Drawing.Color.Transparent
-        ChartArea3.AxisX.LabelStyle.Enabled = False
-        ChartArea3.AxisX.MajorGrid.Enabled = False
-        ChartArea3.AxisX.MajorTickMark.Enabled = False
-        ChartArea3.AxisY.LabelStyle.Enabled = False
-        ChartArea3.AxisY.MajorGrid.Enabled = False
-        ChartArea3.BackColor = System.Drawing.Color.Transparent
-        ChartArea3.Name = "ChartArea1"
-        Me.Chart1.ChartAreas.Add(ChartArea3)
-        Legend3.Name = "Legend1"
-        Me.Chart1.Legends.Add(Legend3)
+        ChartArea6.AxisX.LabelStyle.Enabled = False
+        ChartArea6.AxisX.MajorGrid.Enabled = False
+        ChartArea6.AxisX.MajorTickMark.Enabled = False
+        ChartArea6.AxisY.LabelStyle.Enabled = False
+        ChartArea6.AxisY.MajorGrid.Enabled = False
+        ChartArea6.BackColor = System.Drawing.Color.Transparent
+        ChartArea6.Name = "ChartArea1"
+        Me.Chart1.ChartAreas.Add(ChartArea6)
+        Legend6.Name = "Legend1"
+        Me.Chart1.Legends.Add(Legend6)
         Me.Chart1.Location = New System.Drawing.Point(249, 217)
         Me.Chart1.Name = "Chart1"
-        Series7.ChartArea = "ChartArea1"
-        Series7.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Area
-        Series7.IsVisibleInLegend = False
-        Series7.Legend = "Legend1"
-        Series7.Name = "Series1"
-        Series8.ChartArea = "ChartArea1"
-        Series8.IsVisibleInLegend = False
-        Series8.Legend = "Legend1"
-        Series8.Name = "Series2"
-        Series9.ChartArea = "ChartArea1"
-        Series9.IsVisibleInLegend = False
-        Series9.Legend = "Legend1"
-        Series9.Name = "Series3"
-        Me.Chart1.Series.Add(Series7)
-        Me.Chart1.Series.Add(Series8)
-        Me.Chart1.Series.Add(Series9)
+        Series16.ChartArea = "ChartArea1"
+        Series16.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Area
+        Series16.IsVisibleInLegend = False
+        Series16.Legend = "Legend1"
+        Series16.Name = "Series1"
+        Series17.ChartArea = "ChartArea1"
+        Series17.IsVisibleInLegend = False
+        Series17.Legend = "Legend1"
+        Series17.Name = "Series2"
+        Series18.ChartArea = "ChartArea1"
+        Series18.IsVisibleInLegend = False
+        Series18.Legend = "Legend1"
+        Series18.Name = "Series3"
+        Me.Chart1.Series.Add(Series16)
+        Me.Chart1.Series.Add(Series17)
+        Me.Chart1.Series.Add(Series18)
         Me.Chart1.Size = New System.Drawing.Size(317, 122)
         Me.Chart1.TabIndex = 120
         Me.Chart1.Text = "Chart1"
         '
-        'Button4
-        '
-        Me.Button4.Location = New System.Drawing.Point(228, 10)
-        Me.Button4.Name = "Button4"
-        Me.Button4.Size = New System.Drawing.Size(75, 29)
-        Me.Button4.TabIndex = 121
-        Me.Button4.Text = "AutoFocus"
-        Me.Button4.UseVisualStyleBackColor = True
-        '
         'Button_Scan
         '
-        Me.Button_Scan.Location = New System.Drawing.Point(382, 10)
+        Me.Button_Scan.Location = New System.Drawing.Point(308, 11)
         Me.Button_Scan.Name = "Button_Scan"
         Me.Button_Scan.Size = New System.Drawing.Size(75, 29)
         Me.Button_Scan.TabIndex = 125
@@ -1392,9 +1419,9 @@ Partial Class Form1
         '
         'Pbar
         '
-        Me.Pbar.Location = New System.Drawing.Point(532, 10)
+        Me.Pbar.Location = New System.Drawing.Point(522, 12)
         Me.Pbar.Name = "Pbar"
-        Me.Pbar.Size = New System.Drawing.Size(420, 29)
+        Me.Pbar.Size = New System.Drawing.Size(430, 29)
         Me.Pbar.TabIndex = 126
         '
         'StatusStrip1
@@ -1497,7 +1524,7 @@ Partial Class Form1
         Me.TextBoxY.BorderStyle = System.Windows.Forms.BorderStyle.None
         Me.TextBoxY.Font = New System.Drawing.Font("Calibri", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.TextBoxY.ForeColor = System.Drawing.SystemColors.ControlDarkDark
-        Me.TextBoxY.Location = New System.Drawing.Point(496, 14)
+        Me.TextBoxY.Location = New System.Drawing.Point(486, 14)
         Me.TextBoxY.Name = "TextBoxY"
         Me.TextBoxY.Size = New System.Drawing.Size(30, 20)
         Me.TextBoxY.TabIndex = 90
@@ -1509,7 +1536,7 @@ Partial Class Form1
         Me.TextBoxX.BorderStyle = System.Windows.Forms.BorderStyle.None
         Me.TextBoxX.Font = New System.Drawing.Font("Calibri", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.TextBoxX.ForeColor = System.Drawing.SystemColors.ControlDarkDark
-        Me.TextBoxX.Location = New System.Drawing.Point(460, 14)
+        Me.TextBoxX.Location = New System.Drawing.Point(450, 15)
         Me.TextBoxX.Name = "TextBoxX"
         Me.TextBoxX.Size = New System.Drawing.Size(30, 20)
         Me.TextBoxX.TabIndex = 89
@@ -1590,7 +1617,6 @@ Partial Class Form1
         '
         'GroupBox1
         '
-        Me.GroupBox1.Controls.Add(Me.Button28)
         Me.GroupBox1.Controls.Add(Me.CheckBox1)
         Me.GroupBox1.Controls.Add(Me.Button22)
         Me.GroupBox1.Controls.Add(Me.Button19)
@@ -1639,57 +1665,89 @@ Partial Class Form1
         Me.Button18.Text = "Duper"
         Me.Button18.UseVisualStyleBackColor = True
         '
+        'CheckBox2
+        '
+        Me.CheckBox2.AutoSize = True
+        Me.CheckBox2.Location = New System.Drawing.Point(389, 18)
+        Me.CheckBox2.Name = "CheckBox2"
+        Me.CheckBox2.Size = New System.Drawing.Size(55, 17)
+        Me.CheckBox2.TabIndex = 150
+        Me.CheckBox2.Text = "EDOF"
+        Me.CheckBox2.UseVisualStyleBackColor = True
+        '
         'Button28
         '
-        Me.Button28.Location = New System.Drawing.Point(322, 22)
+        Me.Button28.Location = New System.Drawing.Point(1254, 14)
         Me.Button28.Name = "Button28"
         Me.Button28.Size = New System.Drawing.Size(75, 23)
         Me.Button28.TabIndex = 151
-        Me.Button28.Text = "EDOF"
+        Me.Button28.Text = "Button28"
         Me.Button28.UseVisualStyleBackColor = True
         '
-        'TabPage10
+        'Button29
         '
-        Me.TabPage10.Controls.Add(Me.PictureBox2)
-        Me.TabPage10.Location = New System.Drawing.Point(19, 4)
-        Me.TabPage10.Name = "TabPage10"
-        Me.TabPage10.Size = New System.Drawing.Size(1076, 992)
-        Me.TabPage10.TabIndex = 3
-        Me.TabPage10.Text = "EDOF"
-        Me.TabPage10.UseVisualStyleBackColor = True
+        Me.Button29.Location = New System.Drawing.Point(66, 51)
+        Me.Button29.Name = "Button29"
+        Me.Button29.Size = New System.Drawing.Size(75, 23)
+        Me.Button29.TabIndex = 152
+        Me.Button29.Text = "Stop LIve"
+        Me.Button29.UseVisualStyleBackColor = True
         '
-        'PictureBox2
+        'TabPage11
         '
-        Me.PictureBox2.BackColor = System.Drawing.Color.Black
-        Me.PictureBox2.Location = New System.Drawing.Point(6, 6)
-        Me.PictureBox2.Name = "PictureBox2"
-        Me.PictureBox2.Size = New System.Drawing.Size(966, 946)
-        Me.PictureBox2.TabIndex = 3
-        Me.PictureBox2.TabStop = False
+        Me.TabPage11.Controls.Add(Me.Button31)
+        Me.TabPage11.Controls.Add(Me.Button30)
+        Me.TabPage11.Controls.Add(Me.Button29)
+        Me.TabPage11.Location = New System.Drawing.Point(4, 25)
+        Me.TabPage11.Name = "TabPage11"
+        Me.TabPage11.Padding = New System.Windows.Forms.Padding(3)
+        Me.TabPage11.Size = New System.Drawing.Size(687, 344)
+        Me.TabPage11.TabIndex = 10
+        Me.TabPage11.Text = "TabPage11"
+        Me.TabPage11.UseVisualStyleBackColor = True
+        '
+        'Button30
+        '
+        Me.Button30.Location = New System.Drawing.Point(75, 80)
+        Me.Button30.Name = "Button30"
+        Me.Button30.Size = New System.Drawing.Size(75, 23)
+        Me.Button30.TabIndex = 153
+        Me.Button30.Text = "EDOF"
+        Me.Button30.UseVisualStyleBackColor = True
+        '
+        'Button31
+        '
+        Me.Button31.Location = New System.Drawing.Point(75, 109)
+        Me.Button31.Name = "Button31"
+        Me.Button31.Size = New System.Drawing.Size(75, 23)
+        Me.Button31.TabIndex = 154
+        Me.Button31.Text = "Golive"
+        Me.Button31.UseVisualStyleBackColor = True
         '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1905, 1061)
+        Me.Controls.Add(Me.Button28)
+        Me.Controls.Add(Me.CheckBox2)
         Me.Controls.Add(Me.GroupBox1)
         Me.Controls.Add(Me.TabControl2)
         Me.Controls.Add(Me.Label9)
         Me.Controls.Add(Me.TextBox_exposure)
         Me.Controls.Add(Me.CheckBoxLED)
         Me.Controls.Add(Me.Button6)
-        Me.Controls.Add(Me.Button_Brightfield_Acquire)
         Me.Controls.Add(Me.Button1)
         Me.Controls.Add(Me.StatusStrip1)
         Me.Controls.Add(Me.TextBoxY)
         Me.Controls.Add(Me.TextBoxX)
         Me.Controls.Add(Me.Pbar)
         Me.Controls.Add(Me.Button_Scan)
-        Me.Controls.Add(Me.Button4)
         Me.Controls.Add(Me.TabControl1)
         Me.Controls.Add(Me.RadioButton_zoom_out)
         Me.Controls.Add(Me.RadioButton_zoom_in)
         Me.Controls.Add(Me.Button_adjustBrightness)
+        Me.Controls.Add(Me.Button_Brightfield_Acquire)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Name = "Form1"
         Me.Text = "Darius"
@@ -1714,6 +1772,8 @@ Partial Class Form1
         CType(Me.PictureBox0, System.ComponentModel.ISupportInitialize).EndInit()
         Me.TabPage4.ResumeLayout(False)
         CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.TabPage10.ResumeLayout(False)
+        CType(Me.PictureBox2, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.Chart1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.StatusStrip1.ResumeLayout(False)
         Me.StatusStrip1.PerformLayout()
@@ -1723,8 +1783,7 @@ Partial Class Form1
         Me.TabPage7.ResumeLayout(False)
         Me.GroupBox1.ResumeLayout(False)
         Me.GroupBox1.PerformLayout()
-        Me.TabPage10.ResumeLayout(False)
-        CType(Me.PictureBox2, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.TabPage11.ResumeLayout(False)
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -1862,7 +1921,12 @@ Partial Class Form1
     Friend WithEvents Button27 As Button
     Friend WithEvents TextBox19 As TextBox
     Friend WithEvents TextBox20 As TextBox
-    Friend WithEvents Button28 As Button
     Friend WithEvents TabPage10 As TabPage
     Friend WithEvents PictureBox2 As PictureBox
+    Friend WithEvents CheckBox2 As CheckBox
+    Friend WithEvents Button28 As Button
+    Friend WithEvents Button29 As Button
+    Friend WithEvents TabPage11 As TabPage
+    Friend WithEvents Button31 As Button
+    Friend WithEvents Button30 As Button
 End Class

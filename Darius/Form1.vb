@@ -32,7 +32,7 @@ Public Class Form1
         Imagetype = ImagetypeEnum.Brightfield
         Camera = New XimeaColor
         EDF = New ExtendedDepth5(Camera.W, Camera.H, 0.25, False)
-        ZEDOF = New ZstackStructure(Camera.W, Camera.H, 5)
+        ZEDOF = New ZstackStructure(Camera.W, Camera.H, 15)
         'Triangle = New TriangulationStructure(340, 1078, 2600, 700)
         If Camera.status Then
             TextBox_exposure.Text = Camera.exp
@@ -100,7 +100,7 @@ Public Class Form1
         TabControl2.Height = TabControl1.Height
         PictureBox_Preview.Left = d
         PictureBox_Preview.Top = d
-        PictureBox_Preview.Width = TabControl2.Width - 2 * d
+        PictureBox_Preview.Width = TabControl2.Width - 2 * d - GroupBox3.Height * 1.5
 
         Tracking = New TrackingStructure(PictureBox_Preview)
         Tracking.Update()
@@ -238,9 +238,11 @@ Public Class Form1
             Display.zoom = True
             PictureBox0.SizeMode = PictureBoxSizeMode.CenterImage
             PictureBox1.SizeMode = PictureBoxSizeMode.CenterImage
+            PictureBox2.SizeMode = PictureBoxSizeMode.CenterImage
         Else
             PictureBox0.SizeMode = PictureBoxSizeMode.Zoom
             PictureBox1.SizeMode = PictureBoxSizeMode.Zoom
+            PictureBox2.SizeMode = PictureBoxSizeMode.Zoom
         End If
     End Sub
 
@@ -250,11 +252,9 @@ Public Class Form1
 
     Private Sub TextBox3_KeyDown(sender As Object, e As KeyEventArgs) Handles TextBox3.KeyDown
         If e.KeyCode = Keys.Return Then
-            Dim watch As New Stopwatch
-            watch.Start()
+
             Stage.MoveRelative(Stage.Zaxe, Val(TextBox3.Text))
-            watch.Stop()
-            ' MsgBox(watch.ElapsedMilliseconds)
+
         End If
     End Sub
 
@@ -321,36 +321,51 @@ Public Class Form1
         CheckBoxLED.Checked = True
         If TabControl1.SelectedIndex = 0 Then
 
-            'ExitLive()
-            Imagetype = ImagetypeEnum.Brightfield
-            '  Camera.setGain(0)
-            ' TextBoxGain.Text = Setting.Gett("Gain")
 
-            'Textbox_exposure.Text = get
             LEDcontroller.SetRelays(2, False)
             LEDcontroller.SetRelays(1, True)
-            Button_adjustBrightness.PerformClick()
-            TextBox_exposure.Text = Setting.Gett("Exposureb")
-            ChangeExposure()
-            'GoLive()
+            If Imagetype = ImagetypeEnum.EDF_Fluorescence Or Imagetype = ImagetypeEnum.Fluorescence Then
+                Imagetype = ImagetypeEnum.Brightfield
+                Button_adjustBrightness.PerformClick()
+                TextBox_exposure.Text = Setting.Gett("Exposureb")
+                ChangeExposure()
+            End If
+            Imagetype = ImagetypeEnum.Brightfield
 
-        End If
 
-        If TabControl1.SelectedIndex = 1 Then
+            End If
 
-            'ExitLive()
-            Imagetype = ImagetypeEnum.Fluorescence
-            'Textbox_exposure.Text = 0.1
+            If TabControl1.SelectedIndex = 1 Then
+
             LEDcontroller.SetRelays(1, False)
             LEDcontroller.SetRelays(2, True)
-            Button_adjustBrightness.PerformClick()
-            'Camera.setGain(30)
-            TextBox_exposure.Text = Setting.Gett("Exposuref")
-            ChangeExposure()
 
-            'TextBoxGain.Text = Setting.Gett("Gain")
-            'GoLive()
-        End If
+            If Imagetype = ImagetypeEnum.EDF_Brightfield Or Imagetype = ImagetypeEnum.Brightfield Then
+
+                Imagetype = ImagetypeEnum.Fluorescence
+                Button_adjustBrightness.PerformClick()
+                TextBox_exposure.Text = Setting.Gett("Exposuref")
+                ChangeExposure()
+            End If
+
+            Imagetype = ImagetypeEnum.Fluorescence
+
+            End If
+
+            If TabControl1.SelectedIndex = 2 Then
+
+            If Imagetype = ImagetypeEnum.Fluorescence Then Imagetype = ImagetypeEnum.EDF_Fluorescence : PictureBox2.Image = PictureBox1.Image
+            If Imagetype = ImagetypeEnum.Brightfield Then Imagetype = ImagetypeEnum.EDF_Brightfield : PictureBox2.Image = PictureBox0.Image
+
+            ExitLive()
+
+            AcquireEDOF()
+            Dim bmp As New Bitmap(Camera.W, Camera.H, Imaging.PixelFormat.Format24bppRgb)
+            byteToBitmap(EDFbytes, bmp)
+            PictureBox2.Image = bmp
+
+            GoLive()
+            End If
 
     End Sub
 
@@ -360,28 +375,54 @@ Public Class Form1
 
     Public Sub Acquire()
         ExitLive() : Camera.ResetMatrix()
+        Thread.Sleep(500)
 
         Dim bmp As New Bitmap(Camera.captureBmp)
         SaveFileDialog1.DefaultExt = ".jpg"
         If SaveFileDialog1.ShowDialog() = DialogResult.Cancel Then Exit Sub
-        If Imagetype = ImagetypeEnum.Brightfield Then
-
-            bmp.Save(SaveFileDialog1.FileName + "_WD.jpg")
-            'Display.MakeFullsizeImage.Save(SaveFileDialog1.FileName + "_WD.jpg")
-            ReDim Preserve Filenames(fileN)
-            Filenames(fileN) = SaveFileDialog1.FileName + "_WD.jpg"
-            fileN += 1
-            ListBox1.Items.Add(Path.GetFileName(SaveFileDialog1.FileName + "_WD.jpg"))
-        ElseIf Imagetype = ImagetypeEnum.Fluorescence Then
 
 
-            bmp.Save(SaveFileDialog1.FileName + "_FiBi.jpg")
 
-            ReDim Preserve Filenames(fileN)
-            Filenames(fileN) = SaveFileDialog1.FileName + "_FiBi.jpg"
-            fileN += 1
-            ListBox1.Items.Add(Path.GetFileName(SaveFileDialog1.FileName + "_FiBi.jpg"))
-        End If
+        Select Case Imagetype
+            Case ImagetypeEnum.Brightfield
+
+
+                bmp.Save(SaveFileDialog1.FileName + "_WD.jpg")
+                'Display.MakeFullsizeImage.Save(SaveFileDialog1.FileName + "_WD.jpg")
+                ReDim Preserve Filenames(fileN)
+                Filenames(fileN) = SaveFileDialog1.FileName + "_WD.jpg"
+                fileN += 1
+                ListBox1.Items.Add(Path.GetFileName(SaveFileDialog1.FileName + "_WD.jpg"))
+            Case ImagetypeEnum.Fluorescence
+
+
+                bmp.Save(SaveFileDialog1.FileName + "_FiBi.jpg")
+
+                ReDim Preserve Filenames(fileN)
+                Filenames(fileN) = SaveFileDialog1.FileName + "_FiBi.jpg"
+                fileN += 1
+                ListBox1.Items.Add(Path.GetFileName(SaveFileDialog1.FileName + "_FiBi.jpg"))
+            Case ImagetypeEnum.EDF_Brightfield
+                '  ExitLive()
+
+                'AcquireEDOF()
+                Dim bmpEDF As New Bitmap(Camera.W, Camera.H, Imaging.PixelFormat.Format24bppRgb)
+                byteToBitmap(EDFbytes, bmpEDF)
+
+                bmpEDF.Save(SaveFileDialog1.FileName + "_EDOF_WD.jpg")
+
+
+                '  GoLive()
+            Case ImagetypeEnum.EDF_Fluorescence
+
+                Dim bmpEDF As New Bitmap(Camera.W, Camera.H, Imaging.PixelFormat.Format24bppRgb)
+                byteToBitmap(EDFbytes, bmpEDF)
+
+                bmpEDF.Save(SaveFileDialog1.FileName + "_EDOF_FiBi.jpg")
+
+        End Select
+
+
 
         GoLive()
         Display.AdjustBrightness()
@@ -520,7 +561,7 @@ Public Class Form1
 
 
 
-        If Tracking.ROI.IsMade Then
+        If Tracking.ROI.IsMade And Not CheckBox2.Checked Then
 
 
             Dim vx(Tracking.ROI.numDots * 2 - 1) As Single
@@ -541,7 +582,7 @@ Public Class Form1
 
             A = Fit.Main(vx, vy, 1000, 0.0000001)
             If A.Sum = 0 Then
-                MsgBox("Predicytive focus couldn't be estimated. TryCast moving your points inside the tissue.")
+                MsgBox("Predicytive focus couldn't be estimated. Try moving your points inside the tissue.")
                 Scanning = False : GoTo 1
             End If
 
@@ -549,29 +590,29 @@ Public Class Form1
             Dim X0 As Single = Stage.X
             Dim Y0 As Single = Stage.Y
 
-
-
         End If
 
 
-        Stage.SetAcceleration(Stage.Zaxe, AutoFocus.Zacceleration)
+        'Stage.SetAcceleration(Stage.Zaxe, AutoFocus.Zacceleration)
         If Tracking.ROI.IsMade Then
             Tracking.MovetoROIEdge()
-            Stage.MoveAbsolute(Stage.Zaxe, Fit.ComputeE({Stage.X, Stage.Y}, A))
+            If Not CheckBox2.Checked Then Stage.MoveAbsolute(Stage.Zaxe, Fit.ComputeE({Stage.X, Stage.Y}, A))
 
         End If
-
-
-
-
 
         ' Dim BytesExport(Camera.Bytes.GetUpperBound(0)) As Byte
         For loop_y = 1 To y
             For loop_x = 1 To X
                 Pbar.Increment(1)
                 If Scanning = False Then GoTo 1
-                Camera.Capture_Threaded()
-                Thread.Sleep(Camera.exp * 1.2)
+                If CheckBox2.Checked Then
+                    AcquireEDOF()
+
+                Else
+
+                    Camera.Capture_Threaded()
+                    Thread.Sleep(Camera.exp * 1.2)
+                End If
 
 
                 'Moves while it generates the preview and others.
@@ -589,10 +630,16 @@ Public Class Form1
                     End If
                 End If
 
-                If Tracking.ROI.IsMade Then Stage.MoveAbsolute(Stage.Zaxe, Fit.ComputeE({Stage.X, Stage.Y}, A), False)
-                Do Until Camera.ready
+                If Tracking.ROI.IsMade And Not CheckBox2.Checked Then
 
-                Loop
+                    Stage.MoveAbsolute(Stage.Zaxe, Fit.ComputeE({Stage.X, Stage.Y}, A), False)
+                    Do Until Camera.ready
+
+                    Loop
+
+
+                End If
+
                 Do Until Pyramid(0).Ready And Pyramid(1).Ready And Pyramid(2).Ready And Pyramid(3).Ready
 
                 Loop
@@ -608,11 +655,25 @@ Public Class Form1
 
                 If direction > 0 Then
                     For i = 0 To Pyramid(0).pages - 1
-                        Pyramid(i).SaveTile(loop_x - 1, loop_y - 1, (Camera.Bytes))
+
+                        If CheckBox2.Checked Then
+                            Pyramid(i).SaveTile(loop_x - 1, loop_y - 1, (EDFbytes))
+                        Else
+                            Pyramid(i).SaveTile(loop_x - 1, loop_y - 1, (Camera.Bytes))
+                        End If
+
                     Next
                 Else
                     For i = 0 To Pyramid(0).pages - 1
-                        Pyramid(i).SaveTile(X - loop_x, loop_y - 1, (Camera.Bytes))
+
+                        If CheckBox2.Checked Then
+                            Pyramid(i).SaveTile(X - loop_x, loop_y - 1, (EDFbytes))
+                        Else
+                            Pyramid(i).SaveTile(X - loop_x, loop_y - 1, (Camera.Bytes))
+                        End If
+
+
+
                     Next
                 End If
                 'byteToBitmap(Camera.Bytes, Display.Bmp)
@@ -657,7 +718,7 @@ Public Class Form1
         'Camera.SetPolicyToUNSafe()
         'Camera.Flatfield(0)
         'Camera.SetDataMode(Colortype.Grey)
-        Stage.SetAcceleration(Stage.Zaxe, Stage.Zacc)
+        'Stage.SetAcceleration(Stage.Zaxe, Stage.Zacc)
         GoLive()
         Display.AdjustBrightness()
 
@@ -805,14 +866,15 @@ Public Class Form1
 
     End Sub
     Public Sub GetPreview()
+        Stage.MoveAbsolute(Stage.Zaxe, 0)
         Stage.MoveAbsolute(Stage.Yaxe, 0)
         Stage.MoveAbsolute(Stage.Xaxe, 12.5)
-        Stage.MoveAbsolute(Stage.Zaxe, 0)
+        Stage.MoveAbsolute(Stage.Zaxe, 20)
         'MsgBox("Load the sample and then hit OK.")
 
         Tracking.UpdateBmp(Preview.Capture(Val(TextBox_PrevieEXp.Text), Val(TextBox_PreviewFocus.Text)))
 
-
+        Stage.MoveAbsolute(Stage.Zaxe, 0)
         Stage.Go_Middle()
         'stage.MoveAbsolute(stage.Zaxe, lastZ)
 
@@ -873,19 +935,22 @@ Public Class Form1
 
     Private Sub Button8_Click(sender As Object, e As EventArgs) Handles Button8.Click
 
+        Stage.MoveAbsolute(Stage.Zaxe, 0)
         Stage.MoveAbsolute(Stage.Yaxe, 0)
         Stage.MoveAbsolute(Stage.Xaxe, 12.5)
-        Stage.MoveAbsolute(Stage.Zaxe, 0)
+        Stage.MoveAbsolute(Stage.Zaxe, 20)
 
     End Sub
 
     Private Sub Button13_Click(sender As Object, e As EventArgs) Handles Button13.Click
-
+        Stage.MoveAbsolute(Stage.Zaxe, 0)
         Stage.Go_Middle()
         Stage.GoToFocus()
     End Sub
 
     Private Sub Button12_Click(sender As Object, e As EventArgs) Handles Button12.Click
+        Preview.CaptureWhole(Val(TextBox_PrevieEXp.Text), Val(TextBox_PreviewFocus.Text)).Save("c:\temp\whole.jpg")
+
         Tracking.UpdateBmp(Preview.Capture(Val(TextBox_PrevieEXp.Text), Val(TextBox_PreviewFocus.Text)))
         Preview.bmpf.Save("C:\temp\preview.jpg")
         PictureBox_Preview.Image = Tracking.bmp.bmp
@@ -1117,7 +1182,7 @@ Public Class Form1
         Stage.MoveRelative(Stage.Yaxe, -Stage.FOVY)
         cropped = Montage.Clone(New Rectangle(Camera.W - croppedsize / 2, Camera.H - croppedsize / 2, croppedsize, croppedsize), Imaging.PixelFormat.Format24bppRgb)
         PictureBox0.Image = cropped
-
+        cropped.Save("c:\temp\cropped.jpg")
     End Sub
 
     Private Sub Button10_Click(sender As Object, e As EventArgs) Handles Button10.Click
@@ -1132,9 +1197,10 @@ Public Class Form1
     Private Sub Button16_Click(sender As Object, e As EventArgs) Handles Button16.Click
         'stage.SetSpeed(stage.Zport, 500000)
         If MsgBox("Load the Calibration slide and hit OK.", MsgBoxStyle.OkCancel) = MsgBoxResult.Cancel Then Exit Sub
+        Stage.MoveAbsolute(Stage.Zaxe, 0)
         Stage.MoveAbsolute(Stage.Yaxe, 0)
         Stage.MoveAbsolute(Stage.Xaxe, 12.5)
-        Stage.MoveAbsolute(Stage.Zaxe, 0)
+        Stage.MoveAbsolute(Stage.Zaxe, 20)
         'MsgBox("Load the sample and then hit OK.")
         Tracking.UpdateBmp(Preview.CaptureROI(TextBox_PrevieEXp.Text, TextBox_PreviewFocus.Text))
 
@@ -1377,43 +1443,58 @@ Public Class Form1
 
     End Sub
 
-    Private Sub Button28_Click(sender As Object, e As EventArgs) Handles Button28.Click
+    Private Sub Button28_Click(sender As Object, e As EventArgs)
 
+    End Sub
 
+    Private Sub TextBoxY_TextChanged(sender As Object, e As EventArgs) Handles TextBoxY.TextChanged
+
+    End Sub
+
+    Private Sub Button28_Click_1(sender As Object, e As EventArgs) Handles Button28.Click
         ExitLive()
+        Dim i, j, c As Integer
+        Dim Cx, Cy As Single
+        Stage.UpdatePositions()
+        Cx = Stage.X
+        Cy = Stage.Y
 
-        Piezo.MoveAbsolute(0)
-        Dim numZ As Integer = 5
+        For j = 1 To TextBoxY.Text
+            For i = 1 To TextBoxX.Text
 
-        Dim ZupperFrame(numZ - 1)() As Byte
-
-        Dim watch As New Stopwatch
-
-        Pbar.Maximum = 11
-        For loop_Z = 0 To numZ - 1
-            ReDim ZupperFrame(loop_Z)(Camera.W * Camera.H * 3 - 1)
-            Camera.Capture()
-
-            Buffer.BlockCopy(Camera.Bytes, 0, ZupperFrame(loop_Z), 0, Camera.Bytes.Length)
-            Pbar.Increment(1)
-            Application.DoEvents()
-            Piezo.MoveRelative(20)
-            'byteToBitmap((ZupperFrame(loop_Z)), Camera.BmpRef)
-            'Camera.BmpRef.Save("c:\temp\oskol\" + loop_Z.ToString + ".jpg")
+                AcquireEDOF()
+                Dim bmp As New Bitmap(Camera.W, Camera.H, Imaging.PixelFormat.Format24bppRgb)
+                byteToBitmap(EDFbytes, bmp)
+                bmp.Save("c:\temp\Scan\" + c.ToString + ".jpg")
+                c += 1
+                If i < TextBoxX.Text Then Stage.MoveRelative(Stage.Xaxe, -Stage.FOVX, False)
+            Next
+            Stage.MoveRelative(Stage.Xaxe, Stage.FOVX * (TextBoxX.Text - 1), False)
+            Stage.MoveRelative(Stage.Yaxe, Stage.FOVY, False)
         Next
+        Stage.MoveAbsoluteAsync(Stage.Xaxe, Cx)
+        Stage.MoveAbsoluteAsync(Stage.Yaxe, Cy)
+        GoLive()
+    End Sub
 
-        'SaveJaggedArray(ZupperFrame, Camera.W, Camera.H, SaveFileDialog1.FileName + ".tif")
+    Private Sub Button29_Click(sender As Object, e As EventArgs) Handles Button29.Click
+        ExitLive() : Camera.ResetMatrix()
+    End Sub
 
-        Pbar.Value = 0
-        Piezo.MoveAbsolute(0)
-        byteToBitmap(ZEDOF.Process(ZupperFrame), Camera.BmpRef)
-        'Camera.SetDataMode(Colortype.RGB)
-
-        'Display.BayerInterpolate(EDF.AnalyzeZuper(ZupperFrame), Camera.BmpRef)
-        PictureBox2.Image = Camera.BmpRef
+    Private Sub Button30_Click(sender As Object, e As EventArgs) Handles Button30.Click
 
 
+        AcquireEDOF()
+        Dim bmp As New Bitmap(Camera.W, Camera.H, Imaging.PixelFormat.Format24bppRgb)
+        byteToBitmap(EDFbytes, bmp)
+        PictureBox0.Image = bmp
+
+
+    End Sub
+
+    Private Sub Button31_Click(sender As Object, e As EventArgs) Handles Button31.Click
         GoLive()
     End Sub
 End Class
+
 

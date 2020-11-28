@@ -1,18 +1,23 @@
 ﻿Public Class ZstackStructure
-    Dim W, H, Z As Integer
+    Public W, H, Z As Integer
     Dim Pattern2D(,), ScalingUpPattern(), ScalingDownPattern() As Integer
     Dim GreenBytes(), GreenEdgeBytes()() As Single
     Public MaxMap() As Single
     Dim BLure As FFTW_VB_Real
+    Dim bytes()() As Byte
+    Dim zc As Integer
     Dim Central As CentralDerivitavie
+    Dim bytesout() As Byte
 
     Public Sub New(W As Integer, H As Integer, Z As Integer)
         Me.W = W
         Me.H = H
         Me.Z = Z
         ReDim GreenEdgeBytes(Z - 1)
+        ReDim bytes(Z - 1)
         For zi = 0 To Z - 1
             ReDim GreenEdgeBytes(zi)(W / 2 * H / 2 - 1)
+            ReDim bytes(zi)(W * H * 3 - 1)
         Next
         ReDim GreenBytes(W / 2 * H / 2 - 1)
         BLure = New FFTW_VB_Real(W / 2, H / 2)
@@ -50,11 +55,46 @@
         Next
         ReDim MaxMap(W / 2 * H / 2 - 1)
     End Sub
+    Public Sub Clear()
+        ReDim GreenEdgeBytes(Z - 1)
+        ReDim bytes(Z - 1)
+        For zi = 0 To Z - 1
+            ReDim GreenEdgeBytes(zi)(W / 2 * H / 2 - 1)
+            ReDim bytes(zi)(W * H * 3 - 1)
+        Next
+        ReDim GreenBytes(W / 2 * H / 2 - 1)
+    End Sub
+    Public Sub Upload(bytesin() As Byte, zi As Integer)
 
-    Public Function Process(bytes()() As Byte) As Byte()
+        Buffer.BlockCopy(bytesin, 0, bytes(zi), 0, bytesin.Length)
+        zc = zi
+    End Sub
 
+    Public Sub Acquire()
+        For loop_Z = 0 To Z - 1
+            Camera.Capture()
+            Stage.MoveRelative(Stage.Zaxe, 0.01, False)
+            Upload(Camera.Bytes, loop_Z)
+            Process()
+        Next
+        Stage.MoveRelative(Stage.Zaxe, -0.01 * Z, False)
+        Wrapup()
 
-        Dim bytesout(W * H * 3 - 1) As Byte
+    End Sub
+
+    Public Sub Process()
+
+        GetColorBytes(bytes(zc), GreenBytes, W / 2, H / 2)
+        Central.AnalyzeX(GreenBytes, GreenEdgeBytes(zc))
+        BLure.UpLoad(GreenEdgeBytes(zc))
+        BLure.Process_FT_MTF()
+        BLure.DownLoad(GreenEdgeBytes(zc))
+
+    End Sub
+    Public Sub ProcessAll(bytesin()() As Byte)
+
+        Me.bytes = bytes
+
         For zi = 0 To Z - 1
 
             GetColorBytes(bytes(zi), GreenBytes, W / 2, H / 2)
@@ -65,17 +105,23 @@
 
         Next
 
+
+
+    End Sub
+    Public Function Wrapup() As Byte()
+        ReDim bytesout(W * H * 3 - 1)
         Dim max, maxZ As Single
         Dim maxi As Integer = W / 2 * H / 2 - 1
         Dim i As Integer
+        ReDim MaxMap(W / 2 * H / 2 - 1)
         For i = 0 To maxi
             max = 0 : maxZ = 0
-            For Z = 0 To Z - 1
-                If GreenEdgeBytes(Z)(i) > max Then max = GreenEdgeBytes(Z)(i) : maxZ = Z
+            For Zi = 0 To Z - 1
+                If GreenEdgeBytes(Zi)(i) > max Then max = GreenEdgeBytes(Zi)(i) : maxZ = Zi
             Next
             MaxMap(i) = maxZ
         Next
-
+        'SaveSinglePageTiff16("c:\temp\maxmap.tif", MaxMap, W / 2 - 1, H / 2 - 1)
         i = 0
         Dim index As Integer
         Dim j As Integer
@@ -87,11 +133,8 @@
             bytesout(j + 2) = bytes(index)(j + 2)
             i += 1
         Next
-
         Return bytesout
-
     End Function
-
     Sub GetColorBytes(BytesIn() As Byte, ByRef BytesOut() As Single, Wb As Integer, Hb As Integer)
         'to read green 
         ReDim BytesOut(Wb * Hb - 1)

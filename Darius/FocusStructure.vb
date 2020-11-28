@@ -51,15 +51,16 @@ Public Class FocusStructure
     End Sub
 
     Public Sub Initialize()
-
+        Camera.StopAcqusition()
         Camera.Flatfield(0)
         exp = Camera.exp
         Camera.SetDataMode(Colortype.Grey)
         Camera.SetExposure(exp / bin, False)
         Camera.ReSetROI()
-        Camera.SetBinning(True, bin)
+        Camera.SetBinning(bin)
         ReDim BinnedImage(Nimg - 1)
         Stage.SetAcceleration(Stage.Zaxe, Zacceleration)
+        Camera.StartAcqusition()
 
         'To use only integer steps 
         '      Range = Int(Range / Nimg * stage.ZMMtoSteps) * Nimg / stage.ZMMtoSteps
@@ -346,13 +347,15 @@ Public Class FocusStructure
 
 
     Public Sub Release()
+
+        Camera.StopAcqusition()
+        Camera.SetExposure(exp, False)
+        Camera.SetDataMode(Colortype.RGB)
+        Camera.SetROI()
         Camera.SetDataMode(Colortype.RGB)
         If Camera.FFsetup Then Camera.Flatfield(1)
-        Camera.SetExposure(exp, False)
-        Camera.SetBinning(False, bin)
-        Camera.SetROI()
-
         Stage.SetAcceleration(Stage.Zaxe, Stage.Zacc)
+        Camera.StartAcqusition()
     End Sub
 
 
