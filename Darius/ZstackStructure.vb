@@ -8,6 +8,7 @@
     Dim zc As Integer
     Dim current As Long
     Dim ticks As Long
+    Public direction As Integer
     Dim Central As CentralDerivitavie
     Public OutputBytes() As Byte
 
@@ -56,6 +57,7 @@
             p = Y * W * 3 * 2 + 1
         Next
         ReDim MaxMap(W / 2 * H / 2 - 1)
+        direction = 1
     End Sub
     Public Sub Clear()
         ReDim GreenEdgeBytes(Z - 1)
@@ -72,21 +74,22 @@
         zc = zi
     End Sub
 
-    Public Sub AcquireThreaded()
+    Public Sub AcquireThreaded(retrn As Boolean, Optional WithWrapup As Boolean = True)
         ticks = (Camera.exp * Stopwatch.Frequency / 1000)
-        MakeDelay()
+        'MakeDelay()
+        If retrn Then direction = 1
         For loopZ = 0 To Z - 1
             Camera.Trigger()
             MakeDelay()
-            Stage.MoveRelativeAsync(Stage.Zaxe, 0.01, False)
+            Stage.MoveRelativeAsync(Stage.Zaxe, 0.01 * direction, False)
             Camera.cam.GetImageByteArray(bytes(loopZ), Camera.timeout)
             zc = loopZ
             Dim Thread As New System.Threading.Thread(AddressOf Process)
             Thread.Start()
 
         Next
-        Stage.MoveRelative(Stage.Zaxe, -0.01 * Z, False)
-        Wrapup()
+        If retrn Then Stage.MoveRelativeAsync(Stage.Zaxe, -0.01 * Z, False) Else direction = direction * -1
+        If WithWrapup Then Wrapup()
 
     End Sub
 
@@ -146,6 +149,7 @@
         Dim maxi As Integer = W / 2 * H / 2 - 1
         Dim i As Integer
         ReDim MaxMap(W / 2 * H / 2 - 1)
+        '101 ms
         For i = 0 To maxi
             max = 0 : maxZ = 0
             For Zi = 0 To Z - 1
@@ -154,14 +158,15 @@
             MaxMap(i) = maxZ
         Next
         'SaveSinglePageTiff16("c:\temp\maxmap.tif", MaxMap, W / 2 - 1, H / 2 - 1)
-        For Zi = 0 To Z - 1
-            'saveSinglePage32("c:\temp\d\" + Zi.ToString, GreenEdgeBytes(Zi), W / 2, H / 2)
-            'SaveSinglePageTiff16("c:\temp\i\" + Zi.ToString, bytes(Zi), W, H)
-        Next
+        'For Zi = 0 To Z - 1
+        '    'saveSinglePage32("c:\temp\d\" + Zi.ToString, GreenEdgeBytes(Zi), W / 2, H / 2)
+        '    'SaveSinglePageTiff16("c:\temp\i\" + Zi.ToString, bytes(Zi), W, H)
+        'Next
         i = 0
         Dim index As Integer
         Dim j As Integer
         Dim maxj = W * H * 3 - 1
+        ' 78 ms 
         For j = 0 To maxj Step 3
             index = MaxMap(ScalingUpPattern(i))
             OutputBytes(j) = bytes(index)(j)

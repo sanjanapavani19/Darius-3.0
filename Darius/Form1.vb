@@ -198,21 +198,25 @@ Public Class Form1
     Private Sub Button_right_Click(sender As Object, e As EventArgs) Handles Button_right.Click
 
         Stage.MoveRelative(Stage.Xaxe, -Stage.FOVX)
+        ExitEDOf()
     End Sub
 
     Private Sub Button_left_Click(sender As Object, e As EventArgs) Handles Button_left.Click
 
         Stage.MoveRelative(Stage.Xaxe, Stage.FOVX)
+        ExitEDOf()
     End Sub
 
     Private Sub Button_top_Click(sender As Object, e As EventArgs) Handles Button_top.Click
 
         Stage.MoveRelative(Stage.Yaxe, -Stage.FOVY)
+        ExitEDOf()
     End Sub
 
     Private Sub Button_bottom_Click(sender As Object, e As EventArgs) Handles Button_bottom.Click
 
         Stage.MoveRelative(Stage.Yaxe, Stage.FOVY)
+        ExitEDOf()
     End Sub
 
     Private Sub Button_adjustBrightness_Click(sender As Object, e As EventArgs) Handles Button_adjustBrightness.Click
@@ -222,7 +226,10 @@ Public Class Form1
 
     End Sub
 
-
+    Public Sub ExitEDOf()
+        If Imagetype = ImagetypeEnum.EDF_Brightfield Then TabControl1.SelectedIndex = 0
+        If Imagetype = ImagetypeEnum.EDF_Fluorescence Then TabControl1.SelectedIndex = 1
+    End Sub
 
     Private Sub Form1_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
         If Camera.status = True Then
@@ -360,7 +367,7 @@ Public Class Form1
             ExitLive()
 
 
-            ZEDOF.AcquireThreaded()
+            ZEDOF.AcquireThreaded(True)
             Dim bmp As New Bitmap(Camera.W, Camera.H, Imaging.PixelFormat.Format24bppRgb)
             byteToBitmap(ZEDOF.OutputBytes, bmp)
             PictureBox2.Image = bmp
@@ -432,19 +439,20 @@ Public Class Form1
 
 
 
-    Private Sub PictureBox0_MouseDown(sender As Object, e As MouseEventArgs) Handles PictureBox0.MouseDown, PictureBox1.MouseDown
+    Private Sub PictureBox0_MouseDown(sender As Object, e As MouseEventArgs) Handles PictureBox0.MouseDown, PictureBox1.MouseDown, PictureBox2.MouseDown
         Stage.xp = e.X
         Stage.yp = e.Y
 
     End Sub
 
-    Private Sub PictureBox0_MouseUp(sender As Object, e As MouseEventArgs) Handles PictureBox0.MouseUp, PictureBox1.MouseUp
+    Private Sub PictureBox0_MouseUp(sender As Object, e As MouseEventArgs) Handles PictureBox0.MouseUp, PictureBox1.MouseUp, PictureBox2.MouseDown
 
         Dim Z As Integer = 1
         '   If Display.zoom Then Z = Display.sampeling Else Z = 1
+
         Stage.MoveRelativeAsync(Stage.Xaxe, (e.X - Stage.xp) * Stage.FOVX * (1 / Z) / PictureBox0.Width)
         Stage.MoveRelativeAsync(Stage.Yaxe, -(e.Y - Stage.yp) * Stage.FOVY * (1 / Z) / PictureBox0.Height)
-
+        ExitEDOf()
 
     End Sub
 
@@ -531,7 +539,7 @@ Public Class Form1
         If Camera.busy Then ExitLive() : Camera.ResetMatrix()
 
         'Camera.SetPolicyToSafe()
-        Dim TravelX, TravelY As Single
+
         Dim Filen As Integer = 1
         Dim direction As Integer = 1
 
@@ -560,6 +568,11 @@ Public Class Form1
         Dim Fit As New Polynomial_fit
         Dim A(4) As Double
 
+        Dim cx, cy, cz As Single
+        Stage.UpdatePositions()
+        cx = Stage.X
+        cy = Stage.Y
+        cz = Stage.Z
 
 
         If Tracking.ROI.IsMade And Not CheckBox2.Checked Then
@@ -607,7 +620,7 @@ Public Class Form1
                 Pbar.Increment(1)
                 If Scanning = False Then GoTo 1
                 If CheckBox2.Checked Then
-                    ZEDOF.Acquire()
+                    ZEDOF.AcquireThreaded(False, False)
 
                 Else
 
@@ -615,22 +628,34 @@ Public Class Form1
                     Thread.Sleep(Camera.exp * 1.2)
                 End If
 
-
                 'Moves while it generates the preview and others.
                 If loop_x < X Then
-                    Stage.MoveRelative(Stage.Xaxe, -AdjustedStepX * direction, False) : Axis = "X"
+                    If CheckBox2.Checked Then
+
+                        Stage.MoveRelativeAsync(Stage.Xaxe, -AdjustedStepX * direction, False) : Axis = "X"
+                    Else
+                        Stage.MoveRelative(Stage.Xaxe, -AdjustedStepX * direction, False) : Axis = "X"
+                    End If
+
+
                     Stage.X += -AdjustedStepX * direction
-                    TravelX += -AdjustedStepX * direction
+
 
                 Else
                     If loop_y < y Then
-                        Stage.MoveRelative(Stage.Yaxe, AdjustedStepY, False) : Axis = "y"
+                        If CheckBox2.Checked Then
+                            Stage.MoveRelativeAsync(Stage.Yaxe, AdjustedStepY, False) : Axis = "y"
+                        Else
+                            Stage.MoveRelative(Stage.Yaxe, AdjustedStepY, False) : Axis = "y"
+                        End If
+
+
                         Stage.Y += AdjustedStepY
-                        TravelY += AdjustedStepY
+
 
                     End If
                 End If
-
+                ZEDOF.Wrapup()
                 If Tracking.ROI.IsMade And Not CheckBox2.Checked Then
 
                     Stage.MoveAbsolute(Stage.Zaxe, Fit.ComputeE({Stage.X, Stage.Y}, A), False)
@@ -677,9 +702,14 @@ Public Class Form1
 
                     Next
                 End If
-                'byteToBitmap(Camera.Bytes, Display.Bmp)
-                'Array.Copy(Camera.GetBytes, BytesExport, BytesExport.GetLength(0))
-                'Display.Bmp.Save("C:\temp\" + Filen.ToString + "RGB.bmp")
+
+
+
+
+
+
+
+
                 If Axis = "X" Then
                     Filen += direction
                     FrameIndex += 1
@@ -711,10 +741,12 @@ Public Class Form1
         Next
 
 
-        'MakeMontage(X, Y, Bmp, True)
+
 1:
-        Stage.MoveRelative(Stage.Xaxe, TravelX)
-        Stage.MoveRelative(Stage.Yaxe, -TravelY)
+        Stage.MoveAbsoluteAsync(Stage.Xaxe, cx)
+        Stage.MoveAbsoluteAsync(Stage.Yaxe, cy)
+        Stage.MoveAbsoluteAsync(Stage.Zaxe, cz)
+        ZEDOF.direction = 1
         Pbar.Value = 0
         'Camera.SetPolicyToUNSafe()
         'Camera.Flatfield(0)
@@ -1063,9 +1095,6 @@ Public Class Form1
         End If
     End Sub
 
-    Private Sub TextBox_exposure_TextChanged(sender As Object, e As EventArgs) Handles TextBox_exposure.TextChanged
-
-    End Sub
 
     Private Sub TextBox_exposure_MouseWheel(sender As Object, e As MouseEventArgs) Handles TextBox_exposure.MouseWheel
         If Camera.ExposureChanged Then Exit Sub
@@ -1075,9 +1104,10 @@ Public Class Form1
         ChangeExposure()
     End Sub
 
-    Private Sub PictureBox_MouseWheel(sender As Object, e As MouseEventArgs) Handles PictureBox0.MouseWheel, PictureBox1.MouseWheel
+    Private Sub PictureBox_MouseWheel(sender As Object, e As MouseEventArgs) Handles PictureBox0.MouseWheel, PictureBox1.MouseWheel, PictureBox2.MouseWheel
         If Focusing = True Then Exit Sub
         Focusing = True
+        ExitEDOf()
         Dim speed As Single
         If System.Windows.Forms.Control.ModifierKeys = Keys.Control Then speed = 20 Else speed = 5
 
@@ -1496,6 +1526,12 @@ Public Class Form1
     Private Sub Button31_Click(sender As Object, e As EventArgs) Handles Button31.Click
         GoLive()
     End Sub
+
+    Private Sub PictureBox1_Click(sender As Object, e As EventArgs) Handles PictureBox1.Click
+
+    End Sub
+
+
 End Class
 
 
