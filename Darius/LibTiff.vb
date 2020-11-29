@@ -429,6 +429,99 @@ Module LibTiff
         End Using
 
     End Sub
+    Public Sub saveSinglePage32(ByVal filename As String, frame() As Single, Width As Integer, Height As Integer)
+
+
+
+        Const samplesPerPixel As Integer = 1
+        Const bitsPerSample As Integer = 32
+
+        Dim samples As Single() = New Single(Width - 1) {}
+
+        'Tiff.SetTagExtender(AddressOf TagExtender)
+
+        Using output As Tiff = Tiff.Open(filename, "w")
+
+
+
+            output.SetField(TiffTag.IMAGEWIDTH, Width / samplesPerPixel)
+            output.SetField(TiffTag.SAMPLESPERPIXEL, samplesPerPixel)
+            output.SetField(TiffTag.BITSPERSAMPLE, bitsPerSample)
+            output.SetField(TiffTag.SAMPLEFORMAT, SampleFormat.IEEEFP)
+            'output.SetField(TIFFTAG_COMMENT, muse.tag_comments.Length * 2, System.Text.Encoding.Unicode.GetBytes((muse.tag_comments)))
+            'output.SetField(TIFFTAG_TAG, muse.tag_comments.Length * 2, System.Text.Encoding.Unicode.GetBytes((muse.tag_comments)))
+
+            ' specify that it's a page within the multipage file
+            output.SetField(TiffTag.SUBFILETYPE, FileType.PAGE)
+            ' specify the page number
+
+
+            Dim p As Integer = 0
+            For i As Integer = 0 To Height - 1
+                For j As Integer = 0 To Width - 1
+                    samples(j) = frame(p)
+                    p += 1
+                Next
+
+                Dim buf As Byte() = New Byte(samples.Length * 4 - 1) {}
+
+                Buffer.BlockCopy(samples, 0, buf, 0, buf.Length)
+                output.WriteScanline(buf, i)
+            Next
+
+            output.WriteDirectory()
+
+        End Using
+    End Sub
+
+
+
+    Public Sub saveSinglePage32(ByVal filename As String, frame(,) As Single)
+        Dim width As Integer = frame.GetLength(0)
+        Dim height As Integer = frame.GetLength(1)
+
+
+        Const samplesPerPixel As Integer = 1
+        Const bitsPerSample As Integer = 32
+
+        Dim samples As Single() = New Single(width - 1) {}
+
+        'Tiff.SetTagExtender(AddressOf TagExtender)
+
+        Using output As Tiff = Tiff.Open(filename, "w")
+
+
+
+            output.SetField(TiffTag.IMAGEWIDTH, width / samplesPerPixel)
+            output.SetField(TiffTag.SAMPLESPERPIXEL, samplesPerPixel)
+            output.SetField(TiffTag.BITSPERSAMPLE, bitsPerSample)
+            output.SetField(TiffTag.SAMPLEFORMAT, SampleFormat.IEEEFP)
+            'output.SetField(TIFFTAG_COMMENT, muse.tag_comments.Length * 2, System.Text.Encoding.Unicode.GetBytes((muse.tag_comments)))
+            'output.SetField(TIFFTAG_TAG, muse.tag_comments.Length * 2, System.Text.Encoding.Unicode.GetBytes((muse.tag_comments)))
+
+            ' specify that it's a page within the multipage file
+            output.SetField(TiffTag.SUBFILETYPE, FileType.PAGE)
+            ' specify the page number
+
+
+
+            For i As Integer = 0 To height - 1
+                For j As Integer = 0 To width - 1
+                    samples(j) = frame(j, i)
+                Next
+
+                Dim buf As Byte() = New Byte(samples.Length * 4 - 1) {}
+
+                Buffer.BlockCopy(samples, 0, buf, 0, buf.Length)
+                output.WriteScanline(buf, i)
+            Next
+
+            output.WriteDirectory()
+
+        End Using
+    End Sub
+
+
     Public Sub Save_MultiTiff(ByVal Frame(,,) As Single, ByVal filename As String)
 
         Dim width As Integer = Frame.GetUpperBound(0)
@@ -562,50 +655,7 @@ Module LibTiff
             Next
         End Using
     End Sub
-    Public Sub saveSinglePage32(ByVal filename As String, frame(,) As Single)
-        Dim width As Integer = frame.GetLength(0)
-        Dim height As Integer = frame.GetLength(1)
 
-
-        Const samplesPerPixel As Integer = 1
-        Const bitsPerSample As Integer = 32
-
-        Dim samples As Single() = New Single(width - 1) {}
-
-        'Tiff.SetTagExtender(AddressOf TagExtender)
-
-        Using output As Tiff = Tiff.Open(filename, "w")
-
-
-
-            output.SetField(TiffTag.IMAGEWIDTH, width / samplesPerPixel)
-            output.SetField(TiffTag.SAMPLESPERPIXEL, samplesPerPixel)
-            output.SetField(TiffTag.BITSPERSAMPLE, bitsPerSample)
-            output.SetField(TiffTag.SAMPLEFORMAT, SampleFormat.IEEEFP)
-            'output.SetField(TIFFTAG_COMMENT, muse.tag_comments.Length * 2, System.Text.Encoding.Unicode.GetBytes((muse.tag_comments)))
-            'output.SetField(TIFFTAG_TAG, muse.tag_comments.Length * 2, System.Text.Encoding.Unicode.GetBytes((muse.tag_comments)))
-
-            ' specify that it's a page within the multipage file
-            output.SetField(TiffTag.SUBFILETYPE, FileType.PAGE)
-            ' specify the page number
-
-
-
-            For i As Integer = 0 To height - 1
-                For j As Integer = 0 To width - 1
-                    samples(j) = frame(j, i)
-                Next
-
-                Dim buf As Byte() = New Byte(samples.Length * 4 - 1) {}
-
-                Buffer.BlockCopy(samples, 0, buf, 0, buf.Length)
-                output.WriteScanline(buf, i)
-            Next
-
-            output.WriteDirectory()
-
-        End Using
-    End Sub
 
     Public Function Read32(ByVal inputName As String) As Single(,)
 

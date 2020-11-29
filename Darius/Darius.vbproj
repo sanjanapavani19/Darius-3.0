@@ -171,7 +171,6 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AcqusitionStructure.vb" />
     <Compile Include="CentralDerivitavie.vb" />
     <Compile Include="Dover.vb" />
     <Compile Include="ExtendedDepth5.vb" />

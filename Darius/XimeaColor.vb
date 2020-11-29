@@ -4,7 +4,7 @@ Imports System.Windows
 Imports AForge.Imaging
 
 Public Class XimeaColor
-    Private cam As New xiCam
+    Public cam As New xiCam
 
     Public readoutnoise As Single
     Public Name As String
@@ -23,7 +23,7 @@ Public Class XimeaColor
     Public exp As Single
     Public BmpRef As Bitmap
     Public bit_scale As Byte = 2 ^ 4
-    Private timeout As Integer
+    Public timeout As Integer
     Public CCMAtrix As Single
     Public Bytes As Byte()
     Public TRG_MODE As Integer
@@ -71,7 +71,7 @@ Public Class XimeaColor
             ResetMatrix()
 
 
-            timeout = 5000
+            timeout = 1000
             busy = False
             status = True
 
@@ -196,6 +196,20 @@ Public Class XimeaColor
 
         ready = True
     End Sub
+
+    Public Sub Trigger()
+        cam.SetParam(PRM.TRG_SOFTWARE, 1)
+    End Sub
+
+    Public Sub Transfer()
+        cam.GetImageByteArray(Bytes, timeout)
+    End Sub
+
+
+    Public Sub Transfer(ByRef Bytes)
+        cam.GetImageByteArray(Bytes, timeout)
+    End Sub
+
     Public Sub WaitUntillReady()
         Do Until ready
 

@@ -49,7 +49,7 @@ Module SharedResources
     Public Triangle As TriangulationStructure
     Public Tracking As TrackingStructure
     Public ZEDOF As ZstackStructure
-    Public EDFbytes() As Byte
+
     Public Function factorial(ByVal n As Integer) As Integer
         If n <= 1 Then
             Return 1

@@ -6,8 +6,10 @@
     Dim BLure As FFTW_VB_Real
     Dim bytes()() As Byte
     Dim zc As Integer
+    Dim current As Long
+    Dim ticks As Long
     Dim Central As CentralDerivitavie
-    Dim bytesout() As Byte
+    Public OutputBytes() As Byte
 
     Public Sub New(W As Integer, H As Integer, Z As Integer)
         Me.W = W
@@ -70,18 +72,48 @@
         zc = zi
     End Sub
 
-    Public Sub Acquire()
-        For loop_Z = 0 To Z - 1
-            Camera.Capture()
-            Stage.MoveRelative(Stage.Zaxe, 0.01, False)
-            Upload(Camera.Bytes, loop_Z)
-            Process()
+    Public Sub AcquireThreaded()
+        ticks = (Camera.exp * Stopwatch.Frequency / 1000)
+        MakeDelay()
+        For loopZ = 0 To Z - 1
+            Camera.Trigger()
+            MakeDelay()
+            Stage.MoveRelativeAsync(Stage.Zaxe, 0.01, False)
+            Camera.cam.GetImageByteArray(bytes(loopZ), Camera.timeout)
+            zc = loopZ
+            Dim Thread As New System.Threading.Thread(AddressOf Process)
+            Thread.Start()
+
         Next
         Stage.MoveRelative(Stage.Zaxe, -0.01 * Z, False)
         Wrapup()
 
     End Sub
 
+    Public Sub MakeDelay()
+
+        current = System.Diagnostics.Stopwatch.GetTimestamp()
+
+        While (System.Diagnostics.Stopwatch.GetTimestamp() - current) < ticks
+            Application.DoEvents()
+        End While
+
+    End Sub
+    Public Sub Acquire()
+        For loopZ = 0 To Z - 1
+            '56 ms of transfer time
+            Camera.Capture()
+            ' 38 ms moving to the next field
+            Stage.MoveRelative(Stage.Zaxe, 0.01, False)
+            ' 7ms upload
+            Upload(Camera.Bytes, loopZ)
+            ' 30 ms process
+            Process()
+        Next
+        Stage.MoveRelative(Stage.Zaxe, -0.01 * Z, False)
+        Wrapup()
+
+    End Sub
     Public Sub Process()
 
         GetColorBytes(bytes(zc), GreenBytes, W / 2, H / 2)
@@ -109,7 +141,7 @@
 
     End Sub
     Public Function Wrapup() As Byte()
-        ReDim bytesout(W * H * 3 - 1)
+        ReDim OutputBytes(W * H * 3 - 1)
         Dim max, maxZ As Single
         Dim maxi As Integer = W / 2 * H / 2 - 1
         Dim i As Integer
@@ -122,18 +154,22 @@
             MaxMap(i) = maxZ
         Next
         'SaveSinglePageTiff16("c:\temp\maxmap.tif", MaxMap, W / 2 - 1, H / 2 - 1)
+        For Zi = 0 To Z - 1
+            'saveSinglePage32("c:\temp\d\" + Zi.ToString, GreenEdgeBytes(Zi), W / 2, H / 2)
+            'SaveSinglePageTiff16("c:\temp\i\" + Zi.ToString, bytes(Zi), W, H)
+        Next
         i = 0
         Dim index As Integer
         Dim j As Integer
         Dim maxj = W * H * 3 - 1
         For j = 0 To maxj Step 3
             index = MaxMap(ScalingUpPattern(i))
-            bytesout(j) = bytes(index)(j)
-            bytesout(j + 1) = bytes(index)(j + 1)
-            bytesout(j + 2) = bytes(index)(j + 2)
+            OutputBytes(j) = bytes(index)(j)
+            OutputBytes(j + 1) = bytes(index)(j + 1)
+            OutputBytes(j + 2) = bytes(index)(j + 2)
             i += 1
         Next
-        Return bytesout
+        Return OutputBytes
     End Function
     Sub GetColorBytes(BytesIn() As Byte, ByRef BytesOut() As Single, Wb As Integer, Hb As Integer)
         'to read green 

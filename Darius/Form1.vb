@@ -359,13 +359,14 @@ Public Class Form1
 
             ExitLive()
 
-            AcquireEDOF()
+
+            ZEDOF.AcquireThreaded()
             Dim bmp As New Bitmap(Camera.W, Camera.H, Imaging.PixelFormat.Format24bppRgb)
-            byteToBitmap(EDFbytes, bmp)
+            byteToBitmap(ZEDOF.OutputBytes, bmp)
             PictureBox2.Image = bmp
 
             GoLive()
-            End If
+        End If
 
     End Sub
 
@@ -407,7 +408,7 @@ Public Class Form1
 
                 'AcquireEDOF()
                 Dim bmpEDF As New Bitmap(Camera.W, Camera.H, Imaging.PixelFormat.Format24bppRgb)
-                byteToBitmap(EDFbytes, bmpEDF)
+                byteToBitmap(ZEDOF.OutputBytes, bmpEDF)
 
                 bmpEDF.Save(SaveFileDialog1.FileName + "_EDOF_WD.jpg")
 
@@ -416,7 +417,7 @@ Public Class Form1
             Case ImagetypeEnum.EDF_Fluorescence
 
                 Dim bmpEDF As New Bitmap(Camera.W, Camera.H, Imaging.PixelFormat.Format24bppRgb)
-                byteToBitmap(EDFbytes, bmpEDF)
+                byteToBitmap(ZEDOF.OutputBytes, bmpEDF)
 
                 bmpEDF.Save(SaveFileDialog1.FileName + "_EDOF_FiBi.jpg")
 
@@ -606,7 +607,7 @@ Public Class Form1
                 Pbar.Increment(1)
                 If Scanning = False Then GoTo 1
                 If CheckBox2.Checked Then
-                    AcquireEDOF()
+                    ZEDOF.Acquire()
 
                 Else
 
@@ -657,7 +658,7 @@ Public Class Form1
                     For i = 0 To Pyramid(0).pages - 1
 
                         If CheckBox2.Checked Then
-                            Pyramid(i).SaveTile(loop_x - 1, loop_y - 1, (EDFbytes))
+                            Pyramid(i).SaveTile(loop_x - 1, loop_y - 1, (ZEDOF.OutputBytes))
                         Else
                             Pyramid(i).SaveTile(loop_x - 1, loop_y - 1, (Camera.Bytes))
                         End If
@@ -667,7 +668,7 @@ Public Class Form1
                     For i = 0 To Pyramid(0).pages - 1
 
                         If CheckBox2.Checked Then
-                            Pyramid(i).SaveTile(X - loop_x, loop_y - 1, (EDFbytes))
+                            Pyramid(i).SaveTile(X - loop_x, loop_y - 1, (ZEDOF.OutputBytes))
                         Else
                             Pyramid(i).SaveTile(X - loop_x, loop_y - 1, (Camera.Bytes))
                         End If
@@ -1462,9 +1463,9 @@ Public Class Form1
         For j = 1 To TextBoxY.Text
             For i = 1 To TextBoxX.Text
 
-                AcquireEDOF()
+                ZEDOF.Acquire()
                 Dim bmp As New Bitmap(Camera.W, Camera.H, Imaging.PixelFormat.Format24bppRgb)
-                byteToBitmap(EDFbytes, bmp)
+                byteToBitmap(ZEDOF.OutputBytes, bmp)
                 bmp.Save("c:\temp\Scan\" + c.ToString + ".jpg")
                 c += 1
                 If i < TextBoxX.Text Then Stage.MoveRelative(Stage.Xaxe, -Stage.FOVX, False)
@@ -1484,9 +1485,9 @@ Public Class Form1
     Private Sub Button30_Click(sender As Object, e As EventArgs) Handles Button30.Click
 
 
-        AcquireEDOF()
+        ZEDOF.Acquire()
         Dim bmp As New Bitmap(Camera.W, Camera.H, Imaging.PixelFormat.Format24bppRgb)
-        byteToBitmap(EDFbytes, bmp)
+        byteToBitmap(ZEDOF.OutputBytes, bmp)
         PictureBox0.Image = bmp
 
 
