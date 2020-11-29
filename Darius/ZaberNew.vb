@@ -128,28 +128,48 @@ Public Class ZaberNew
     End Sub
 
 
-    Public Sub GoZero(ByRef Axis As Device, position As Integer)
+    Public Sub GoZero(ByRef Axis As Device, block As Boolean)
         Try
-            Axis.GenericCommand(18, position, 0, True)
-            UpdatePositions()
-            Tracking.Update()
+
+            Dim ZZ As String = Setting.Gett("ZOFFSET")
+            If block Then
+                MoveAbsolute(Zaxe, ZZ - 3, True)
+            Else
+                MoveAbsolute(Zaxe, ZZ, True)
+            End If
+
+
         Catch ex As Exception
 
         End Try
 
     End Sub
 
-    Public Sub GoToFocus()
+    Public Sub GoToFocus(block As Boolean)
         Try
-            Zaxe.GenericCommand(18, 2, 0, True)
-            UpdatePositions()
-            Tracking.Update()
+
+            Dim ZZ As String = Setting.Gett("Focus")
+            If block Then
+                MoveAbsolute(Zaxe, ZZ - 3, True)
+            Else
+                MoveAbsolute(Zaxe, ZZ, True)
+            End If
+
         Catch ex As Exception
 
         End Try
 
     End Sub
-
+    Public Sub CalibrateZoffset(AutoFocusrange As Single)
+        Stage.MoveRelative(Stage.Zaxe, -AutoFocusrange / 2)
+        Dim ZZ As Single = Stage.GetPosition(Stage.Zaxe)
+        Setting.Sett("ZOFFSET", ZZ)
+        StorePosition(Stage.Zaxe, 1)
+        Stage.MoveRelative(Stage.Zaxe, AutoFocusrange / 2)
+        ZZ = Stage.GetPosition(Stage.Zaxe)
+        Setting.Sett("Focus", ZZ)
+        StorePosition(Stage.Zaxe, 2)
+    End Sub
 
 
     Public Sub UpdatePositions()

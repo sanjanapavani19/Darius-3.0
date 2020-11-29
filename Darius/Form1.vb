@@ -43,7 +43,7 @@ Public Class Form1
         TextBox_FOVX.Text = Stage.FOVX
         TextBox_FOVY.Text = Stage.FOVY
 
-        Piezo = New EO(10)
+        'Piezo = New EO(10)
 
         TextBoxGain.Text = Setting.Gett("Gain")
         TextBox_exposure.Text = Setting.Gett("exposure")
@@ -63,7 +63,7 @@ Public Class Form1
 
         End If
 
-        GetPreview()
+        GetPreview(False)
     End Sub
 
 
@@ -816,14 +816,7 @@ Public Class Form1
 
 
     Private Sub Button9_Click(sender As Object, e As EventArgs) Handles Button9.Click
-        Stage.MoveRelative(Stage.Zaxe, -AutoFocus.Range / 2)
-        Dim ZZ As Single = Stage.GetPosition(Stage.Zaxe)
-        Setting.Sett("ZOFFSET", ZZ)
-        Stage.StorePosition(Stage.Zaxe, 1)
-        Stage.MoveRelative(Stage.Zaxe, AutoFocus.Range / 2)
-        ZZ = Stage.GetPosition(Stage.Zaxe)
-        Setting.Sett("Focus", ZZ)
-        Stage.StorePosition(Stage.Zaxe, 2)
+        Stage.CalibrateZoffset(AutoFocus.Range)
     End Sub
 
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
@@ -898,13 +891,19 @@ Public Class Form1
         GetPreview()
 
     End Sub
-    Public Sub GetPreview()
+    Public Sub GetPreview(Optional wait As Boolean = True)
         Stage.MoveAbsolute(Stage.Zaxe, 0)
         Stage.MoveAbsolute(Stage.Yaxe, 0)
+
+
+
+        If wait Then
+            Stage.MoveAbsolute(Stage.Xaxe, 0)
+            If MsgBox("Load the sample. Is this a block?", MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then block = True Else block = False
+
+        End If
         Stage.MoveAbsolute(Stage.Xaxe, 12.5)
         Stage.MoveAbsolute(Stage.Zaxe, 20)
-        'MsgBox("Load the sample and then hit OK.")
-
         Tracking.UpdateBmp(Preview.Capture(Val(TextBox_PrevieEXp.Text), Val(TextBox_PreviewFocus.Text)))
 
         Stage.MoveAbsolute(Stage.Zaxe, 0)
@@ -916,10 +915,10 @@ Public Class Form1
         Slideloaded = True
         Button_Scan.Enabled = True
 
-        Stage.GoToFocus()
+        Stage.GoToFocus(block)
     End Sub
     Private Sub Button7_Click(sender As Object, e As EventArgs) Handles Button7.Click
-        Stage.GoToFocus()
+        Stage.GoToFocus(block)
     End Sub
 
     Private Sub CheckBox1_CheckedChanged(sender As Object, e As EventArgs) Handles CheckBoxLED.CheckedChanged
@@ -978,7 +977,7 @@ Public Class Form1
     Private Sub Button13_Click(sender As Object, e As EventArgs) Handles Button13.Click
         Stage.MoveAbsolute(Stage.Zaxe, 0)
         Stage.Go_Middle()
-        Stage.GoToFocus()
+        Stage.GoToFocus(block)
     End Sub
 
     Private Sub Button12_Click(sender As Object, e As EventArgs) Handles Button12.Click
@@ -1243,7 +1242,7 @@ Public Class Form1
         Slideloaded = True
         Button_Scan.Enabled = True
 
-        Stage.GoToFocus()
+        Stage.GoToFocus(block)
 
 
 
@@ -1482,31 +1481,7 @@ Public Class Form1
 
     End Sub
 
-    Private Sub Button28_Click_1(sender As Object, e As EventArgs) Handles Button28.Click
-        ExitLive()
-        Dim i, j, c As Integer
-        Dim Cx, Cy As Single
-        Stage.UpdatePositions()
-        Cx = Stage.X
-        Cy = Stage.Y
 
-        For j = 1 To TextBoxY.Text
-            For i = 1 To TextBoxX.Text
-
-                ZEDOF.Acquire()
-                Dim bmp As New Bitmap(Camera.W, Camera.H, Imaging.PixelFormat.Format24bppRgb)
-                byteToBitmap(ZEDOF.OutputBytes, bmp)
-                bmp.Save("c:\temp\Scan\" + c.ToString + ".jpg")
-                c += 1
-                If i < TextBoxX.Text Then Stage.MoveRelative(Stage.Xaxe, -Stage.FOVX, False)
-            Next
-            Stage.MoveRelative(Stage.Xaxe, Stage.FOVX * (TextBoxX.Text - 1), False)
-            Stage.MoveRelative(Stage.Yaxe, Stage.FOVY, False)
-        Next
-        Stage.MoveAbsoluteAsync(Stage.Xaxe, Cx)
-        Stage.MoveAbsoluteAsync(Stage.Yaxe, Cy)
-        GoLive()
-    End Sub
 
     Private Sub Button29_Click(sender As Object, e As EventArgs) Handles Button29.Click
         ExitLive() : Camera.ResetMatrix()
