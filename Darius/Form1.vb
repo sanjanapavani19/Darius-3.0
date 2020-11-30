@@ -456,7 +456,7 @@ Public Class Form1
 
     End Sub
 
-    Public Function DoAutoFocus(position As Integer) As Single
+    Public Function DoAutoFocus(DoInitialize As Boolean, DoRelease As Boolean) As Single
         Stage.GoZero(Stage.Zaxe, block)
 
         Dim WasLive As Boolean
@@ -464,9 +464,9 @@ Public Class Form1
 
 
         Dim focus As Single
-        AutoFocus.Initialize()
+        If DoInitialize Then AutoFocus.Initialize()
         focus = AutoFocus.Analyze()
-        AutoFocus.Release()
+        If DoRelease Then AutoFocus.Release()
 
         'if camera is stopped because  of this sub then it resumes the live.
         If WasLive Then GoLive()
@@ -475,7 +475,7 @@ Public Class Form1
     End Function
 
     Private Sub Button4_Click(sender As Object, e As EventArgs) Handles Button4.Click
-        DoAutoFocus(1)
+        DoAutoFocus(True, True)
     End Sub
 
 
@@ -584,12 +584,18 @@ Public Class Form1
 
             For i = 0 To Tracking.ROI.numDots - 1
                 Tracking.MovetoDots(i)
-                vy(i) = DoAutoFocus(1)
+
+                ' this is to avoid initialization and releasing every single time.
+                If i = 0 Then vy(i) = DoAutoFocus(True, False)
+                If i = Tracking.ROI.numDots - 1 Then vy(i) = DoAutoFocus(False, True)
+                If i > 0 And i < Tracking.ROI.numDots Then vy(i) = DoAutoFocus(False, False)
+
+
                 vx(i * 2) = Stage.X
                 vx(i * 2 + 1) = Stage.Y
                 Dim imgtest(Camera.Wbinned * Camera.Hbinned - 1) As Byte
                 Camera.Capture()
-                SaveSinglePageTiff("c:\temp\" + i.ToString + ".tif", Camera.Bytes, Camera.W, Camera.H)
+                SaveSinglePageTiff("c:\temp\" + i.ToString + ".tif", Camera.Bytes, Camera.Wbinned, Camera.Hbinned)
                 If Scanning = False Then GoTo 1
 
             Next
@@ -702,11 +708,6 @@ Public Class Form1
 
                     Next
                 End If
-
-
-
-
-
 
 
 

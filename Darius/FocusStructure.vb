@@ -248,6 +248,10 @@ Public Class FocusStructure
 
 
         Dim Speed As Double = Spline.Interpolate(Cpline.Interpolate(Camera.exp) * Nimg)
+
+        Dim BinnedDerivative(Camera.Wbinned * Camera.Hbinned - 1) As Single
+        Dim derivative As New CentralDerivitavie(Camera.Wbinned, Camera.Hbinned)
+
         Stage.SetSpeed(Stage.Zaxe, Speed)
         Stage.MoveRelativeAsync(Stage.Zaxe, Range)
 
@@ -262,7 +266,9 @@ Public Class FocusStructure
 
 
         For zz = 0 To Nimg - 1
-            CM(zz) = FT.FindCenterOfMass3(BinnedImage(zz))
+            'CM(zz) = FT.FindCenterOfMass3(BinnedImage(zz))
+            derivative.AnalyzeX(BinnedImage(zz), BinnedDerivative)
+            CM(zz) = BinnedDerivative.Sum
             '  SaveSinglePageTiff("C:\test\POS- " + zz.ToString + "-" + Pos(zz).ToString + "CM- " + CM(zz).ToString + ".tif", BinnedImage(zz), Camera.Wbinned, Camera.Hbinned)
         Next
 
@@ -309,7 +315,9 @@ Public Class FocusStructure
         Stage.SetSpeed(Stage.Zaxe, 48)
 
         For zz = 0 To Nimg - 1
-            CM(zz) = FT.FindCenterOfMass3(BinnedImage(zz))
+            'CM(zz) = FT.FindCenterOfMass3(BinnedImage(zz))
+            derivative.AnalyzeX(BinnedImage(zz), BinnedDerivative)
+            CM(zz) = BinnedDerivative.Sum
             '    SaveSinglePageTiff("C:\test\2nd\POS- " + zz.ToString + "-" + Pos(zz).ToString + "CM- " + CM(zz).ToString + ".tif", BinnedImage(zz), Camera.Wbinned, Camera.Hbinned)
         Next
 
@@ -323,30 +331,8 @@ Public Class FocusStructure
         Next
         Stage.MoveAbsolute(Stage.Zaxe, focus - MicroSteps)
 
-        'For zz = 0 To Nimg - 1
-        '    If zz > 0 Then Stage.MoveRelative(Stage.Zaxe, MicroSteps) ' The first time should be acquired with no movement 
-        '    Pos(zz) = Stage.Z
-        '    Camera.Capture(BinnedImage(0))
-        '    CM(zz) = FT.FindCenterOfMass3(BinnedImage(0))
-        '    '  SaveSinglePageTiff("C:\temp\2nd\POS- " + zz.ToString + Pos(zz).ToString + "CM- " + CM(zz).ToString + ".tif", BinnedImage(0), Camera.Wbinned, Camera.Hbinned)
-        '    Form1.Chart1.Series(1).Points.AddXY(Int((zz * MicroSteps) * 1000), CM(zz))
-        '    Application.DoEvents()
-        '    If zz > 0 Then
-        '        If CM(zz) > CM(zz - 1) Then decline = 0
-        '    End If
-        '    If CM(zz) < CM.Max Then decline += 1
-        '    If decline = 5 Then Exit For
-        'Next
 
-        'Form1.Chart1.Series(0).Points.Clear()
-        'Form1.Chart1.Series(1).Points.Clear()
 
-        'CmXMax = CM.Max
-        'For zz = 0 To Nimg - 1
-        '    If CM(zz) = CmXMax Then focus = Pos(zz)
-        'Next
-        'Stage.MoveAbsolute(Stage.Zaxe, focus)
-        focus = Stage.Z
 
 
         Return focus
