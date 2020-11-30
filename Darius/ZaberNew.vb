@@ -8,6 +8,7 @@ Public Class ZaberNew
     Dim Watch As New Stopwatch
     Public X, Y, Z As Single
     Public Xacc, Yacc, Zacc As Single
+    Public Xspeed, Yspeed, Zspeed As Single
     Public xp, yp As Single
     Public FOVX, FOVY As Single
     Public SweptZ As Single
@@ -44,11 +45,14 @@ Public Class ZaberNew
         MoveAbsolute(Zaxe, Setting.Gett("FOCUS"))
         StorePosition(Zaxe, 2)
 
+        Xspeed = 65
+        Yspeed = 65
+        Zspeed = 25
 
 
-        SetSpeed(Xaxe, 65)
-        SetSpeed(Yaxe, 65)
-        SetSpeed(Zaxe, 25)
+        SetSpeed(Xaxe, Xspeed)
+        SetSpeed(Yaxe, Yspeed)
+        SetSpeed(Zaxe, Zspeed)
 
         Xacc = 3000
         Yacc = 3000

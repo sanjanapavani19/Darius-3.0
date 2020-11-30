@@ -457,7 +457,7 @@ Public Class Form1
     End Sub
 
     Public Function DoAutoFocus(position As Integer) As Single
-        Stage.GoZero(Stage.Zaxe, 1)
+        Stage.GoZero(Stage.Zaxe, block)
 
         Dim WasLive As Boolean
         If Camera.busy Then ExitLive() : WasLive = True

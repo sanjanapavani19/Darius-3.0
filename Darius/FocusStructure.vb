@@ -10,7 +10,9 @@ Public Class FocusStructure
     'focus point
     Public Z0 As Single
     Dim readout As Single
-    Public Zacceleration As Single = 3000
+    Dim Facceleration, Fspeed As Single
+    Dim Zacceleration, Zspeed As Single
+
     Dim exp As Single
     'One is for camera Cpline  one is for stage spline
     Dim Sx(19), sy(19) As Double
@@ -28,6 +30,9 @@ Public Class FocusStructure
         MicroSteps = Steps / 10
         Nimg = 100
         Me.bin = bin
+
+        Facceleration = 3000
+        Fspeed = 48
 
         FT = New ExtendedDepth5(Camera.OriginalW / bin, Camera.OriginalH / bin, 0, False)
 
@@ -59,7 +64,10 @@ Public Class FocusStructure
         Camera.ReSetROI()
         Camera.SetBinning(bin)
         ReDim BinnedImage(Nimg - 1)
-        Stage.SetAcceleration(Stage.Zaxe, Zacceleration)
+
+
+        Stage.SetAcceleration(Stage.Zaxe, Facceleration)
+        Stage.SetSpeed(Stage.Zaxe, Fspeed)
         Camera.StartAcqusition()
 
         'To use only integer steps 
@@ -90,7 +98,7 @@ Public Class FocusStructure
 
         For s = 0 To 19
             Stage.SetSpeed(Stage.Zaxe, (s + 1) / 10)
-            Microsy(s) = (s + 1) / 10
+            MicroSy(s) = (s + 1) / 10
             Dim watch As New Stopwatch
             watch.Start()
             Stage.MoveRelative(Stage.Zaxe, MicroRange)
@@ -100,7 +108,7 @@ Public Class FocusStructure
             pbar.Value = s
             Application.DoEvents()
         Next
-        MicroSpline = Interpolate.Linear(MicroSx, Microsy)
+        MicroSpline = Interpolate.Linear(MicroSx, MicroSy)
         WriteS2()
         '----------------------------------Camera--------------------------------------------------
         ReDim BinnedImage(0)(Camera.Wbinned * Camera.Hbinned - 1)
@@ -134,7 +142,7 @@ Public Class FocusStructure
         Dim fn As Integer = FreeFile()
         FileOpen(fn, "MicroStage.txt", OpenMode.Output)
         For i = 0 To sy.GetUpperBound(0)
-            PrintLine(fn, MicroSx(i), Microsy(i))
+            PrintLine(fn, MicroSx(i), MicroSy(i))
         Next
         FileClose(fn)
 
@@ -195,13 +203,13 @@ Public Class FocusStructure
         Dim i As Integer
         Do Until (EOF(fn))
             ReDim Preserve MicroSx(i)
-            ReDim Preserve Microsy(i)
+            ReDim Preserve MicroSy(i)
             Input(fn, MicroSx(i))
-            Input(fn, Microsy(i))
+            Input(fn, MicroSy(i))
             i += 1
         Loop
         FileClose(fn)
-        MicroSpline = Interpolate.Linear(MicroSx, Microsy)
+        MicroSpline = Interpolate.Linear(MicroSx, MicroSy)
     End Sub
 
 
@@ -355,6 +363,8 @@ Public Class FocusStructure
         Camera.SetDataMode(Colortype.RGB)
         If Camera.FFsetup Then Camera.Flatfield(1)
         Stage.SetAcceleration(Stage.Zaxe, Stage.Zacc)
+        Stage.SetSpeed(Stage.Zaxe, Stage.Zspeed)
+
         Camera.StartAcqusition()
     End Sub
 
