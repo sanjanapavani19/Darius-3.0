@@ -58,7 +58,7 @@ Public Class XimeaColor
 
 
             cam.SetParam(PRM.SENSOR_TAPS, 4)
-
+            cam.SetParam(PRM.SHARPNESS, 4)
             gain = Setting.Gett("Gain")
 
             setGain(gain)
@@ -71,7 +71,7 @@ Public Class XimeaColor
             ResetMatrix()
 
 
-            timeout = 1000
+            timeout = 5000
             busy = False
             status = True
 
@@ -156,9 +156,7 @@ Public Class XimeaColor
         cam.SetParam(PRM.WB_KB, B)
         cam.SetParam(PRM.WB_KG, G)
         cam.SetParam(PRM.WB_KR, R)
-        Setting.Sett("GainB", B)
-        Setting.Sett("GainG", G)
-        Setting.Sett("GainR", R)
+
 
     End Sub
     Public Sub SetBinning(size As Integer)
@@ -228,8 +226,7 @@ Public Class XimeaColor
 
 
     Public Sub SetFlatField(filename As String, bfilename As String)
-        If Cropped Then ffsetup=False:Exit Sub
-            cam.SetParam(PRM.FFC_FLAT_FIELD_FILE_NAME, filename)
+        cam.SetParam(PRM.FFC_FLAT_FIELD_FILE_NAME, filename)
         cam.SetParam(PRM.FFC_DARK_FIELD_FILE_NAME, bfilename)
         cam.SetParam(PRM.FFC, 1)
         FFsetup = True

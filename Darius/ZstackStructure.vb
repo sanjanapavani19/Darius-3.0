@@ -8,6 +8,8 @@
     Dim zc As Integer
     Dim current As Long
     Dim ticks As Long
+    Dim processDone() As Integer
+    Dim Imagecreated() As Integer
     Public direction As Integer
     Dim Central As CentralDerivitavie
     Public OutputBytes() As Byte
@@ -18,7 +20,10 @@
         Me.Z = Z
         ReDim GreenEdgeBytes(Z - 1)
         ReDim bytes(Z - 1)
+        ReDim processDone(Z - 1)
+        ReDim Imagecreated(Z - 1)
         For zi = 0 To Z - 1
+
             ReDim GreenEdgeBytes(zi)(W / 2 * H / 2 - 1)
             ReDim bytes(zi)(W * H * 3 - 1)
         Next
@@ -75,24 +80,52 @@
     End Sub
 
     Public Sub AcquireThreaded(retrn As Boolean, Optional WithWrapup As Boolean = True)
-        ticks = (Camera.exp * Stopwatch.Frequency / 1000)
+        ticks = (Camera.exp * Stopwatch.Frequency / 1000 * 1.1)
         'MakeDelay()
         If retrn Then direction = 1
+        Array.Clear(Imagecreated, 0, Z)
+        Array.Clear(processDone, 0, Z)
+
+        Dim Thread As New System.Threading.Thread(AddressOf ProcessThreaded)
+        Thread.Start()
+
         For loopZ = 0 To Z - 1
             Camera.Trigger()
             MakeDelay()
             Stage.MoveRelativeAsync(Stage.Zaxe, 0.01 * direction, False)
             Camera.cam.GetImageByteArray(bytes(loopZ), Camera.timeout)
-            zc = loopZ
-            Dim Thread As New System.Threading.Thread(AddressOf Process)
-            Thread.Start()
-
+            Imagecreated(loopZ) = 1
         Next
         If retrn Then Stage.MoveRelativeAsync(Stage.Zaxe, -0.01 * Z, False) Else direction = direction * -1
         If WithWrapup Then Wrapup()
 
     End Sub
+    Public Sub ProcessThreaded()
+        For loopZ = 0 To Z - 1
+            Do Until Imagecreated(loopZ) = 1
+                'Application.DoEvents()
+            Loop
+            GetColorBytes(bytes(loopZ), GreenBytes, W / 2, H / 2)
+            Central.AnalyzeX(GreenBytes, GreenEdgeBytes(loopZ))
+            BLure.UpLoad(GreenEdgeBytes(loopZ))
+            BLure.Process_FT_MTF()
+            BLure.DownLoad(GreenEdgeBytes(loopZ))
+            processDone(loopZ) = 1
+        Next
 
+    End Sub
+
+
+    Public Sub Process()
+        GetColorBytes(bytes(zc), GreenBytes, W / 2, H / 2)
+        Central.AnalyzeX(GreenBytes, GreenEdgeBytes(zc))
+        BLure.UpLoad(GreenEdgeBytes(zc))
+        BLure.Process_FT_MTF()
+        BLure.DownLoad(GreenEdgeBytes(zc))
+        processDone(zc) = 1
+
+
+    End Sub
     Public Sub MakeDelay()
 
         current = System.Diagnostics.Stopwatch.GetTimestamp()
@@ -111,21 +144,14 @@
             ' 7ms upload
             Upload(Camera.Bytes, loopZ)
             ' 30 ms process
+            zc = loopZ
             Process()
         Next
         Stage.MoveRelative(Stage.Zaxe, -0.01 * Z, False)
         Wrapup()
 
     End Sub
-    Public Sub Process()
 
-        GetColorBytes(bytes(zc), GreenBytes, W / 2, H / 2)
-        Central.AnalyzeX(GreenBytes, GreenEdgeBytes(zc))
-        BLure.UpLoad(GreenEdgeBytes(zc))
-        BLure.Process_FT_MTF()
-        BLure.DownLoad(GreenEdgeBytes(zc))
-
-    End Sub
     Public Sub ProcessAll(bytesin()() As Byte)
 
         Me.bytes = bytes
@@ -149,18 +175,22 @@
         Dim maxi As Integer = W / 2 * H / 2 - 1
         Dim i As Integer
         ReDim MaxMap(W / 2 * H / 2 - 1)
-        '101 ms
+
+        Do Until (processDone.Sum = Z)
+
+        Loop
+
         For i = 0 To maxi
-            max = 0 : maxZ = 0
+            max = 0
             For Zi = 0 To Z - 1
-                If GreenEdgeBytes(Zi)(i) > max Then max = GreenEdgeBytes(Zi)(i) : maxZ = Zi
+                If GreenEdgeBytes(Zi)(i) > max Then max = GreenEdgeBytes(Zi)(i) : maxZ = Zi : MaxMap(i) = maxZ
             Next
-            MaxMap(i) = maxZ
         Next
-        'SaveSinglePageTiff16("c:\temp\maxmap.tif", MaxMap, W / 2 - 1, H / 2 - 1)
+        'SaveSinglePageTiff16("c:\temp\maxmap.tif", MaxMap, W / 2, H / 2)
+        'saveSinglePage32("c:\temp\maxtest.tif", maxtest, W / 2, H / 2)
         'For Zi = 0 To Z - 1
-        '    'saveSinglePage32("c:\temp\d\" + Zi.ToString, GreenEdgeBytes(Zi), W / 2, H / 2)
-        '    'SaveSinglePageTiff16("c:\temp\i\" + Zi.ToString, bytes(Zi), W, H)
+        '    saveSinglePage32("c:\temp\d\" + Zi.ToString, GreenEdgeBytes(Zi), W / 2, H / 2)
+        '    SaveSinglePageTiff16("c:\temp\i\" + Zi.ToString, bytes(Zi), W, H)
         'Next
         i = 0
         Dim index As Integer

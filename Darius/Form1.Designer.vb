@@ -24,11 +24,11 @@ Partial Class Form1
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Form1))
-        Dim ChartArea3 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
-        Dim Legend3 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
-        Dim Series7 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
-        Dim Series8 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
-        Dim Series9 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
+        Dim ChartArea1 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
+        Dim Legend1 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
+        Dim Series1 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
+        Dim Series2 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
+        Dim Series3 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
         Me.GroupBox3 = New System.Windows.Forms.GroupBox()
         Me.Button_Home = New System.Windows.Forms.Button()
         Me.Button_bottom = New System.Windows.Forms.Button()
@@ -120,13 +120,14 @@ Partial Class Form1
         Me.TabPage5 = New System.Windows.Forms.TabPage()
         Me.Button2 = New System.Windows.Forms.Button()
         Me.Button17 = New System.Windows.Forms.Button()
-        Me.Button4 = New System.Windows.Forms.Button()
         Me.TabPage9 = New System.Windows.Forms.TabPage()
         Me.TextBox19 = New System.Windows.Forms.TextBox()
         Me.TextBox20 = New System.Windows.Forms.TextBox()
         Me.Button27 = New System.Windows.Forms.Button()
         Me.Button26 = New System.Windows.Forms.Button()
         Me.TabPage11 = New System.Windows.Forms.TabPage()
+        Me.Label22 = New System.Windows.Forms.Label()
+        Me.TextBox21 = New System.Windows.Forms.TextBox()
         Me.Button31 = New System.Windows.Forms.Button()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
         Me.CheckBox1 = New System.Windows.Forms.CheckBox()
@@ -135,6 +136,7 @@ Partial Class Form1
         Me.Button18 = New System.Windows.Forms.Button()
         Me.Button30 = New System.Windows.Forms.Button()
         Me.Button29 = New System.Windows.Forms.Button()
+        Me.Button4 = New System.Windows.Forms.Button()
         Me.TabControl1 = New System.Windows.Forms.TabControl()
         Me.TabPage3 = New System.Windows.Forms.TabPage()
         Me.PictureBox0 = New System.Windows.Forms.PictureBox()
@@ -1221,15 +1223,6 @@ Partial Class Form1
         Me.Button17.Text = "Calibrate"
         Me.Button17.UseVisualStyleBackColor = True
         '
-        'Button4
-        '
-        Me.Button4.Location = New System.Drawing.Point(1275, 13)
-        Me.Button4.Name = "Button4"
-        Me.Button4.Size = New System.Drawing.Size(75, 23)
-        Me.Button4.TabIndex = 121
-        Me.Button4.Text = "AutoFocus"
-        Me.Button4.UseVisualStyleBackColor = True
-        '
         'TabPage9
         '
         Me.TabPage9.Controls.Add(Me.TextBox19)
@@ -1287,6 +1280,8 @@ Partial Class Form1
         '
         'TabPage11
         '
+        Me.TabPage11.Controls.Add(Me.Label22)
+        Me.TabPage11.Controls.Add(Me.TextBox21)
         Me.TabPage11.Controls.Add(Me.Button31)
         Me.TabPage11.Controls.Add(Me.GroupBox1)
         Me.TabPage11.Controls.Add(Me.Button30)
@@ -1298,6 +1293,23 @@ Partial Class Form1
         Me.TabPage11.TabIndex = 10
         Me.TabPage11.Text = "EDOF SandBoX"
         Me.TabPage11.UseVisualStyleBackColor = True
+        '
+        'Label22
+        '
+        Me.Label22.AutoSize = True
+        Me.Label22.Location = New System.Drawing.Point(271, 202)
+        Me.Label22.Name = "Label22"
+        Me.Label22.Size = New System.Drawing.Size(100, 13)
+        Me.Label22.TabIndex = 156
+        Me.Label22.Text = "Number of Z stacks"
+        '
+        'TextBox21
+        '
+        Me.TextBox21.Location = New System.Drawing.Point(377, 199)
+        Me.TextBox21.Name = "TextBox21"
+        Me.TextBox21.Size = New System.Drawing.Size(36, 20)
+        Me.TextBox21.TabIndex = 155
+        Me.TextBox21.Text = "10"
         '
         'Button31
         '
@@ -1314,7 +1326,7 @@ Partial Class Form1
         Me.GroupBox1.Controls.Add(Me.Button22)
         Me.GroupBox1.Controls.Add(Me.Button19)
         Me.GroupBox1.Controls.Add(Me.Button18)
-        Me.GroupBox1.Location = New System.Drawing.Point(66, 172)
+        Me.GroupBox1.Location = New System.Drawing.Point(185, 71)
         Me.GroupBox1.Name = "GroupBox1"
         Me.GroupBox1.Size = New System.Drawing.Size(427, 61)
         Me.GroupBox1.TabIndex = 149
@@ -1375,6 +1387,15 @@ Partial Class Form1
         Me.Button29.TabIndex = 152
         Me.Button29.Text = "Stop LIve"
         Me.Button29.UseVisualStyleBackColor = True
+        '
+        'Button4
+        '
+        Me.Button4.Location = New System.Drawing.Point(1275, 13)
+        Me.Button4.Name = "Button4"
+        Me.Button4.Size = New System.Drawing.Size(75, 23)
+        Me.Button4.TabIndex = 121
+        Me.Button4.Text = "AutoFocus"
+        Me.Button4.UseVisualStyleBackColor = True
         '
         'TabControl1
         '
@@ -1465,34 +1486,34 @@ Partial Class Form1
         'Chart1
         '
         Me.Chart1.BackColor = System.Drawing.Color.Transparent
-        ChartArea3.AxisX.LabelStyle.Enabled = False
-        ChartArea3.AxisX.MajorGrid.Enabled = False
-        ChartArea3.AxisX.MajorTickMark.Enabled = False
-        ChartArea3.AxisY.LabelStyle.Enabled = False
-        ChartArea3.AxisY.MajorGrid.Enabled = False
-        ChartArea3.BackColor = System.Drawing.Color.Transparent
-        ChartArea3.Name = "ChartArea1"
-        Me.Chart1.ChartAreas.Add(ChartArea3)
-        Legend3.Name = "Legend1"
-        Me.Chart1.Legends.Add(Legend3)
+        ChartArea1.AxisX.LabelStyle.Enabled = False
+        ChartArea1.AxisX.MajorGrid.Enabled = False
+        ChartArea1.AxisX.MajorTickMark.Enabled = False
+        ChartArea1.AxisY.LabelStyle.Enabled = False
+        ChartArea1.AxisY.MajorGrid.Enabled = False
+        ChartArea1.BackColor = System.Drawing.Color.Transparent
+        ChartArea1.Name = "ChartArea1"
+        Me.Chart1.ChartAreas.Add(ChartArea1)
+        Legend1.Name = "Legend1"
+        Me.Chart1.Legends.Add(Legend1)
         Me.Chart1.Location = New System.Drawing.Point(249, 217)
         Me.Chart1.Name = "Chart1"
-        Series7.ChartArea = "ChartArea1"
-        Series7.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Area
-        Series7.IsVisibleInLegend = False
-        Series7.Legend = "Legend1"
-        Series7.Name = "Series1"
-        Series8.ChartArea = "ChartArea1"
-        Series8.IsVisibleInLegend = False
-        Series8.Legend = "Legend1"
-        Series8.Name = "Series2"
-        Series9.ChartArea = "ChartArea1"
-        Series9.IsVisibleInLegend = False
-        Series9.Legend = "Legend1"
-        Series9.Name = "Series3"
-        Me.Chart1.Series.Add(Series7)
-        Me.Chart1.Series.Add(Series8)
-        Me.Chart1.Series.Add(Series9)
+        Series1.ChartArea = "ChartArea1"
+        Series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Area
+        Series1.IsVisibleInLegend = False
+        Series1.Legend = "Legend1"
+        Series1.Name = "Series1"
+        Series2.ChartArea = "ChartArea1"
+        Series2.IsVisibleInLegend = False
+        Series2.Legend = "Legend1"
+        Series2.Name = "Series2"
+        Series3.ChartArea = "ChartArea1"
+        Series3.IsVisibleInLegend = False
+        Series3.Legend = "Legend1"
+        Series3.Name = "Series3"
+        Me.Chart1.Series.Add(Series1)
+        Me.Chart1.Series.Add(Series2)
+        Me.Chart1.Series.Add(Series3)
         Me.Chart1.Size = New System.Drawing.Size(317, 122)
         Me.Chart1.TabIndex = 120
         Me.Chart1.Text = "Chart1"
@@ -1757,6 +1778,7 @@ Partial Class Form1
         Me.TabPage9.ResumeLayout(False)
         Me.TabPage9.PerformLayout()
         Me.TabPage11.ResumeLayout(False)
+        Me.TabPage11.PerformLayout()
         Me.GroupBox1.ResumeLayout(False)
         Me.GroupBox1.PerformLayout()
         Me.TabControl1.ResumeLayout(False)
@@ -1917,4 +1939,6 @@ Partial Class Form1
     Friend WithEvents TabPage11 As TabPage
     Friend WithEvents Button31 As Button
     Friend WithEvents Button30 As Button
+    Friend WithEvents Label22 As Label
+    Friend WithEvents TextBox21 As TextBox
 End Class

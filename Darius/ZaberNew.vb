@@ -154,7 +154,7 @@ Public Class ZaberNew
 
             Dim ZZ As String = Setting.Gett("Focus")
             If block Then
-                MoveAbsolute(Zaxe, ZZ - 3, True)
+                MoveAbsolute(Zaxe, ZZ - 5, True)
             Else
                 MoveAbsolute(Zaxe, ZZ, True)
             End If

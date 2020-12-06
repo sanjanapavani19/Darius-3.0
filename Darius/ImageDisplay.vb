@@ -8,9 +8,9 @@ Public Class ImageDisplay
 
     Public Width, Height As Integer
     Dim Bayer As AForge.Imaging.Filters.BayerFilter
-    Dim rawImage As ByteImage
+    Dim rawImage(10)() As Byte
     Public zoom As Boolean
-    Public BmpPreview(10) As FastBMP
+    Public BmpPreview(10) As Bitmap
     Dim f As Integer
     Public GainR, GainG, GainB As Single
     Public busy As Boolean
@@ -18,19 +18,21 @@ Public Class ImageDisplay
     Public ib, ic As Single
     Public RequestIbIc As Boolean
     Dim HistoChart As Chart
+    Dim ImageSize As Integer
+    Public imagetype As ImagetypeEnum
     Public Histogram() As Integer
 
     Public Sub New(W As Integer, H As Integer, ByRef HistoChart As Chart)
         Me.Width = W
         Me.Height = H
         Me.HistoChart = HistoChart
-        rawImage.Width = W
-        rawImage.Height = H
+        ReDim Histogram(HistBin)
         ' Get Raw Data
-        rawImage.Size = rawImage.Width * rawImage.Height
-        ReDim rawImage.data(rawImage.Size - 1)
+        ImageSize = W * H * 3 - 1
+        ReDim rawImage(10)
         For i = 0 To 10
-            BmpPreview(i) = New FastBMP(W, H, Imaging.PixelFormat.Format24bppRgb)
+            BmpPreview(i) = New Bitmap(W, H, Imaging.PixelFormat.Format24bppRgb)
+            ReDim rawImage(i)(W * H * 3 - 1)
         Next
         SetColorGain(Setting.Gett("GainR"), Setting.Gett("GainG"), Setting.Gett("GainB"))
 
@@ -49,16 +51,18 @@ Public Class ImageDisplay
 
     End Sub
 
-    Public Function Preview(rawin As Byte(), Gained As Boolean)
-        rawImage.data = rawin
+    Public Function Preview(rawin As Byte(), Gained As Boolean) As Bitmap
+
         f += 1
         If f = 11 Then f = 1
-        BmpPreview(f).MakeFromBytes(rawin)
+        Buffer.BlockCopy(rawin, 0, rawImage(f), 0, rawin.GetLength(0))
+        byteToBitmap(rawImage(f), BmpPreview(f))
+
         If RequestIbIc Then SetIbIc() : RequestIbIc = False
         'MakeHistogram()
-        'PlotHistogram(HistoChart)
+        '  PlotHistogram()
 
-        Return BmpPreview(f).bmp
+        Return BmpPreview(f)
     End Function
 
 
@@ -78,15 +82,17 @@ Public Class ImageDisplay
 
 
     Public Sub MakeHistogram()
-        ReDim Histogram(HistBin)
 
 
-        For i = 0 To rawImage.Size - 1 Step 4
+        Array.Clear(Histogram, 0, HistBin + 1)
+        Try
+            For i = 0 To ImageSize - 1 Step 4
+                Histogram(rawImage(f)(i) / Camera.CCMAtrix) += 1
+            Next
+        Catch ex As Exception
 
+        End Try
 
-            Histogram(rawImage.data(i) / Camera.CCMAtrix) += 1
-
-        Next
 
         ' We never have zero intensity  this make  it possible  to find the min on the SetIbIc using the min function
         Histogram(0) = Histogram(1)

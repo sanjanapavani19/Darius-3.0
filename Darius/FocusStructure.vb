@@ -67,7 +67,7 @@ Public Class FocusStructure
 
 
         Stage.SetAcceleration(Stage.Zaxe, Facceleration)
-        Stage.SetSpeed(Stage.Zaxe, Fspeed)
+        '  Stage.SetSpeed(Stage.Zaxe, Fspeed)
         Camera.StartAcqusition()
 
         'To use only integer steps 
@@ -347,6 +347,7 @@ Public Class FocusStructure
         Camera.SetDataMode(Colortype.RGB)
         Camera.SetROI()
         Camera.SetDataMode(Colortype.RGB)
+
         If Camera.FFsetup Then Camera.Flatfield(1)
         Stage.SetAcceleration(Stage.Zaxe, Stage.Zacc)
         Stage.SetSpeed(Stage.Zaxe, Stage.Zspeed)
