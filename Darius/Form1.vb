@@ -600,7 +600,7 @@ Public Class Form1
                 Dim imgtest(Camera.Wbinned * Camera.Hbinned - 1) As Byte
                 Camera.Capture()
                 SaveSinglePageTiff("c:\temp\" + i.ToString + ".tif", Camera.Bytes, Camera.Wbinned, Camera.Hbinned)
-                If Scanning = False Then GoTo 1
+                If Scanning = False Then AutoFocus.Release() : GoTo 1
 
             Next
             AutoFocus.Release()
@@ -621,6 +621,7 @@ Public Class Form1
         If Tracking.ROI.IsMade Then
             Tracking.MovetoROIEdge()
             If Not CheckBox2.Checked Then Stage.MoveAbsolute(Stage.Zaxe, Fit.ComputeE({Stage.X, Stage.Y}, A))
+
 
         End If
 
@@ -667,8 +668,8 @@ Public Class Form1
                 End If
                 ZEDOF.Wrapup()
                 If Tracking.ROI.IsMade And Not CheckBox2.Checked Then
-
                     Stage.MoveAbsolute(Stage.Zaxe, Fit.ComputeE({Stage.X, Stage.Y}, A), False)
+
                     Do Until Camera.ready
 
                     Loop
@@ -1541,6 +1542,8 @@ Public Class Form1
     Private Sub TextBox_exposure_TextChanged(sender As Object, e As EventArgs) Handles TextBox_exposure.TextChanged
 
     End Sub
+
+
 End Class
 
 

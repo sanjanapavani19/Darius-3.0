@@ -80,6 +80,7 @@ Public Class XimeaColor
 
             SetROI(New Rectangle((OriginalW - 2048) / 2, (OriginalH - 2048) / 2, 2048, 2048))
             SetDataMode(Colortype.RGB)
+
             StartAcqusition()
             status = True
         End If
@@ -199,6 +200,10 @@ Public Class XimeaColor
         cam.SetParam(PRM.TRG_SOFTWARE, 1)
     End Sub
 
+
+    Public Sub TriggerOff()
+        cam.SetParam(PRM.TRG_SOFTWARE, 0)
+    End Sub
     Public Sub Transfer()
         cam.GetImageByteArray(Bytes, timeout)
     End Sub

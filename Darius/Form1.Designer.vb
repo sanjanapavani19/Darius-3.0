@@ -171,6 +171,7 @@ Partial Class Form1
         Me.Button_Luigi = New System.Windows.Forms.Button()
         Me.TabPage7 = New System.Windows.Forms.TabPage()
         Me.CheckBox2 = New System.Windows.Forms.CheckBox()
+        Me.Button28 = New System.Windows.Forms.Button()
         Me.GroupBox3.SuspendLayout()
         Me.TabControl_Settings.SuspendLayout()
         Me.TabPage13.SuspendLayout()
@@ -321,6 +322,7 @@ Partial Class Form1
         'TabPage13
         '
         Me.TabPage13.BackColor = System.Drawing.Color.WhiteSmoke
+        Me.TabPage13.Controls.Add(Me.Button28)
         Me.TabPage13.Controls.Add(Me.Button20)
         Me.TabPage13.Controls.Add(Me.Button21)
         Me.TabPage13.Controls.Add(Me.Button15)
@@ -1735,6 +1737,15 @@ Partial Class Form1
         Me.CheckBox2.Text = "EDOF"
         Me.CheckBox2.UseVisualStyleBackColor = True
         '
+        'Button28
+        '
+        Me.Button28.Location = New System.Drawing.Point(147, 174)
+        Me.Button28.Name = "Button28"
+        Me.Button28.Size = New System.Drawing.Size(174, 23)
+        Me.Button28.TabIndex = 70
+        Me.Button28.Text = "Calibrate Block Z offset"
+        Me.Button28.UseVisualStyleBackColor = True
+        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -1941,4 +1952,5 @@ Partial Class Form1
     Friend WithEvents Button30 As Button
     Friend WithEvents Label22 As Label
     Friend WithEvents TextBox21 As TextBox
+    Friend WithEvents Button28 As Button
 End Class

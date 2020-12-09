@@ -85,24 +85,24 @@ Public Class TrackingStructure
 
 
 
-            Dots(3).Rect = New Rectangle(Rect.Right - Cursor.Width, Rect.Bottom - Cursor.Height, Cursor.Width, Cursor.Height)
-            Dots(3).InitialX = Dots(3).Rect.X
-            Dots(3).InitialY = Dots(3).Rect.Y
+            'Dots(3).Rect = New Rectangle(Rect.Right - Cursor.Width, Rect.Bottom - Cursor.Height, Cursor.Width, Cursor.Height)
+            'Dots(3).InitialX = Dots(3).Rect.X
+            'Dots(3).InitialY = Dots(3).Rect.Y
 
-            Dots(4).Rect = New Rectangle(Rect.Left + Rect.Width / 2, Rect.Top + Rect.Height / 2, Cursor.Width, Cursor.Height)
-            Dots(4).InitialX = Dots(4).Rect.X
-            Dots(4).InitialY = Dots(4).Rect.Y
-
-
-            Dots(5).Rect = New Rectangle(Rect.Left + Rect.Width / 4, Rect.Top + Rect.Height / 4, Cursor.Width, Cursor.Height)
-            Dots(5).InitialX = Dots(4).Rect.X
-            Dots(5).InitialY = Dots(4).Rect.Y
+            'Dots(4).Rect = New Rectangle(Rect.Left + Rect.Width / 2, Rect.Top + Rect.Height / 2, Cursor.Width, Cursor.Height)
+            'Dots(4).InitialX = Dots(4).Rect.X
+            'Dots(4).InitialY = Dots(4).Rect.Y
 
 
+            'Dots(5).Rect = New Rectangle(Rect.Left + Rect.Width / 4, Rect.Top + Rect.Height / 4, Cursor.Width, Cursor.Height)
+            'Dots(5).InitialX = Dots(4).Rect.X
+            'Dots(5).InitialY = Dots(4).Rect.Y
 
-            Dots(6).Rect = New Rectangle(Rect.Left + Rect.Width * (3 / 4), Rect.Top + Rect.Height * (3 / 4), Cursor.Width, Cursor.Height)
-            Dots(6).InitialX = Dots(4).Rect.X
-            Dots(6).InitialY = Dots(4).Rect.Y
+
+
+            'Dots(6).Rect = New Rectangle(Rect.Left + Rect.Width * (3 / 4), Rect.Top + Rect.Height * (3 / 4), Cursor.Width, Cursor.Height)
+            'Dots(6).InitialX = Dots(4).Rect.X
+            'Dots(6).InitialY = Dots(4).Rect.Y
 
             IsMade = True
         End Sub
@@ -349,6 +349,7 @@ Public Class TrackingStructure
 
     End Sub
     Private Sub Navigate(sender As Object, e As MouseEventArgs) Handles pb.MouseDoubleClick
+        Form1.ExitEDOf()
         Stage.MoveAbsolute(Stage.Xaxe, ConvertPixeltoCoordinateX(e.X))
         Stage.MoveAbsolute(Stage.Yaxe, ConvertPixeltoCoordinateY(e.Y))
     End Sub

@@ -80,7 +80,7 @@
     End Sub
 
     Public Sub AcquireThreaded(retrn As Boolean, Optional WithWrapup As Boolean = True)
-        ticks = (Camera.exp * Stopwatch.Frequency / 1000 * 1.1)
+        ticks = (Camera.exp * Stopwatch.Frequency / 1000)
         'MakeDelay()
         If retrn Then direction = 1
         Array.Clear(Imagecreated, 0, Z)
@@ -92,8 +92,15 @@
         For loopZ = 0 To Z - 1
             Camera.Trigger()
             MakeDelay()
+
             Stage.MoveRelativeAsync(Stage.Zaxe, 0.01 * direction, False)
-            Camera.cam.GetImageByteArray(bytes(loopZ), Camera.timeout)
+            Try
+                Camera.cam.GetImageByteArray(bytes(loopZ), Camera.timeout)
+            Catch ex As Exception
+
+            End Try
+
+            'Camera.TriggerOff()
             Imagecreated(loopZ) = 1
         Next
         If retrn Then Stage.MoveRelativeAsync(Stage.Zaxe, -0.01 * Z, False) Else direction = direction * -1

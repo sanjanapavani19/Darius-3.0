@@ -47,7 +47,7 @@ Public Class ZaberNew
 
         Xspeed = 65
         Yspeed = 65
-        Zspeed = 25
+        Zspeed = 10
 
 
         SetSpeed(Xaxe, Xspeed)
@@ -56,7 +56,7 @@ Public Class ZaberNew
 
         Xacc = 3000
         Yacc = 3000
-        Zacc = 100
+        Zacc = 50
 
         SetAcceleration(Xaxe, Xacc)
         SetAcceleration(Yaxe, Yacc)
@@ -137,7 +137,7 @@ Public Class ZaberNew
 
             Dim ZZ As String = Setting.Gett("ZOFFSET")
             If block Then
-                MoveAbsolute(Zaxe, ZZ - 3, True)
+                MoveAbsolute(Zaxe, ZZ - 5, True)
             Else
                 MoveAbsolute(Zaxe, ZZ, True)
             End If
