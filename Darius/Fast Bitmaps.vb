@@ -181,7 +181,10 @@ Public Class FastBMP
 End Class
 
 Module Bitmaps
+    Dim I_am_busy As Boolean
     Public Sub byteToBitmap(bytes() As Byte, ByRef bmp As Bitmap)
+        If I_am_busy Then Exit Sub
+        I_am_busy = True
         Dim rect As Rectangle = New Rectangle(0, 0, bmp.Width, bmp.Height)
         Dim bmpData As BitmapData = bmp.LockBits(rect, ImageLockMode.ReadWrite, bmp.PixelFormat)
         ' Copy the RGB values back to the bitmap
@@ -191,6 +194,7 @@ Module Bitmaps
         If bmp.PixelFormat = PixelFormat.Format8bppIndexed Then
             bmp.Palette = GetGrayScalePalette()
         End If
+        I_am_busy = False
     End Sub
 
 

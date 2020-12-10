@@ -135,7 +135,7 @@ Public Class Form1
     Public Sub ChangeExposure()
         Camera.ResetMatrix()
 
-        Camera.ExposureChanged = True
+
         Camera.exp = Val(TextBox_exposure.Text)
 
         Select Case Display.imagetype
@@ -147,6 +147,7 @@ Public Class Form1
         Setting.Sett("EXPOSURE", Camera.exp)
         Timer1.Interval = 1
         If Camera.exp > 1 Then Timer1.Interval = Camera.exp
+        Camera.ExposureChanged = True
 
         'Do Until Camera.ExposureChanged = False
 
@@ -175,10 +176,10 @@ Public Class Form1
         Do
             Camera.busy = True
             If Camera.Dostop Then Exit Do
-            If Camera.ExposureChanged Then Camera.SetExposure() : Camera.ExposureChanged = False : Display.RequestIbIc = True
+            If Camera.ExposureChanged Then Camera.SetExposure() : Camera.ResetMatrix() : Display.RequestIbIc(1) = True
+            If Display.RequestIbIc(0) = True Then Camera.ResetMatrix()
             Camera.Capture()
-
-
+            If Display.RequestIbIc(0) = True Then Display.RequestIbIc(1) = True
             If Display.imagetype = ImagetypeEnum.Brightfield Then PictureBox0.Image = Display.Preview(Camera.Bytes, True)
             If Display.imagetype = ImagetypeEnum.Fluorescence Then PictureBox1.Image = Display.Preview(Camera.Bytes, True)
 
@@ -1143,13 +1144,7 @@ Public Class Form1
     End Sub
 
 
-    Private Sub TextBox_exposure_MouseWheel(sender As Object, e As MouseEventArgs) Handles TextBox_exposure.MouseWheel
-        If Camera.ExposureChanged Then Exit Sub
 
-        TextBox_exposure.Text += e.Delta / 120
-        If TextBox_exposure.Text < 1 Then TextBox_exposure.Text = 1
-        ChangeExposure()
-    End Sub
 
     Private Sub PictureBox_MouseWheel(sender As Object, e As MouseEventArgs) Handles PictureBox0.MouseWheel, PictureBox1.MouseWheel, PictureBox2.MouseWheel
         If Focusing = True Then Exit Sub

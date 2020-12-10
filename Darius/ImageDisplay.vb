@@ -16,7 +16,7 @@ Public Class ImageDisplay
     Public busy As Boolean
     Public HistBin As Integer = 255
     Public ib, ic As Single
-    Public RequestIbIc As Boolean
+    Public RequestIbIc(1) As Boolean
     Dim HistoChart As Chart
     Dim ImageSize As Integer
     Public imagetype As ImagetypeEnum
@@ -34,11 +34,13 @@ Public Class ImageDisplay
             BmpPreview(i) = New Bitmap(W, H, Imaging.PixelFormat.Format24bppRgb)
             ReDim rawImage(i)(W * H * 3 - 1)
         Next
+        RequestIbIc(0) = False
+        RequestIbIc(1) = False
         SetColorGain(Setting.Gett("GainR"), Setting.Gett("GainG"), Setting.Gett("GainB"), ImagetypeEnum.Brightfield)
 
     End Sub
     Public Sub AdjustBrightness()
-        RequestIbIc = True
+        RequestIbIc(0) = True
     End Sub
 
     Public Sub PlotHistogram()
@@ -58,7 +60,7 @@ Public Class ImageDisplay
         Buffer.BlockCopy(rawin, 0, rawImage(f), 0, rawin.GetLength(0))
         byteToBitmap(rawImage(f), BmpPreview(f))
 
-        If RequestIbIc Then SetIbIc() : RequestIbIc = False
+        If RequestIbIc(1) Then SetIbIc() : RequestIbIc(0) = False : RequestIbIc(1) = False : Camera.ExposureChanged = False
         'MakeHistogram()
         '  PlotHistogram()
 
