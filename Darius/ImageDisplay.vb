@@ -34,7 +34,7 @@ Public Class ImageDisplay
             BmpPreview(i) = New Bitmap(W, H, Imaging.PixelFormat.Format24bppRgb)
             ReDim rawImage(i)(W * H * 3 - 1)
         Next
-        SetColorGain(Setting.Gett("GainR"), Setting.Gett("GainG"), Setting.Gett("GainB"))
+        SetColorGain(Setting.Gett("GainR"), Setting.Gett("GainG"), Setting.Gett("GainB"), ImagetypeEnum.Brightfield)
 
     End Sub
     Public Sub AdjustBrightness()
@@ -67,14 +67,31 @@ Public Class ImageDisplay
 
 
 
-    Public Sub SetColorGain(R As Single, G As Single, B As Single)
+    Public Sub SetColorGain(R As Single, G As Single, B As Single, Imagingtype As ImagetypeEnum)
         GainR = R
         GainB = B
         GainG = G
+        Select Case Imagingtype
+            Case ImagetypeEnum.Brightfield
+                Setting.Sett("GainB", B)
+                Setting.Sett("GainG", G)
+                Setting.Sett("GainR", R)
 
-        Setting.Sett("GainB", B)
-        Setting.Sett("GainG", G)
-        Setting.Sett("GainR", R)
+            Case ImagetypeEnum.Fluorescence
+                Setting.Sett("GainB_FiBi", B)
+                Setting.Sett("GainG_FiBi", G)
+                Setting.Sett("GainR_FiBi", R)
+
+            Case ImagetypeEnum.EDF_Brightfield
+                Setting.Sett("GainB", B)
+                Setting.Sett("GainG", G)
+                Setting.Sett("GainR", R)
+
+            Case ImagetypeEnum.EDF_Fluorescence
+                Setting.Sett("GainB_FiBi", B)
+                Setting.Sett("GainG_FiBi", G)
+                Setting.Sett("GainR_FiBi", R)
+        End Select
 
         Camera.SetColorGain(R, G, B)
     End Sub

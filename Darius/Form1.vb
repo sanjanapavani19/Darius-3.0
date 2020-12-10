@@ -47,7 +47,12 @@ Public Class Form1
 
         'Piezo = New EO(10)
 
+
         TextBoxGain.Text = Setting.Gett("Gain")
+        TextBox_GainB.Text = Setting.Gett("GainB")
+        TextBox_GainG.Text = Setting.Gett("GainG")
+        TextBox_GainR.Text = Setting.Gett("GainR")
+
         TextBox_exposure.Text = Setting.Gett("exposure")
 
 
@@ -114,10 +119,7 @@ Public Class Form1
         Chart1.Left = GroupBox3.Left + GroupBox3.Width + d
         Chart1.Top = GroupBox3.Top
         Chart1.Height = GroupBox3.Height
-        TextBoxGain.Text = Setting.Gett("Gain")
-        TextBox_GainB.Text = Setting.Gett("GainB")
-        TextBox_GainG.Text = Setting.Gett("GainG")
-        TextBox_GainR.Text = Setting.Gett("GainR")
+
         ListBox1.Left = Chart1.Left + Chart1.Width + d
         ListBox1.Top = GroupBox3.Top
         ListBox1.Height = GroupBox3.Height
@@ -272,7 +274,7 @@ Public Class Form1
     Private Sub TextBox_GainR_KeyDown(sender As Object, e As KeyEventArgs) Handles TextBox_GainR.KeyDown
         If e.KeyCode = Keys.Return Then
             Try
-                Display.SetColorGain(Val(TextBox_GainR.Text), Val(TextBox_GainG.Text), Val(TextBox_GainB.Text))
+                Display.SetColorGain(Val(TextBox_GainR.Text), Val(TextBox_GainG.Text), Val(TextBox_GainB.Text), Display.imagetype)
             Catch ex As Exception
 
             End Try
@@ -287,7 +289,7 @@ Public Class Form1
     Private Sub TextBox_GainG_KeyDown(sender As Object, e As KeyEventArgs) Handles TextBox_GainG.KeyDown
         If e.KeyCode = Keys.Return Then
             Try
-                Display.SetColorGain(Val(TextBox_GainR.Text), Val(TextBox_GainG.Text), Val(TextBox_GainB.Text))
+                Display.SetColorGain(Val(TextBox_GainR.Text), Val(TextBox_GainG.Text), Val(TextBox_GainB.Text), Display.imagetype)
             Catch ex As Exception
 
             End Try
@@ -300,7 +302,7 @@ Public Class Form1
     Private Sub TextBox_GainB_KeyDown(sender As Object, e As KeyEventArgs) Handles TextBox_GainB.KeyDown
         If e.KeyCode = Keys.Return Then
             Try
-                Display.SetColorGain(Val(TextBox_GainR.Text), Val(TextBox_GainG.Text), Val(TextBox_GainB.Text))
+                Display.SetColorGain(Val(TextBox_GainR.Text), Val(TextBox_GainG.Text), Val(TextBox_GainB.Text), Display.imagetype)
             Catch ex As Exception
 
             End Try
@@ -337,7 +339,10 @@ Public Class Form1
                 Display.imagetype = ImagetypeEnum.Brightfield
 
                 TextBox_exposure.Text = Setting.Gett("Exposureb")
-
+                TextBox_GainB.Text = Setting.Gett("GainB")
+                TextBox_GainG.Text = Setting.Gett("GainG")
+                TextBox_GainR.Text = Setting.Gett("GainR")
+                Display.SetColorGain(Setting.Gett("GainR"), Setting.Gett("GainG"), Setting.Gett("GainB"), ImagetypeEnum.Brightfield)
                 ChangeExposure()
 
             End If
@@ -356,7 +361,10 @@ Public Class Form1
                 Display.imagetype = ImagetypeEnum.Fluorescence
 
                 TextBox_exposure.Text = Setting.Gett("Exposuref")
-
+                TextBox_GainB.Text = Setting.Gett("GainB_FiBi")
+                TextBox_GainG.Text = Setting.Gett("GainG_FiBi")
+                TextBox_GainR.Text = Setting.Gett("GainR_FiBi")
+                Display.SetColorGain(Setting.Gett("GainR_FiBi"), Setting.Gett("GainG_FiBi"), Setting.Gett("GainB_FiBi"), ImagetypeEnum.Fluorescence)
                 ChangeExposure()
                 ' Display.RequestIbIc = True
             End If
@@ -547,6 +555,17 @@ Public Class Form1
 
         'Camera.SetPolicyToSafe()
 
+
+
+        Select Case Display.imagetype
+            Case ImagetypeEnum.Brightfield
+                Camera.SetFlatField("ff.tif", "dark.tif")
+
+            Case ImagetypeEnum.Fluorescence
+                Camera.SetFlatField("ff_FiBi.tif", "dark.tif")
+
+        End Select
+
         Dim Filen As Integer = 1
         Dim direction As Integer = 1
 
@@ -666,7 +685,7 @@ Public Class Form1
 
                     End If
                 End If
-                ZEDOF.Wrapup()
+                If CheckBox2.Checked Then ZEDOF.Wrapup()
                 If Tracking.ROI.IsMade And Not CheckBox2.Checked Then
                     Stage.MoveAbsolute(Stage.Zaxe, Fit.ComputeE({Stage.X, Stage.Y}, A), False)
 
@@ -878,7 +897,15 @@ Public Class Form1
             Flatfieldbytes(i) = Flatfield(i) / 25
         Next
 
-        SaveSinglePageTiff16("ff.tif", Flatfieldbytes, Camera.W, Camera.H)
+
+
+        Select Case Display.imagetype
+            Case ImagetypeEnum.Brightfield
+                SaveSinglePageTiff16("ff.tif", Flatfieldbytes, Camera.W, Camera.H)
+            Case ImagetypeEnum.Fluorescence
+                SaveSinglePageTiff16("ff_FiBi.tif", Flatfieldbytes, Camera.W, Camera.H)
+        End Select
+
 
 
         Camera.SetDataMode(Colortype.RGB)
@@ -887,18 +914,21 @@ Public Class Form1
         Camera.Capture()
 
 
-        Camera.SetFlatField("ff.tif", "dark.tif")
+        Select Case Display.imagetype
+            Case ImagetypeEnum.Brightfield
+                Camera.SetFlatField("ff.tif", "dark.tif")
+
+            Case ImagetypeEnum.Fluorescence
+                Camera.SetFlatField("ff_FiBi.tif", "dark.tif")
+
+        End Select
+
 
 
         Camera.Capture()
         If WasLive Then GoLive()
     End Sub
 
-    Private Sub Button11_Click(sender As Object, e As EventArgs) Handles Button11.Click
-
-        Camera.SetFlatField("ff.tif", "dark.tif")
-
-    End Sub
 
 
     Private Sub Button_Acquire_fLUORESCENT_Click(sender As Object, e As EventArgs)

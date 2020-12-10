@@ -40,6 +40,7 @@ Partial Class Form1
         Me.RadioButton_zoom_in = New System.Windows.Forms.RadioButton()
         Me.TabControl_Settings = New System.Windows.Forms.TabControl()
         Me.TabPage13 = New System.Windows.Forms.TabPage()
+        Me.Button28 = New System.Windows.Forms.Button()
         Me.Button20 = New System.Windows.Forms.Button()
         Me.Button21 = New System.Windows.Forms.Button()
         Me.Button15 = New System.Windows.Forms.Button()
@@ -90,7 +91,6 @@ Partial Class Form1
         Me.TextBox13 = New System.Windows.Forms.TextBox()
         Me.TextBox14 = New System.Windows.Forms.TextBox()
         Me.TextBox15 = New System.Windows.Forms.TextBox()
-        Me.Button11 = New System.Windows.Forms.Button()
         Me.Button3 = New System.Windows.Forms.Button()
         Me.TextBoxGC = New System.Windows.Forms.TextBox()
         Me.TextBoxGY = New System.Windows.Forms.TextBox()
@@ -171,7 +171,6 @@ Partial Class Form1
         Me.Button_Luigi = New System.Windows.Forms.Button()
         Me.TabPage7 = New System.Windows.Forms.TabPage()
         Me.CheckBox2 = New System.Windows.Forms.CheckBox()
-        Me.Button28 = New System.Windows.Forms.Button()
         Me.GroupBox3.SuspendLayout()
         Me.TabControl_Settings.SuspendLayout()
         Me.TabPage13.SuspendLayout()
@@ -361,6 +360,15 @@ Partial Class Form1
         Me.TabPage13.Size = New System.Drawing.Size(687, 344)
         Me.TabPage13.TabIndex = 3
         Me.TabPage13.Text = "Stage"
+        '
+        'Button28
+        '
+        Me.Button28.Location = New System.Drawing.Point(147, 174)
+        Me.Button28.Name = "Button28"
+        Me.Button28.Size = New System.Drawing.Size(174, 23)
+        Me.Button28.TabIndex = 70
+        Me.Button28.Text = "Calibrate Block Z offset"
+        Me.Button28.UseVisualStyleBackColor = True
         '
         'Button20
         '
@@ -825,7 +833,6 @@ Partial Class Form1
         Me.TabPage1.Controls.Add(Me.TextBox13)
         Me.TabPage1.Controls.Add(Me.TextBox14)
         Me.TabPage1.Controls.Add(Me.TextBox15)
-        Me.TabPage1.Controls.Add(Me.Button11)
         Me.TabPage1.Controls.Add(Me.Button3)
         Me.TabPage1.Controls.Add(Me.TextBoxGC)
         Me.TabPage1.Controls.Add(Me.TextBoxGY)
@@ -910,16 +917,6 @@ Partial Class Form1
         Me.TextBox15.TabIndex = 139
         Me.TextBox15.Text = "1"
         Me.TextBox15.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        '
-        'Button11
-        '
-        Me.Button11.Enabled = False
-        Me.Button11.Location = New System.Drawing.Point(177, 145)
-        Me.Button11.Name = "Button11"
-        Me.Button11.Size = New System.Drawing.Size(133, 23)
-        Me.Button11.TabIndex = 138
-        Me.Button11.Text = "Load FlatField"
-        Me.Button11.UseVisualStyleBackColor = True
         '
         'Button3
         '
@@ -1737,15 +1734,6 @@ Partial Class Form1
         Me.CheckBox2.Text = "EDOF"
         Me.CheckBox2.UseVisualStyleBackColor = True
         '
-        'Button28
-        '
-        Me.Button28.Location = New System.Drawing.Point(147, 174)
-        Me.Button28.Name = "Button28"
-        Me.Button28.Size = New System.Drawing.Size(174, 23)
-        Me.Button28.TabIndex = 70
-        Me.Button28.Text = "Calibrate Block Z offset"
-        Me.Button28.UseVisualStyleBackColor = True
-        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -1869,7 +1857,6 @@ Partial Class Form1
     Friend WithEvents ToolStripStatusLabel3 As ToolStripStatusLabel
     Friend WithEvents Button1 As Button
     Friend WithEvents Button3 As Button
-    Friend WithEvents Button11 As Button
     Friend WithEvents Button6 As Button
     Friend WithEvents Button7 As Button
     Friend WithEvents CheckBoxLED As CheckBox
