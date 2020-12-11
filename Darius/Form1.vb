@@ -172,14 +172,17 @@ Public Class Form1
 
     Public Sub Live()
 
+        Dim Charttest As New Chart
+        Charttest = Chart1
 
         Do
+
             Camera.busy = True
             If Camera.Dostop Then Exit Do
-            If Camera.ExposureChanged Then Camera.SetExposure() : Camera.ResetMatrix() : Display.RequestIbIc(1) = True
-            If Display.RequestIbIc(0) = True Then Camera.ResetMatrix()
+            If Camera.ExposureChanged Then Camera.SetExposure() : Camera.ResetMatrix() : Display.RequestIbIc = 0
+            If Display.RequestIbIc = 0 Then Camera.ResetMatrix() : Display.RequestIbIc = 1
             Camera.Capture()
-            If Display.RequestIbIc(0) = True Then Display.RequestIbIc(1) = True
+            If Display.RequestIbIc = 1 Then Display.RequestIbIc = 2
             If Display.imagetype = ImagetypeEnum.Brightfield Then PictureBox0.Image = Display.Preview(Camera.Bytes, True)
             If Display.imagetype = ImagetypeEnum.Fluorescence Then PictureBox1.Image = Display.Preview(Camera.Bytes, True)
 
@@ -1173,7 +1176,7 @@ Public Class Form1
     End Sub
 
     Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
-        Display.MakeHistogram()
+        'Display.MakeHistogram()
         Display.PlotHistogram()
     End Sub
 
