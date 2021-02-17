@@ -1,4 +1,4 @@
-﻿Imports System.ComponentModel
+Imports System.ComponentModel
 Imports System.IO
 Imports AForge.Imaging.Filters
 Imports Microsoft.VisualBasic.Devices
@@ -32,8 +32,9 @@ Public Class Form1
 
         Camera = New XimeaColor
         EDF = New ExtendedDepth5(Camera.W, Camera.H, 0.25, False)
-        ZEDOF = New ZstackStructure(Camera.W, Camera.H, Setting.Gett("ZSTACKIMAGES"))
-        TextBox21.Text = Setting.Gett("ZSTACKIMAGES")
+        ZEDOF = New ZstackStructure(Camera.W, Camera.H, Setting.Gett("ZSTACRRANGE"), Setting.Gett("ZSTACKSTEPS"))
+        TextBox21.Text = Setting.Gett("ZSTACRRANGE")
+        TextBox22.Text = Setting.Gett("ZSTACKSTEPS")
         'Triangle = New TriangulationStructure(340, 1078, 2600, 700)
         If Camera.status Then
             TextBox_exposure.Text = Camera.exp
@@ -133,7 +134,7 @@ Public Class Form1
     End Sub
 
     Public Sub ChangeExposure()
-        Camera.ResetMatrix()
+
 
 
         Camera.exp = Val(TextBox_exposure.Text)
@@ -147,7 +148,7 @@ Public Class Form1
         Setting.Sett("EXPOSURE", Camera.exp)
         Timer1.Interval = 1
         If Camera.exp > 1 Then Timer1.Interval = Camera.exp
-        Camera.ExposureChanged = True
+        Camera.ExposureChanged = 0
 
         'Do Until Camera.ExposureChanged = False
 
@@ -164,31 +165,6 @@ Public Class Form1
 
         Dim Thread1 As New System.Threading.Thread(AddressOf Live)
         Thread1.Start()
-
-
-    End Sub
-
-
-
-    Public Sub Live()
-
-        Dim Charttest As New Chart
-        Charttest = Chart1
-
-        Do
-
-            Camera.busy = True
-            If Camera.Dostop Then Exit Do
-            If Camera.ExposureChanged Then Camera.SetExposure() : Camera.ResetMatrix() : Display.RequestIbIc = 0
-            If Display.RequestIbIc = 0 Then Camera.ResetMatrix() : Display.RequestIbIc = 1
-            Camera.Capture()
-            If Display.RequestIbIc = 1 Then Display.RequestIbIc = 2
-            If Display.imagetype = ImagetypeEnum.Brightfield Then PictureBox0.Image = Display.Preview(Camera.Bytes, True)
-            If Display.imagetype = ImagetypeEnum.Fluorescence Then PictureBox1.Image = Display.Preview(Camera.Bytes, True)
-
-            Application.DoEvents()
-        Loop
-        Camera.busy = False
 
 
     End Sub
@@ -381,17 +357,19 @@ Public Class Form1
 
             If Display.imagetype = ImagetypeEnum.Fluorescence Then Display.imagetype = ImagetypeEnum.EDF_Fluorescence : PictureBox2.Image = PictureBox1.Image
             If Display.imagetype = ImagetypeEnum.Brightfield Then Display.imagetype = ImagetypeEnum.EDF_Brightfield : PictureBox2.Image = PictureBox0.Image
-
-            ExitLive()
+            Dim ccMatrix As Single = Camera.CCMAtrix
+            ExitLive() : Camera.ResetMatrix()
 
 
             ZEDOF.AcquireThreaded(True)
             'ZEDOF.Acquire()
             Dim bmp As New Bitmap(Camera.W, Camera.H, Imaging.PixelFormat.Format24bppRgb)
-            byteToBitmap(ZEDOF.OutputBytes, bmp)
+            'byteToBitmap(ZEDOF.OutputBytes, bmp)
+            Display.ApplyBrightness(ZEDOF.OutputBytes, ccMatrix, bmp)
             PictureBox2.Image = bmp
 
             GoLive()
+            Display.AdjustBrightness()
         End If
 
     End Sub
@@ -414,39 +392,39 @@ Public Class Form1
             Case ImagetypeEnum.Brightfield
 
 
-                bmp.Save(SaveFileDialog1.FileName + "_WD")
+                bmp.Save(SaveFileDialog1.FileName)
                 'Display.MakeFullsizeImage.Save(SaveFileDialog1.FileName + "_WD.jpg")
                 ReDim Preserve Filenames(fileN)
-                Filenames(fileN) = SaveFileDialog1.FileName + "_WD"
+                Filenames(fileN) = SaveFileDialog1.FileName
                 fileN += 1
-                ListBox1.Items.Add(Path.GetFileName(SaveFileDialog1.FileName + "_WD"))
+                ListBox1.Items.Add(Path.GetFileName(SaveFileDialog1.FileName))
             Case ImagetypeEnum.Fluorescence
 
 
-                bmp.Save(SaveFileDialog1.FileName + "_FiBi")
+                bmp.Save(SaveFileDialog1.FileName)
 
                 ReDim Preserve Filenames(fileN)
-                Filenames(fileN) = SaveFileDialog1.FileName + "_FiBi"
+                Filenames(fileN) = SaveFileDialog1.FileName
                 fileN += 1
-                ListBox1.Items.Add(Path.GetFileName(SaveFileDialog1.FileName + "_FiBi"))
+                ListBox1.Items.Add(Path.GetFileName(SaveFileDialog1.FileName))
             Case ImagetypeEnum.EDF_Brightfield
 
                 bmp = New Bitmap(Camera.W, Camera.H, Imaging.PixelFormat.Format24bppRgb)
                 'ZEDOF.AcquireThreaded(True)
 
-                ZEDOF.AcquireThreaded(True)
+                'ZEDOF.AcquireThreaded(True)
 
                 byteToBitmap(ZEDOF.OutputBytes, bmp)
-                bmp.Save(SaveFileDialog1.FileName + "_EDOF_WD")
-                ListBox1.Items.Add(Path.GetFileName(SaveFileDialog1.FileName + "EDOF_WD"))
+                bmp.Save(SaveFileDialog1.FileName)
+                ListBox1.Items.Add(Path.GetFileName(SaveFileDialog1.FileName))
 
                 '  GoLive()
             Case ImagetypeEnum.EDF_Fluorescence
                 bmp = New Bitmap(Camera.W, Camera.H, Imaging.PixelFormat.Format24bppRgb)
                 ZEDOF.AcquireThreaded(True)
                 byteToBitmap(ZEDOF.OutputBytes, bmp)
-                bmp.Save(SaveFileDialog1.FileName + "_EDOF_FiBi")
-                ListBox1.Items.Add(Path.GetFileName(SaveFileDialog1.FileName + "EDOF_FiBi"))
+                bmp.Save(SaveFileDialog1.FileName)
+                ListBox1.Items.Add(Path.GetFileName(SaveFileDialog1.FileName))
         End Select
 
 
@@ -539,16 +517,18 @@ Public Class Form1
         Scanning = True
         Button_Scan.Text = "Cancel"
         FastScan(TextBoxX.Text, TextBoxY.Text, 0.00, SaveFileDialog1.FileName)
+        If Scanning = True Then CheckBoxLED.Checked = False Else CheckBoxLED.Checked = True
         If Scanning = False Then GoTo 2
         watch.Stop()
-        MsgBox("Scanned in " + (watch.ElapsedMilliseconds / 1000).ToString + " s")
+
+        MsgBox("Scanned in " + (watch.ElapsedMilliseconds / 1000).ToString + " s" + vbCrLf + vbCrLf + "Richard: We have turned off the LEd for you just in case you went to the bathroom." + vbCrLf + vbCrLf + "Darius Developmen Team.")
 
         ListBox1.Items.Add(Path.GetFileName(SaveFileDialog1.FileName))
         ReDim Preserve Filenames(fileN)
         Filenames(fileN) = SaveFileDialog1.FileName
         fileN += 1
 2:
-        If Scanning = True Then CheckBoxLED.Checked = False Else CheckBoxLED.Checked = True
+
         Scanning = False
         Button_Scan.Text = "Scan"
     End Sub
@@ -1560,18 +1540,37 @@ Public Class Form1
 
 
 
-    Private Sub TextBox21_KeyDown(sender As Object, e As KeyEventArgs) Handles TextBox21.KeyDown
+    Private Sub TextBox21_KeyDown(sender As Object, e As KeyEventArgs) Handles TextBox21.KeyDown, TextBox22.KeyDown
         If e.KeyCode = Keys.Return Then
-            ZEDOF = New ZstackStructure(Camera.W, Camera.H, TextBox21.Text)
-            Setting.Sett("ZSTACKIMAGES", TextBox21.Text)
+            ZEDOF = New ZstackStructure(Camera.W, Camera.H, TextBox21.Text, TextBox22.Text)
+            Setting.Sett("ZSTACRRANGE", TextBox21.Text)
+            Setting.Sett("ZSTACKSTEPS", TextBox22.Text)
         End If
     End Sub
+    Public Sub Live()
+        Dim Charttest As New Chart
+        Charttest = Chart1
 
-    Private Sub TextBox_exposure_TextChanged(sender As Object, e As EventArgs) Handles TextBox_exposure.TextChanged
+        Do
+
+            Camera.busy = True
+            If Camera.Dostop Then Exit Do
+            If Camera.ExposureChanged = 0 Then Camera.SetExposure() : Display.RequestIbIc = 0 : Camera.ExposureChanged = 1
+            If Display.RequestIbIc = 0 Then Camera.ResetMatrix() : Display.RequestIbIc = 1
+            Camera.Capture()
+            If Display.imagetype = ImagetypeEnum.Brightfield Then PictureBox0.Image = Display.Preview(Camera.Bytes, True)
+            If Display.imagetype = ImagetypeEnum.Fluorescence Then PictureBox1.Image = Display.Preview(Camera.Bytes, True)
+
+            Application.DoEvents()
+        Loop
+        Camera.busy = False
+
 
     End Sub
 
+    Private Sub TextBox21_TextChanged(sender As Object, e As EventArgs) Handles TextBox21.TextChanged
 
+    End Sub
 End Class
 
 

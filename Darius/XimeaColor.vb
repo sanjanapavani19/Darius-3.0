@@ -27,7 +27,7 @@ Public Class XimeaColor
     Public CCMAtrix As Single
     Public Bytes As Byte()
     Public TRG_MODE As Integer
-    Public ExposureChanged As Boolean
+    Public ExposureChanged As Integer = 2
     Public MatrixResetRequested As Boolean
     Public MatrixResetChanged As Boolean
     Public Cropped As Boolean
@@ -58,7 +58,7 @@ Public Class XimeaColor
 
 
             cam.SetParam(PRM.SENSOR_TAPS, 4)
-            cam.SetParam(PRM.SHARPNESS, 4)
+            cam.SetParam(PRM.SHARPNESS, 0)
             gain = Setting.Gett("Gain")
 
             setGain(gain)

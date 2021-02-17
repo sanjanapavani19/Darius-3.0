@@ -19,6 +19,7 @@ Public Class ImageDisplay
     Public RequestIbIc As Integer
     Dim HistoChart As Chart
     Dim ImageSize As Integer
+
     Public imagetype As ImagetypeEnum
     Public Histogram() As Integer
 
@@ -34,8 +35,8 @@ Public Class ImageDisplay
             BmpPreview(i) = New Bitmap(W, H, Imaging.PixelFormat.Format24bppRgb)
             ReDim rawImage(i)(W * H * 3 - 1)
         Next
-        RequestIbIc(0) = False
-        RequestIbIc(1) = False
+        RequestIbIc = 2
+
         SetColorGain(Setting.Gett("GainR"), Setting.Gett("GainG"), Setting.Gett("GainB"), ImagetypeEnum.Brightfield)
 
     End Sub
@@ -60,14 +61,37 @@ Public Class ImageDisplay
         Buffer.BlockCopy(rawin, 0, rawImage(f), 0, rawin.GetLength(0))
         byteToBitmap(rawImage(f), BmpPreview(f))
 
-        If RequestIbIc = 2 Then SetIbIc() : RequestIbIc = 0 : Camera.ExposureChanged = False
+        If RequestIbIc = 1 Then SetIbIc() : RequestIbIc = 2
         'MakeHistogram()
         '  PlotHistogram()
 
         Return BmpPreview(f)
     End Function
 
+    Public Sub ApplyBrightness(rawin As Byte(), CCMAtrix As Single, ByRef bmp As Bitmap)
+        Dim p As Integer
+        Dim r, g, b As Integer
+        Dim rawtemp(rawin.GetLongLength(0)) As Byte
 
+        For y = 0 To Height - 1
+            For x = 0 To Width - 1
+                b = rawin(p) * CCMAtrix
+                g = rawin(p + 1) * CCMAtrix
+                r = rawin(p + 2) * CCMAtrix
+                If b > 255 Then b = 255
+                If g > 255 Then g = 255
+                If r > 255 Then r = 255
+
+                rawtemp(p) = b
+                rawtemp(p + 1) = g
+                rawtemp(p + 2) = r
+                p += 3
+            Next
+        Next
+
+        byteToBitmap(rawtemp, bmp)
+
+    End Sub
 
     Public Sub SetColorGain(R As Single, G As Single, B As Single, Imagingtype As ImagetypeEnum)
         GainR = R

@@ -12,12 +12,17 @@
     Dim Imagecreated() As Integer
     Public direction As Integer
     Dim Central As CentralDerivitavie
+    Dim StepSize As Single = 0.01
+    Dim Range As Single
     Public OutputBytes() As Byte
 
-    Public Sub New(W As Integer, H As Integer, Z As Integer)
+    Public Sub New(W As Integer, H As Integer, Range As Single, Stepsize As Single)
         Me.W = W
         Me.H = H
-        Me.Z = Z
+        Me.Range = (Range / 1000)
+        Me.StepSize = (Stepsize / 1000)
+        Z = Int(Range / Stepsize)
+
         ReDim GreenEdgeBytes(Z - 1)
         ReDim bytes(Z - 1)
         ReDim processDone(Z - 1)
@@ -93,7 +98,7 @@
             Camera.Trigger()
             MakeDelay()
 
-            Stage.MoveRelativeAsync(Stage.Zaxe, 0.01 * direction, False)
+            Stage.MoveRelativeAsync(Stage.Zaxe, StepSize * direction, False)
             Try
                 Camera.cam.GetImageByteArray(bytes(loopZ), Camera.timeout)
             Catch ex As Exception
@@ -103,7 +108,7 @@
             'Camera.TriggerOff()
             Imagecreated(loopZ) = 1
         Next
-        If retrn Then Stage.MoveRelativeAsync(Stage.Zaxe, -0.01 * Z, False) Else direction = direction * -1
+        If retrn Then Stage.MoveRelativeAsync(Stage.Zaxe, -StepSize * Z, False) Else direction = direction * -1
         If WithWrapup Then Wrapup()
 
     End Sub
@@ -147,14 +152,14 @@
             '56 ms of transfer time
             Camera.Capture()
             ' 38 ms moving to the next field
-            Stage.MoveRelative(Stage.Zaxe, 0.01, False)
+            Stage.MoveRelative(Stage.Zaxe, StepSize, False)
             ' 7ms upload
             Upload(Camera.Bytes, loopZ)
             ' 30 ms process
             zc = loopZ
             Process()
         Next
-        Stage.MoveRelative(Stage.Zaxe, -0.01 * Z, False)
+        Stage.MoveRelative(Stage.Zaxe, -StepSize * Z, False)
         Wrapup()
 
     End Sub
