@@ -211,6 +211,7 @@ Public Class Form1
     End Sub
 
     Public Sub ExitEDOf()
+
         If Display.imagetype = ImagetypeEnum.EDF_Brightfield Then TabControl1.SelectedIndex = 0
         If Display.imagetype = ImagetypeEnum.EDF_Fluorescence Then TabControl1.SelectedIndex = 1
     End Sub
@@ -324,6 +325,7 @@ Public Class Form1
                 TextBox_GainR.Text = Setting.Gett("GainR")
                 Display.SetColorGain(Setting.Gett("GainR"), Setting.Gett("GainG"), Setting.Gett("GainB"), ImagetypeEnum.Brightfield)
                 ChangeExposure()
+                'Display.AdjustBrightness()
 
             End If
             Display.imagetype = ImagetypeEnum.Brightfield
@@ -346,7 +348,8 @@ Public Class Form1
                 TextBox_GainR.Text = Setting.Gett("GainR_FiBi")
                 Display.SetColorGain(Setting.Gett("GainR_FiBi"), Setting.Gett("GainG_FiBi"), Setting.Gett("GainB_FiBi"), ImagetypeEnum.Fluorescence)
                 ChangeExposure()
-                ' Display.RequestIbIc = True
+                'Display.AdjustBrightness()
+
             End If
 
             Display.imagetype = ImagetypeEnum.Fluorescence
@@ -365,11 +368,11 @@ Public Class Form1
             'ZEDOF.Acquire()
             Dim bmp As New Bitmap(Camera.W, Camera.H, Imaging.PixelFormat.Format24bppRgb)
             'byteToBitmap(ZEDOF.OutputBytes, bmp)
+
             Display.ApplyBrightness(ZEDOF.OutputBytes, ccMatrix, bmp)
             PictureBox2.Image = bmp
-
+            CheckBoxLED.Checked = False
             GoLive()
-            Display.AdjustBrightness()
         End If
 
     End Sub
@@ -409,21 +412,19 @@ Public Class Form1
                 ListBox1.Items.Add(Path.GetFileName(SaveFileDialog1.FileName))
             Case ImagetypeEnum.EDF_Brightfield
 
+                ReDim Preserve Filenames(fileN)
                 bmp = New Bitmap(Camera.W, Camera.H, Imaging.PixelFormat.Format24bppRgb)
-                'ZEDOF.AcquireThreaded(True)
-
-                'ZEDOF.AcquireThreaded(True)
-
                 byteToBitmap(ZEDOF.OutputBytes, bmp)
                 bmp.Save(SaveFileDialog1.FileName)
                 ListBox1.Items.Add(Path.GetFileName(SaveFileDialog1.FileName))
-
+                Filenames(fileN) = SaveFileDialog1.FileName
                 '  GoLive()
             Case ImagetypeEnum.EDF_Fluorescence
+                ReDim Preserve Filenames(fileN)
                 bmp = New Bitmap(Camera.W, Camera.H, Imaging.PixelFormat.Format24bppRgb)
-                ZEDOF.AcquireThreaded(True)
                 byteToBitmap(ZEDOF.OutputBytes, bmp)
                 bmp.Save(SaveFileDialog1.FileName)
+                Filenames(fileN) = SaveFileDialog1.FileName
                 ListBox1.Items.Add(Path.GetFileName(SaveFileDialog1.FileName))
         End Select
 
