@@ -8,9 +8,10 @@ Public Class ImageDisplay
 
     Public Width, Height As Integer
     Dim Bayer As AForge.Imaging.Filters.BayerFilter
-    Dim rawImage(10)() As Byte
+    Dim rawImage(21)() As Byte
     Public zoom As Boolean
-    Public BmpPreview(10) As Bitmap
+    Public BmpPreview(21) As FastBMP
+
     Dim f As Integer
     Public GainR, GainG, GainB As Single
     Public busy As Boolean
@@ -30,9 +31,9 @@ Public Class ImageDisplay
         ReDim Histogram(HistBin)
         ' Get Raw Data
         ImageSize = W * H * 3 - 1
-        ReDim rawImage(10)
-        For i = 0 To 10
-            BmpPreview(i) = New Bitmap(W, H, Imaging.PixelFormat.Format24bppRgb)
+        ReDim rawImage(21)
+        For i = 0 To 20
+            BmpPreview(i) = New FastBMP(W, H, Imaging.PixelFormat.Format24bppRgb)
             ReDim rawImage(i)(W * H * 3 - 1)
         Next
         RequestIbIc = 2
@@ -41,6 +42,9 @@ Public Class ImageDisplay
 
     End Sub
     Public Sub AdjustBrightness()
+        Do Until RequestIbIc = 3
+
+        Loop
         RequestIbIc = 0
     End Sub
 
@@ -55,17 +59,16 @@ Public Class ImageDisplay
     End Sub
 
     Public Function Preview(rawin As Byte(), Gained As Boolean) As Bitmap
-
+        If RequestIbIc = 2 Then RequestIbIc = 3
         f += 1
-        If f = 11 Then f = 1
+        If f = 20 Then f = 0
         Buffer.BlockCopy(rawin, 0, rawImage(f), 0, rawin.GetLength(0))
-        byteToBitmap(rawImage(f), BmpPreview(f))
 
+        BmpPreview(f).MakeFromBytes(rawImage(f))
         If RequestIbIc = 1 Then SetIbIc() : RequestIbIc = 2
-        'MakeHistogram()
         '  PlotHistogram()
 
-        Return BmpPreview(f)
+        Return BmpPreview(f).bmp
     End Function
 
     Public Sub ApplyBrightness(rawin As Byte(), CCMAtrix As Single, ByRef bmp As Bitmap)

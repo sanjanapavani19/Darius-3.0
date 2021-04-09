@@ -58,7 +58,7 @@ Public Class XimeaColor
 
 
             cam.SetParam(PRM.SENSOR_TAPS, 4)
-            cam.SetParam(PRM.SHARPNESS, 0)
+            cam.SetParam(PRM.SHARPNESS, 2)
             gain = Setting.Gett("Gain")
 
             setGain(gain)
@@ -87,6 +87,9 @@ Public Class XimeaColor
 
 
 
+    End Sub
+    Public Sub SensorType(type As Integer)
+        cam.SetParam(PRM.SENSOR_TAPS, type)
     End Sub
     Public Sub StartAcqusition()
         cam.StartAcquisition()
@@ -239,6 +242,7 @@ Public Class XimeaColor
 
     Public Sub Flatfield(value As Integer)
         cam.SetParam(PRM.FFC, value)
+
     End Sub
 
 

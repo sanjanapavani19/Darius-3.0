@@ -112,9 +112,9 @@ Public Class TrackingStructure
             Pbox.Refresh()
             Pbox.CreateGraphics.DrawRectangle(pen, Rect)
 
-            For i = 0 To numDots - 1
-                Pbox.CreateGraphics.DrawRectangle(Dots(i).pen, Dots(i).Rect)
-            Next
+            'For i = 0 To numDots - 1
+            '    Pbox.CreateGraphics.DrawRectangle(Dots(i).pen, Dots(i).Rect)
+            'Next
         End Sub
 
         Public Sub Move(Dx As Integer, Dy As Integer)

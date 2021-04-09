@@ -76,7 +76,14 @@ Public Class FastBMP
     Public Sub MakeFromBytes(bytes As Byte())
         Me.bytes = bytes
 
-        byteToBitmap(bytes, bmp)
+        Dim rect As Rectangle = New Rectangle(0, 0, bmp.Width, bmp.Height)
+        Dim bmpData As BitmapData = bmp.LockBits(rect, ImageLockMode.ReadWrite, bmp.PixelFormat)
+        ' Copy the RGB values back to the bitmap
+        Runtime.InteropServices.Marshal.Copy(bytes, 0, bmpData.Scan0, bmpData.Stride * bmp.Height)
+        ' Unlock the bits.
+        bmp.UnlockBits(bmpData)
+
+
         'GR = Graphics.FromImage(bmp)
     End Sub
     Public Sub RefreshROI()

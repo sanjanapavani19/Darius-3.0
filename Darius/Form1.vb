@@ -307,17 +307,39 @@ Public Class Form1
     End Sub
 
 
-    Private Sub TabControl1_SelectedIndexChanged(sender As Object, e As EventArgs) _
-         Handles TabControl1.SelectedIndexChanged
-        If Not Camera.busy Then Exit Sub
-        CheckBoxLED.Checked = True
-        If TabControl1.SelectedIndex = 0 Then
+    Public Sub Live()
+        Dim Charttest As New Chart
+        Charttest = Chart1
+        Dim BmpPreview As New Bitmap(Camera.W, Camera.H, Imaging.PixelFormat.Format24bppRgb)
+        Do
+            Camera.busy = True
+            If Camera.Dostop Then Exit Do
 
+            If Camera.ExposureChanged = 0 Then Camera.SetExposure() : Display.AdjustBrightness() : Camera.ExposureChanged = 1
+            If Display.RequestIbIc = 0 Then Camera.ResetMatrix() : Display.RequestIbIc = 1
+            Camera.Capture()
+
+            If Display.imagetype = ImagetypeEnum.Brightfield Then PictureBox0.Image = Display.Preview(Camera.Bytes, True)
+            If Display.imagetype = ImagetypeEnum.Fluorescence Then PictureBox1.Image = Display.Preview(Camera.Bytes, True)
+
+            Application.DoEvents()
+        Loop
+        Camera.busy = False
+
+    End Sub
+
+    Private Sub TabControl1_SelectedIndexChanged(sender As Object, e As EventArgs) Handles TabControl1.SelectedIndexChanged
+        If Not Camera.busy Then Exit Sub
+
+        CheckBoxLED.Checked = True
+
+        If TabControl1.SelectedIndex = 0 Then
 
             LEDcontroller.SetRelays(2, False)
             LEDcontroller.SetRelays(1, True)
             If Display.imagetype = ImagetypeEnum.EDF_Fluorescence Or Display.imagetype = ImagetypeEnum.Fluorescence Then
                 Display.imagetype = ImagetypeEnum.Brightfield
+                Camera.SetFlatField("ff.tif", "dark.tif")
 
                 TextBox_exposure.Text = Setting.Gett("Exposureb")
                 TextBox_GainB.Text = Setting.Gett("GainB")
@@ -339,8 +361,9 @@ Public Class Form1
             LEDcontroller.SetRelays(2, True)
 
             If Display.imagetype = ImagetypeEnum.EDF_Brightfield Or Display.imagetype = ImagetypeEnum.Brightfield Then
-
                 Display.imagetype = ImagetypeEnum.Fluorescence
+                Camera.SetFlatField("ff_FiBi.tif", "dark.tif")
+
 
                 TextBox_exposure.Text = Setting.Gett("Exposuref")
                 TextBox_GainB.Text = Setting.Gett("GainB_FiBi")
@@ -351,8 +374,8 @@ Public Class Form1
                 'Display.AdjustBrightness()
 
             End If
-
             Display.imagetype = ImagetypeEnum.Fluorescence
+
 
         End If
 
@@ -373,8 +396,9 @@ Public Class Form1
             PictureBox2.Image = bmp
             CheckBoxLED.Checked = False
             GoLive()
-        End If
 
+
+        End If
     End Sub
 
     Private Sub Button_Brightfield_Acquire_Click(sender As Object, e As EventArgs) Handles Button_Brightfield_Acquire.Click
@@ -522,7 +546,7 @@ Public Class Form1
         If Scanning = False Then GoTo 2
         watch.Stop()
 
-        MsgBox("Scanned in " + (watch.ElapsedMilliseconds / 1000).ToString + " s" + vbCrLf + vbCrLf + "Richard: We have turned off the LEd for you just in case you went to the bathroom." + vbCrLf + vbCrLf + "Darius Developmen Team.")
+        MsgBox("Scanned in " + (watch.ElapsedMilliseconds / 1000).ToString + " s")
 
         ListBox1.Items.Add(Path.GetFileName(SaveFileDialog1.FileName))
         ReDim Preserve Filenames(fileN)
@@ -558,6 +582,13 @@ Public Class Form1
         Dim AdjustedStepX As Single = Stage.FOVX * (1 - overlap)
         Dim AdjustedStepY As Single = Stage.FOVY * (1 - overlap)
 
+        Dim cx, cy, cz As Single
+        Stage.UpdatePositions()
+        cx = Stage.X
+        cy = Stage.Y
+        cz = Stage.Z
+
+
         Pbar.Visible = True
         Pbar.Maximum = X * y
 
@@ -570,6 +601,7 @@ Public Class Form1
         Dim Pyramid(3) As Pyramids
 
         Pyramid(0) = New Pyramids(X, y, Camera.W, Camera.H, 4, 0, Address, 100)
+        If Pyramid(0).TiffisOpen Then MsgBox("tHE FILE IS ALREADY OPEN SOMEWHERE ELSE. pLEASE CLOSE IT FIRSt. ") : Scanning = False : GoTo 1
         Pyramid(1) = New Pyramids(X, y, Camera.W, Camera.H, 4, 1, Address + "1", 100)
         Pyramid(2) = New Pyramids(X, y, Camera.W, Camera.H, 4, 2, Address + "2", 100)
         Pyramid(3) = New Pyramids(X, y, Camera.W, Camera.H, 4, 3, Address + "3", 100)
@@ -579,11 +611,6 @@ Public Class Form1
         Dim Fit As New Polynomial_fit
         Dim A(4) As Double
 
-        Dim cx, cy, cz As Single
-        Stage.UpdatePositions()
-        cx = Stage.X
-        cy = Stage.Y
-        cz = Stage.Z
 
 
         If Tracking.ROI.IsMade And Not CheckBox2.Checked Then
@@ -639,8 +666,10 @@ Public Class Form1
 
                 Else
 
-                    Camera.Capture_Threaded()
-                    Thread.Sleep(Camera.exp * 1.2)
+                    'Camera.Capture_Threaded()
+                    'Thread.Sleep(Camera.exp * 1.2)
+
+                    Camera.Capture()
                 End If
 
                 'Moves while it generates the preview and others.
@@ -848,7 +877,9 @@ Public Class Form1
     Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Button3.Click
         Dim WasLive As Boolean
         If Camera.busy Then ExitLive() : WasLive = True
+
         Camera.Capture()
+
         Camera.Flatfield(0)
         Camera.SetROI()
         Camera.SetDataMode(Colortype.Grey)
@@ -866,29 +897,36 @@ Public Class Form1
         Dim direction As Integer = 1
         For y = 1 To 5
             For x = 1 To 5
-                Stage.MoveRelative(Stage.Xaxe, direction * Stage.FOVX / 10)
+                'Stage.MoveRelative(Stage.Xaxe, direction * Stage.FOVX / 10)
                 Camera.Capture()
                 For i = 0 To Camera.W * Camera.H - 1
                     Flatfield(i) += Camera.Bytes(i)
                 Next
             Next
-            Stage.MoveRelative(Stage.Yaxe, Stage.FOVY / 10)
+            'Stage.MoveRelative(Stage.Yaxe, Stage.FOVY / 10)
             direction *= -1
         Next
-        Stage.MoveRelative(Stage.Yaxe, -5 * Stage.FOVY / 10)
-        Stage.MoveRelative(Stage.Xaxe, -5 * Stage.FOVX / 10)
-
-        For i = 0 To Camera.W * Camera.H - 1
-            Flatfieldbytes(i) = Flatfield(i) / 25
-        Next
+        'Stage.MoveRelative(Stage.Yaxe, -5 * Stage.FOVY / 10)
+        'Stage.MoveRelative(Stage.Xaxe, -5 * Stage.FOVX / 10)
 
 
+        Dim BLure = New FFTW_VB_Real(Camera.W, Camera.H)
+        BLure.MakeGaussianReal(0.1, BLure.MTF, 2)
+        BLure.UpLoad(Flatfield)
+        BLure.Process_FT_MTF()
+        BLure.DownLoad(Flatfield)
+
+
+        'For i = 0 To Camera.W * Camera.H - 1
+        '    If Flatfield(i) > 255 Then Flatfield(i) = 255
+        '    Flatfieldbytes(i) = Flatfield(i)
+        'Next
 
         Select Case Display.imagetype
             Case ImagetypeEnum.Brightfield
-                SaveSinglePageTiff16("ff.tif", Flatfieldbytes, Camera.W, Camera.H)
+                SaveSinglePageTiff16("ff.tif", Flatfield, Camera.W, Camera.H)
             Case ImagetypeEnum.Fluorescence
-                SaveSinglePageTiff16("ff_FiBi.tif", Flatfieldbytes, Camera.W, Camera.H)
+                SaveSinglePageTiff16("ff_FiBi.tif", Flatfield, Camera.W, Camera.H)
         End Select
 
 
@@ -1166,13 +1204,13 @@ Public Class Form1
     End Sub
 
     Private Sub Button18_Click(sender As Object, e As EventArgs) Handles Button_Luigi.Click
-        Try
-            Dim viewer As New LuigiViewer.DisplayForm(Filenames(ListBox1.SelectedIndex))
-            viewer.Show()
+        'Try
+        '    Dim viewer As New LuigiViewer.DisplayForm(Filenames(ListBox1.SelectedIndex))
+        '    viewer.Show()
 
-        Catch
-            MsgBox("No image file is found", MsgBoxStyle.Critical)
-        End Try
+        'Catch
+        '    MsgBox("No image file is found", MsgBoxStyle.Critical)
+        'End Try
 
     End Sub
 
@@ -1548,29 +1586,18 @@ Public Class Form1
             Setting.Sett("ZSTACKSTEPS", TextBox22.Text)
         End If
     End Sub
-    Public Sub Live()
-        Dim Charttest As New Chart
-        Charttest = Chart1
 
-        Do
-
-            Camera.busy = True
-            If Camera.Dostop Then Exit Do
-            If Camera.ExposureChanged = 0 Then Camera.SetExposure() : Display.RequestIbIc = 0 : Camera.ExposureChanged = 1
-            If Display.RequestIbIc = 0 Then Camera.ResetMatrix() : Display.RequestIbIc = 1
-            Camera.Capture()
-            If Display.imagetype = ImagetypeEnum.Brightfield Then PictureBox0.Image = Display.Preview(Camera.Bytes, True)
-            If Display.imagetype = ImagetypeEnum.Fluorescence Then PictureBox1.Image = Display.Preview(Camera.Bytes, True)
-
-            Application.DoEvents()
-        Loop
-        Camera.busy = False
-
-
-    End Sub
 
     Private Sub TextBox21_TextChanged(sender As Object, e As EventArgs) Handles TextBox21.TextChanged
 
+    End Sub
+
+    Private Sub Button11_Click(sender As Object, e As EventArgs) Handles Button11.Click
+        Camera.Flatfield(1)
+    End Sub
+
+    Private Sub Button32_Click(sender As Object, e As EventArgs) Handles Button32.Click
+        Camera.Flatfield(0)
     End Sub
 End Class
 

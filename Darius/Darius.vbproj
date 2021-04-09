@@ -218,6 +218,12 @@
     <Compile Include="Shared.vb" />
     <Compile Include="StackImage.vb" />
     <Compile Include="Pyramids.vb" />
+    <Compile Include="Toggle.Designer.vb">
+      <DependentUpon>Toggle.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Toggle.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="TrackingStructure.vb" />
     <Compile Include="TriangulationStructure.vb" />
     <Compile Include="XimeaColor.vb" />
@@ -278,10 +284,6 @@
     <ProjectReference Include="..\IMSLs\IMSLs.csproj">
       <Project>{8b2e38d5-6577-4229-89e4-d1cc9b8fc3c8}</Project>
       <Name>IMSLs</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\LuigiViewer\LuigiViewer.vbproj">
-      <Project>{86f5c1c3-9590-4944-8f1d-2b11ea34e45a}</Project>
-      <Name>LuigiViewer</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -14,7 +14,7 @@ Public Class Pyramids
     End Structure
 
     Dim Scale As Integer
-
+    Public TiffisOpen As Boolean
     Dim stride As Integer
     Public pages, page As Integer
     Public address As String
@@ -30,7 +30,7 @@ Public Class Pyramids
 
     Public Tile As TileStructure
     Public Sub New(X As Integer, Y As Integer, bmpWidth As Integer, bmpHeight As Integer, pages As Integer, page As Integer, address As String, compression As Integer)
-
+        TiffisOpen = False
         Me.pages = pages
         Me.X = X
         Me.Y = Y
@@ -67,7 +67,12 @@ Public Class Pyramids
         indexXoffset = 3 * Scale
 
         ReDim Tile.bytes(Tile.width * Tile.height * 3 - 1)
-        SetTiff(page)
+        Try
+            SetTiff(page)
+        Catch ex As Exception
+            TiffisOpen = True
+        End Try
+
 
         Ready = True
     End Sub
