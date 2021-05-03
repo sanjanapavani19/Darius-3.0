@@ -15,7 +15,7 @@ Public Class ZaberNew
     Public Xaxe, Yaxe, Zaxe As Device
 
     Public Sub New(FOVX As Single, FOVY As Single)
-        Dim com As Connection = Connection.OpenSerialPort("COM7")
+        Dim com As Connection = Connection.OpenSerialPort("COM5")
         Dim Devicelist = com.DetectDevices()
         Xaxe = Devicelist(2)
         Yaxe = Devicelist(1)
@@ -24,7 +24,7 @@ Public Class ZaberNew
         Me.FOVY = FOVY
         Home()
         MoveAbsolute(Xaxe, 11.7, False)
-        MoveAbsolute(Xaxe, 37.6, True)
+        MoveAbsolute(Xaxe, 37.6, False)
     End Sub
 
     Public Sub SetFOV(FOVX As Single, FOVY As Single)
@@ -70,7 +70,7 @@ Public Class ZaberNew
             Axis.MoveRelative(R, Units.Length_Millimetres)
             If update Then
                 UpdatePositions()
-                Tracking.Update()
+                If Tracking IsNot Nothing Then Tracking.Update()
             End If
         Catch ex As Exception
 
@@ -82,7 +82,7 @@ Public Class ZaberNew
         Axis.MoveRelativeAsync(R, Units.Length_Millimetres)
         If update Then
             UpdatePositions()
-            Tracking.Update()
+            If Tracking IsNot Nothing Then Tracking.Update()
         Else
 
         End If
@@ -92,7 +92,7 @@ Public Class ZaberNew
             Axis.MoveAbsolute(R, Units.Length_Millimetres)
             If update Then
                 UpdatePositions()
-                Tracking.Update()
+                If Tracking IsNot Nothing Then Tracking.Update()
             End If
         Catch ex As Exception
 
@@ -104,7 +104,7 @@ Public Class ZaberNew
         Try
             Axis.MoveAbsoluteAsync(R, Units.Length_Millimetres)
             UpdatePositions()
-            Tracking.Update()
+            If Tracking IsNot Nothing Then Tracking.Update()
         Catch ex As Exception
 
         End Try

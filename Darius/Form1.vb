@@ -42,6 +42,7 @@ Public Class Form1
             Display = New ImageDisplay(Camera.W, Camera.H, Chart1)
             Display.imagetype = ImagetypeEnum.Brightfield
         End If
+
         Stage = New ZaberNew(Setting.Gett("FOVX"), Setting.Gett("FOVY"))
         TextBox_FOVX.Text = Stage.FOVX
         TextBox_FOVY.Text = Stage.FOVY
@@ -608,54 +609,55 @@ Public Class Form1
 
         Dim ColorBytes(Camera.W * Camera.H * 3 - 1)
 
-        Dim Fit As New Polynomial_fit
+        'Dim Fit As New Polynomial_fit
         Dim A(4) As Double
 
 
 
-        If Tracking.ROI.IsMade And Not CheckBox2.Checked Then
+        'If Tracking.ROI.IsMade And Not CheckBox2.Checked Then
 
 
-            Dim vx(Tracking.ROI.numDots * 2 - 1) As Single
-            Dim vy(Tracking.ROI.numDots - 1) As Single
+        '    Dim vx(Tracking.ROI.numDots * 2 - 1) As Single
+        '    Dim vy(Tracking.ROI.numDots - 1) As Single
 
-            AutoFocus.Initialize()
-            For i = 0 To Tracking.ROI.numDots - 1
-                Tracking.MovetoDots(i)
+        '    AutoFocus.Initialize()
+        '    For i = 0 To Tracking.ROI.numDots - 1
+        '        Tracking.MovetoDots(i)
 
-                vy(i) = DoAutoFocus(False, False)
+        '        vy(i) = DoAutoFocus(False, False)
 
 
-                vx(i * 2) = Stage.X
-                vx(i * 2 + 1) = Stage.Y
-                Dim imgtest(Camera.Wbinned * Camera.Hbinned - 1) As Byte
-                Camera.Capture()
-                SaveSinglePageTiff("c:\temp\" + i.ToString + ".tif", Camera.Bytes, Camera.Wbinned, Camera.Hbinned)
-                If Scanning = False Then AutoFocus.Release() : GoTo 1
+        '        vx(i * 2) = Stage.X
+        '        vx(i * 2 + 1) = Stage.Y
+        '        Dim imgtest(Camera.Wbinned * Camera.Hbinned - 1) As Byte
+        '        Camera.Capture()
+        '        SaveSinglePageTiff("c:\temp\" + i.ToString + ".tif", Camera.Bytes, Camera.Wbinned, Camera.Hbinned)
+        '        If Scanning = False Then AutoFocus.Release() : GoTo 1
 
-            Next
-            AutoFocus.Release()
-            A = Fit.Main(vx, vy, 1000, 0.0000001)
-            If A.Sum = 0 Then
-                MsgBox("Predicytive focus couldn't be estimated. Try moving your points inside the tissue.")
-                Scanning = False : GoTo 1
-            End If
+        '    Next
+        '    AutoFocus.Release()
+        '    A = Fit.Main(vx, vy, 1000, 0.0000001)
+        '    If A.Sum = 0 Then
+        '        MsgBox("Predicytive focus couldn't be estimated. Try moving your points inside the tissue.")
+        '        Scanning = False : GoTo 1
+        '    End If
 
-            Tracking.MovetoROIEdge()
-            Dim X0 As Single = Stage.X
-            Dim Y0 As Single = Stage.Y
+        '    Tracking.MovetoROIEdge()
+        '    Dim X0 As Single = Stage.X
+        '    Dim Y0 As Single = Stage.Y
 
-        End If
+        'End If
 
 
         'Stage.SetAcceleration(Stage.Zaxe, AutoFocus.Zacceleration)
-        If Tracking.ROI.IsMade Then
-            Tracking.MovetoROIEdge()
-            If Not CheckBox2.Checked Then Stage.MoveAbsolute(Stage.Zaxe, Fit.ComputeE({Stage.X, Stage.Y}, A))
+        'If Tracking.ROI.IsMade Then
+        '    Tracking.MovetoROIEdge()
+        '    If Not CheckBox2.Checked Then Stage.MoveAbsolute(Stage.Zaxe, Fit.ComputeE({Stage.X, Stage.Y}, A))
 
 
-        End If
+        'End If
 
+        Tracking.MovetoROIEdge()
         ' Dim BytesExport(Camera.Bytes.GetUpperBound(0)) As Byte
         For loop_y = 1 To y
             For loop_x = 1 To X
@@ -701,7 +703,7 @@ Public Class Form1
                 End If
                 If CheckBox2.Checked Then ZEDOF.Wrapup()
                 If Tracking.ROI.IsMade And Not CheckBox2.Checked Then
-                    Stage.MoveAbsolute(Stage.Zaxe, Fit.ComputeE({Stage.X, Stage.Y}, A), False)
+                    'Stage.MoveAbsolute(Stage.Zaxe, Fit.ComputeE({Stage.X, Stage.Y}, A), False)
 
                     Do Until Camera.ready
 
@@ -1000,7 +1002,7 @@ Public Class Form1
 
     Public Sub UpdateLED(status As Boolean)
 
-        Try
+        If Display IsNot Nothing Then
             If status Then
                 If Display.imagetype = ImagetypeEnum.Brightfield Then
 
@@ -1017,9 +1019,7 @@ Public Class Form1
                 LEDcontroller.SetRelays(2, False)
 
             End If
-        Catch ex As Exception
-
-        End Try
+        End If
     End Sub
 
 
