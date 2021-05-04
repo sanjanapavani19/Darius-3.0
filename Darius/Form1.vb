@@ -824,8 +824,6 @@ Public Class Form1
     End Sub
 
 
-
-
     Private Sub TextBox4_KeyDown(sender As Object, e As KeyEventArgs) Handles TextBox4.KeyDown
         If e.KeyCode = Keys.Return Then
             Stage.MoveAbsolute(Stage.Xaxe, TextBox4.Text)
@@ -839,21 +837,11 @@ Public Class Form1
         End If
     End Sub
 
-    Private Sub TextBox6_TextChanged(sender As Object, e As EventArgs) Handles TextBox6.TextChanged
-
-    End Sub
-
     Private Sub TextBox6_KeyDown(sender As Object, e As KeyEventArgs) Handles TextBox6.KeyDown
         If e.KeyCode = Keys.Return Then
             Stage.MoveAbsolute(Stage.Zaxe, TextBox6.Text)
         End If
     End Sub
-
-    Private Sub RadioButton_Conversion_CheckedChanged(sender As Object, e As EventArgs)
-
-    End Sub
-
-
 
 
     Private Sub Button9_Click(sender As Object, e As EventArgs) Handles Button9.Click
@@ -864,17 +852,6 @@ Public Class Form1
         Tracking.clear()
     End Sub
 
-    Private Sub RadioButton_zoom_out_CheckedChanged(sender As Object, e As EventArgs) Handles RadioButton_zoom_out.CheckedChanged
-
-    End Sub
-
-    Private Sub PictureBox_Preview_Click(sender As Object, e As EventArgs) Handles PictureBox_Preview.Click
-
-    End Sub
-
-    Private Sub Textbox_exposure_Click(sender As Object, e As EventArgs)
-
-    End Sub
 
     Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Button3.Click
         Dim WasLive As Boolean
@@ -982,7 +959,8 @@ Public Class Form1
         Stage.MoveAbsolute(Stage.Zaxe, 0)
         Stage.Go_Middle()
         'stage.MoveAbsolute(stage.Zaxe, lastZ)
-
+        Dim ID As String = Mid(Now.Year, 3).ToString & Now.Month.ToString & Now.Day.ToString & Now.Hour.ToString & Now.Minute.ToString & Now.Second.ToString
+        Tracking.bmp.bmp.Save("C:\Previews\" + ID + ".png")
         Tracking.Pbox.Image = Tracking.bmp.bmp
 
         Slideloaded = True
@@ -1060,9 +1038,6 @@ Public Class Form1
 
     End Sub
 
-    Private Sub TextBox_PrevieEXp_TextChanged(sender As Object, e As EventArgs) Handles TextBox_PrevieEXp.TextChanged
-
-    End Sub
 
     Private Sub TextBox_PrevieEXp_KeyDown(sender As Object, e As KeyEventArgs) Handles TextBox_PrevieEXp.KeyDown
         If e.KeyCode = Keys.Return Then
@@ -1077,21 +1052,6 @@ Public Class Form1
 
     End Sub
 
-    Private Sub PictureBox0_Click(sender As Object, e As EventArgs) Handles PictureBox0.Click
-
-    End Sub
-
-    Private Sub PictureBox0_KeyDown(sender As Object, e As KeyEventArgs) Handles PictureBox0.KeyDown
-
-    End Sub
-
-    Private Sub PictureBox0_KeyUp(sender As Object, e As KeyEventArgs) Handles PictureBox0.KeyUp
-
-    End Sub
-
-    Private Sub TextBox7_TextChanged(sender As Object, e As EventArgs) Handles TextBox7.TextChanged
-
-    End Sub
 
     Private Sub TextBox7_KeyDown(sender As Object, e As KeyEventArgs) Handles TextBox7.KeyDown
         If e.KeyCode = Keys.Return Then
@@ -1134,11 +1094,6 @@ Public Class Form1
             Stage.SetAcceleration(Stage.Zaxe, TextBox12.Text)
         End If
     End Sub
-
-    Private Sub TextBox_GainR_TextChanged(sender As Object, e As EventArgs) Handles TextBox_GainR.TextChanged
-
-    End Sub
-
 
 
 
@@ -1184,9 +1139,7 @@ Public Class Form1
         Focusing = False
     End Sub
 
-    Private Sub TextBox15_TextChanged(sender As Object, e As EventArgs) Handles TextBox15.TextChanged
 
-    End Sub
 
     Private Sub TextBox15_KeyDown(sender As Object, e As KeyEventArgs) Handles TextBox15.KeyDown
         If e.KeyCode = Keys.Return Then
@@ -1199,9 +1152,6 @@ Public Class Form1
         Display.PlotHistogram()
     End Sub
 
-    Private Sub Button5_Click(sender As Object, e As EventArgs)
-
-    End Sub
 
     Private Sub Button18_Click(sender As Object, e As EventArgs) Handles Button_Luigi.Click
         'Try
@@ -1214,9 +1164,6 @@ Public Class Form1
 
     End Sub
 
-    Private Sub Label4_Click(sender As Object, e As EventArgs)
-
-    End Sub
 
     Private Sub Button_Sedeen_Click(sender As Object, e As EventArgs) Handles Button_Sedeen.Click
         Try
@@ -1233,9 +1180,7 @@ Public Class Form1
 
     End Sub
 
-    Private Sub TextBox_FOVX_TextChanged(sender As Object, e As EventArgs) Handles TextBox_FOVX.TextChanged
 
-    End Sub
 
     Private Sub TextBox_FOVX_KeyDown(sender As Object, e As KeyEventArgs) Handles TextBox_FOVX.KeyDown, TextBox_FOVY.KeyDown
         If e.KeyCode = Keys.Return Then
@@ -1285,9 +1230,6 @@ Public Class Form1
         If Not Camera.busy Then GoLive()
     End Sub
 
-    Private Sub TabPage6_Click(sender As Object, e As EventArgs) Handles TabPage6.Click
-
-    End Sub
 
     Private Sub Button16_Click(sender As Object, e As EventArgs) Handles Button16.Click
         'stage.SetSpeed(stage.Zport, 500000)
@@ -1313,9 +1255,6 @@ Public Class Form1
 
     End Sub
 
-    Private Sub TextBox_PreviewFocus_TextChanged(sender As Object, e As EventArgs) Handles TextBox_PreviewFocus.TextChanged
-
-    End Sub
 
     Private Sub Button18_Click_1(sender As Object, e As EventArgs) Handles Button18.Click
         'TabControl1.SelectedIndex = 0
@@ -1441,9 +1380,6 @@ Public Class Form1
         End If
     End Sub
 
-    Private Sub TextBox17_TextChanged(sender As Object, e As EventArgs) Handles TextBox17.TextChanged
-
-    End Sub
 
     Private Sub TextBox17_KeyDown(sender As Object, e As KeyEventArgs) Handles TextBox17.KeyDown
         If e.KeyCode = Keys.Return Then
@@ -1535,9 +1471,7 @@ Public Class Form1
         Pbar.Value = 0
     End Sub
 
-    Private Sub TextBox1_TextChanged(sender As Object, e As EventArgs) Handles TextBox1.TextChanged
 
-    End Sub
 
     Private Sub Button27_Click(sender As Object, e As EventArgs) Handles Button27.Click
         ExitLive()
@@ -1548,13 +1482,6 @@ Public Class Form1
 
     End Sub
 
-    Private Sub Button28_Click(sender As Object, e As EventArgs)
-
-    End Sub
-
-    Private Sub TextBoxY_TextChanged(sender As Object, e As EventArgs) Handles TextBoxY.TextChanged
-
-    End Sub
 
 
 
@@ -1588,9 +1515,6 @@ Public Class Form1
     End Sub
 
 
-    Private Sub TextBox21_TextChanged(sender As Object, e As EventArgs) Handles TextBox21.TextChanged
-
-    End Sub
 
     Private Sub Button11_Click(sender As Object, e As EventArgs) Handles Button11.Click
         Camera.Flatfield(1)
@@ -1599,6 +1523,8 @@ Public Class Form1
     Private Sub Button32_Click(sender As Object, e As EventArgs) Handles Button32.Click
         Camera.Flatfield(0)
     End Sub
+
+
 End Class
 
 

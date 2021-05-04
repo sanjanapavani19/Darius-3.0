@@ -100,11 +100,13 @@ Public Class ZaberNew
 
     End Sub
 
-    Public Sub MoveAbsoluteAsync(ByRef Axis As Device, R As Single)
+    Public Sub MoveAbsoluteAsync(ByRef Axis As Device, R As Single, Optional update As Boolean = True)
         Try
             Axis.MoveAbsoluteAsync(R, Units.Length_Millimetres)
-            UpdatePositions()
-            If Tracking IsNot Nothing Then Tracking.Update()
+            If update Then
+                UpdatePositions()
+                If Tracking IsNot Nothing Then Tracking.Update()
+            End If
         Catch ex As Exception
 
         End Try
