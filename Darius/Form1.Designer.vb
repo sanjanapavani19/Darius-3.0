@@ -24,11 +24,11 @@ Partial Class Form1
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Form1))
-        Dim ChartArea6 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
-        Dim Legend6 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
-        Dim Series16 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
-        Dim Series17 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
-        Dim Series18 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
+        Dim ChartArea1 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
+        Dim Legend1 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
+        Dim Series1 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
+        Dim Series2 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
+        Dim Series3 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
         Me.GroupBox3 = New System.Windows.Forms.GroupBox()
         Me.Button_Home = New System.Windows.Forms.Button()
         Me.Button_bottom = New System.Windows.Forms.Button()
@@ -85,6 +85,8 @@ Partial Class Form1
         Me.TextBox18 = New System.Windows.Forms.TextBox()
         Me.Label20 = New System.Windows.Forms.Label()
         Me.TabPage1 = New System.Windows.Forms.TabPage()
+        Me.Button32 = New System.Windows.Forms.Button()
+        Me.Button11 = New System.Windows.Forms.Button()
         Me.Label10 = New System.Windows.Forms.Label()
         Me.Label11 = New System.Windows.Forms.Label()
         Me.Label12 = New System.Windows.Forms.Label()
@@ -174,8 +176,6 @@ Partial Class Form1
         Me.TabPage7 = New System.Windows.Forms.TabPage()
         Me.CheckBox2 = New System.Windows.Forms.CheckBox()
         Me.Histogram1 = New AForge.Controls.Histogram()
-        Me.Button11 = New System.Windows.Forms.Button()
-        Me.Button32 = New System.Windows.Forms.Button()
         Me.GroupBox3.SuspendLayout()
         Me.TabControl_Settings.SuspendLayout()
         Me.TabPage13.SuspendLayout()
@@ -859,6 +859,24 @@ Partial Class Form1
         Me.TabPage1.TabIndex = 5
         Me.TabPage1.Text = "Camera"
         '
+        'Button32
+        '
+        Me.Button32.Location = New System.Drawing.Point(193, 174)
+        Me.Button32.Name = "Button32"
+        Me.Button32.Size = New System.Drawing.Size(129, 23)
+        Me.Button32.TabIndex = 146
+        Me.Button32.Text = "Turn off FlatField"
+        Me.Button32.UseVisualStyleBackColor = True
+        '
+        'Button11
+        '
+        Me.Button11.Location = New System.Drawing.Point(193, 145)
+        Me.Button11.Name = "Button11"
+        Me.Button11.Size = New System.Drawing.Size(129, 23)
+        Me.Button11.TabIndex = 145
+        Me.Button11.Text = "Turn on FlatField"
+        Me.Button11.UseVisualStyleBackColor = True
+        '
         'Label10
         '
         Me.Label10.AutoSize = True
@@ -1511,34 +1529,34 @@ Partial Class Form1
         'Chart1
         '
         Me.Chart1.BackColor = System.Drawing.Color.Transparent
-        ChartArea6.AxisX.LabelStyle.Enabled = False
-        ChartArea6.AxisX.MajorGrid.Enabled = False
-        ChartArea6.AxisX.MajorTickMark.Enabled = False
-        ChartArea6.AxisY.LabelStyle.Enabled = False
-        ChartArea6.AxisY.MajorGrid.Enabled = False
-        ChartArea6.BackColor = System.Drawing.Color.Transparent
-        ChartArea6.Name = "ChartArea1"
-        Me.Chart1.ChartAreas.Add(ChartArea6)
-        Legend6.Name = "Legend1"
-        Me.Chart1.Legends.Add(Legend6)
+        ChartArea1.AxisX.LabelStyle.Enabled = False
+        ChartArea1.AxisX.MajorGrid.Enabled = False
+        ChartArea1.AxisX.MajorTickMark.Enabled = False
+        ChartArea1.AxisY.LabelStyle.Enabled = False
+        ChartArea1.AxisY.MajorGrid.Enabled = False
+        ChartArea1.BackColor = System.Drawing.Color.Transparent
+        ChartArea1.Name = "ChartArea1"
+        Me.Chart1.ChartAreas.Add(ChartArea1)
+        Legend1.Name = "Legend1"
+        Me.Chart1.Legends.Add(Legend1)
         Me.Chart1.Location = New System.Drawing.Point(249, 217)
         Me.Chart1.Name = "Chart1"
-        Series16.ChartArea = "ChartArea1"
-        Series16.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Area
-        Series16.IsVisibleInLegend = False
-        Series16.Legend = "Legend1"
-        Series16.Name = "Series1"
-        Series17.ChartArea = "ChartArea1"
-        Series17.IsVisibleInLegend = False
-        Series17.Legend = "Legend1"
-        Series17.Name = "Series2"
-        Series18.ChartArea = "ChartArea1"
-        Series18.IsVisibleInLegend = False
-        Series18.Legend = "Legend1"
-        Series18.Name = "Series3"
-        Me.Chart1.Series.Add(Series16)
-        Me.Chart1.Series.Add(Series17)
-        Me.Chart1.Series.Add(Series18)
+        Series1.ChartArea = "ChartArea1"
+        Series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Area
+        Series1.IsVisibleInLegend = False
+        Series1.Legend = "Legend1"
+        Series1.Name = "Series1"
+        Series2.ChartArea = "ChartArea1"
+        Series2.IsVisibleInLegend = False
+        Series2.Legend = "Legend1"
+        Series2.Name = "Series2"
+        Series3.ChartArea = "ChartArea1"
+        Series3.IsVisibleInLegend = False
+        Series3.Legend = "Legend1"
+        Series3.Name = "Series3"
+        Me.Chart1.Series.Add(Series1)
+        Me.Chart1.Series.Add(Series2)
+        Me.Chart1.Series.Add(Series3)
         Me.Chart1.Size = New System.Drawing.Size(317, 122)
         Me.Chart1.TabIndex = 120
         Me.Chart1.Text = "Chart1"
@@ -1768,24 +1786,6 @@ Partial Class Form1
         Me.Histogram1.TabIndex = 151
         Me.Histogram1.Text = "Histogram1"
         Me.Histogram1.Values = Nothing
-        '
-        'Button11
-        '
-        Me.Button11.Location = New System.Drawing.Point(193, 145)
-        Me.Button11.Name = "Button11"
-        Me.Button11.Size = New System.Drawing.Size(129, 23)
-        Me.Button11.TabIndex = 145
-        Me.Button11.Text = "Turn on FlatField"
-        Me.Button11.UseVisualStyleBackColor = True
-        '
-        'Button32
-        '
-        Me.Button32.Location = New System.Drawing.Point(193, 174)
-        Me.Button32.Name = "Button32"
-        Me.Button32.Size = New System.Drawing.Size(129, 23)
-        Me.Button32.TabIndex = 146
-        Me.Button32.Text = "Turn off FlatField"
-        Me.Button32.UseVisualStyleBackColor = True
         '
         'Form1
         '

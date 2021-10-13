@@ -109,7 +109,7 @@ Public Class Form1
         TabControl2.Height = TabControl1.Height
         PictureBox_Preview.Left = d
         PictureBox_Preview.Top = d
-        PictureBox_Preview.Width = TabControl2.Width - 2 * d - GroupBox3.Height * 1.5
+        PictureBox_Preview.Width = (TabControl2.Width - 2 * d - GroupBox3.Height * 1.5) * 0.8
 
         Tracking = New TrackingStructure(PictureBox_Preview)
         Tracking.Update()
@@ -656,8 +656,10 @@ Public Class Form1
 
 
         'End If
+        If Tracking.ROI.IsMade Then
+            Tracking.MovetoROIEdge()
+        End If
 
-        Tracking.MovetoROIEdge()
         ' Dim BytesExport(Camera.Bytes.GetUpperBound(0)) As Byte
         For loop_y = 1 To y
             For loop_x = 1 To X
@@ -866,8 +868,34 @@ Public Class Form1
 
         CheckBoxLED.Checked = False
         Thread.Sleep(500)
+        Dim dark(Camera.W * Camera.H - 1) As Single
+
+        Dim BLure = New FFTW_VB_Real(Camera.W, Camera.H)
+        BLure.MakeGaussianReal(0.1, BLure.MTF, 2)
+
+
+        'Turning off the color Gains
+        Camera.SetColorGain(1, 1, 1)
+
+
+        Pbar.Maximum = 50
+
         Camera.Capture()
-        SaveSinglePageTiff16("dark.tif", Camera.Bytes, Camera.W, Camera.H)
+
+        For y = 1 To 5
+            For x = 1 To 5
+                'Stage.MoveRelative(Stage.Xaxe, direction * Stage.FOVX / 10)
+
+                Pbar.Increment(1)
+                For i = 0 To Camera.W * Camera.H - 1
+                    dark(i) += Camera.Bytes(i)
+                Next
+            Next
+
+        Next
+
+
+        SaveSinglePageTiff16("dark.tif", dark, Camera.W, Camera.H)
         CheckBoxLED.Checked = True
         Thread.Sleep(500)
 
@@ -878,6 +906,7 @@ Public Class Form1
             For x = 1 To 5
                 'Stage.MoveRelative(Stage.Xaxe, direction * Stage.FOVX / 10)
                 Camera.Capture()
+                Pbar.Increment(1)
                 For i = 0 To Camera.W * Camera.H - 1
                     Flatfield(i) += Camera.Bytes(i)
                 Next
@@ -889,11 +918,9 @@ Public Class Form1
         'Stage.MoveRelative(Stage.Xaxe, -5 * Stage.FOVX / 10)
 
 
-        Dim BLure = New FFTW_VB_Real(Camera.W, Camera.H)
-        BLure.MakeGaussianReal(0.1, BLure.MTF, 2)
-        BLure.UpLoad(Flatfield)
-        BLure.Process_FT_MTF()
-        BLure.DownLoad(Flatfield)
+        'BLure.UpLoad(Flatfield)
+        'BLure.Process_FT_MTF()
+        'BLure.DownLoad(Flatfield)
 
 
         'For i = 0 To Camera.W * Camera.H - 1
@@ -924,9 +951,10 @@ Public Class Form1
                 Camera.SetFlatField("ff_FiBi.tif", "dark.tif")
 
         End Select
+        ' setting back the color gain 
 
-
-
+        Display.SetColorGain(Val(TextBox_GainR.Text), Val(TextBox_GainG.Text), Val(TextBox_GainB.Text), Display.imagetype)
+        Pbar.Value = 0
         Camera.Capture()
         If WasLive Then GoLive()
     End Sub
@@ -949,11 +977,12 @@ Public Class Form1
 
         If wait Then
             Stage.MoveAbsolute(Stage.Xaxe, 0)
-            If MsgBox("Load the sample. Is this a block?", MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then block = True Else block = False
+            'If MsgBox("Load the sample. Is this a block?", MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then block = True Else block = False
+            block = False
 
         End If
-        Stage.MoveAbsolute(Stage.Xaxe, 12.5)
-        Stage.MoveAbsolute(Stage.Zaxe, 20)
+        Stage.MoveAbsolute(Stage.Xaxe, 12)
+        Stage.MoveAbsolute(Stage.Zaxe, 10)
         Tracking.UpdateBmp(Preview.Capture(Val(TextBox_PrevieEXp.Text), Val(TextBox_PreviewFocus.Text)))
 
         Stage.MoveAbsolute(Stage.Zaxe, 0)
@@ -1018,8 +1047,8 @@ Public Class Form1
 
         Stage.MoveAbsolute(Stage.Zaxe, 0)
         Stage.MoveAbsolute(Stage.Yaxe, 0)
-        Stage.MoveAbsolute(Stage.Xaxe, 12.5)
-        Stage.MoveAbsolute(Stage.Zaxe, 20)
+        Stage.MoveAbsolute(Stage.Xaxe, 12)
+        Stage.MoveAbsolute(Stage.Zaxe, 10)
 
     End Sub
 
@@ -1524,7 +1553,13 @@ Public Class Form1
         Camera.Flatfield(0)
     End Sub
 
+    Private Sub TextBox_GainR_TextChanged(sender As Object, e As EventArgs) Handles TextBox_GainR.TextChanged
 
+    End Sub
+
+    Private Sub Button28_Click(sender As Object, e As EventArgs) Handles Button28.Click
+
+    End Sub
 End Class
 
 
