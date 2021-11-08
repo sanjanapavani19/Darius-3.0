@@ -15,7 +15,7 @@ Public Class ZaberNew
     Public Xaxe, Yaxe, Zaxe As Device
 
     Public Sub New(FOVX As Single, FOVY As Single)
-        Dim com As Connection = Connection.OpenSerialPort("COM5")
+        Dim com As Connection = Connection.OpenSerialPort("COM7")
         Dim Devicelist = com.DetectDevices()
         Xaxe = Devicelist(2)
         Yaxe = Devicelist(1)
