@@ -15,7 +15,7 @@ Public Class ZaberNew
     Public Xaxe, Yaxe, Zaxe As Device
 
     Public Sub New(FOVX As Single, FOVY As Single)
-        Dim com As Connection = Connection.OpenSerialPort("COM7")
+        Dim com As Connection = Connection.OpenSerialPort("COM4")
         Dim Devicelist = com.DetectDevices()
         Xaxe = Devicelist(2)
         Yaxe = Devicelist(1)
@@ -167,12 +167,12 @@ Public Class ZaberNew
 
     End Sub
     Public Sub CalibrateZoffset(AutoFocusrange As Single)
-        Stage.MoveRelative(Stage.Zaxe, -AutoFocusrange / 2)
+        'Stage.MoveRelative(Stage.Zaxe, -AutoFocusrange / 2)
         Dim ZZ As Single = Stage.GetPosition(Stage.Zaxe)
         Setting.Sett("ZOFFSET", ZZ)
         StorePosition(Stage.Zaxe, 1)
-        Stage.MoveRelative(Stage.Zaxe, AutoFocusrange / 2)
-        ZZ = Stage.GetPosition(Stage.Zaxe)
+        'Stage.MoveRelative(Stage.Zaxe, AutoFocusrange / 2)
+        'ZZ = Stage.GetPosition(Stage.Zaxe)
         Setting.Sett("Focus", ZZ)
         StorePosition(Stage.Zaxe, 2)
     End Sub

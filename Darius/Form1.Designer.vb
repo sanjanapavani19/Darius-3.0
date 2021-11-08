@@ -148,6 +148,8 @@ Partial Class Form1
         Me.PictureBox1 = New System.Windows.Forms.PictureBox()
         Me.TabPage10 = New System.Windows.Forms.TabPage()
         Me.PictureBox2 = New System.Windows.Forms.PictureBox()
+        Me.TabPage14 = New System.Windows.Forms.TabPage()
+        Me.PictureBox3 = New System.Windows.Forms.PictureBox()
         Me.Button_Brightfield_Acquire = New System.Windows.Forms.Button()
         Me.OpenFileDialog1 = New System.Windows.Forms.OpenFileDialog()
         Me.SaveFileDialog1 = New System.Windows.Forms.SaveFileDialog()
@@ -194,6 +196,8 @@ Partial Class Form1
         CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.TabPage10.SuspendLayout()
         CType(Me.PictureBox2, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.TabPage14.SuspendLayout()
+        CType(Me.PictureBox3, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.Chart1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.StatusStrip1.SuspendLayout()
         Me.TabControl2.SuspendLayout()
@@ -1446,6 +1450,7 @@ Partial Class Form1
         Me.TabControl1.Controls.Add(Me.TabPage3)
         Me.TabControl1.Controls.Add(Me.TabPage4)
         Me.TabControl1.Controls.Add(Me.TabPage10)
+        Me.TabControl1.Controls.Add(Me.TabPage14)
         Me.TabControl1.ItemSize = New System.Drawing.Size(71, 15)
         Me.TabControl1.Location = New System.Drawing.Point(0, 47)
         Me.TabControl1.Multiline = True
@@ -1512,6 +1517,25 @@ Partial Class Form1
         Me.PictureBox2.Size = New System.Drawing.Size(966, 946)
         Me.PictureBox2.TabIndex = 3
         Me.PictureBox2.TabStop = False
+        '
+        'TabPage14
+        '
+        Me.TabPage14.Controls.Add(Me.PictureBox3)
+        Me.TabPage14.Location = New System.Drawing.Point(19, 4)
+        Me.TabPage14.Name = "TabPage14"
+        Me.TabPage14.Size = New System.Drawing.Size(1076, 992)
+        Me.TabPage14.TabIndex = 4
+        Me.TabPage14.Text = "Stupid MUSE"
+        Me.TabPage14.UseVisualStyleBackColor = True
+        '
+        'PictureBox3
+        '
+        Me.PictureBox3.BackColor = System.Drawing.Color.Black
+        Me.PictureBox3.Location = New System.Drawing.Point(6, 6)
+        Me.PictureBox3.Name = "PictureBox3"
+        Me.PictureBox3.Size = New System.Drawing.Size(966, 946)
+        Me.PictureBox3.TabIndex = 4
+        Me.PictureBox3.TabStop = False
         '
         'Button_Brightfield_Acquire
         '
@@ -1841,6 +1865,8 @@ Partial Class Form1
         CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.TabPage10.ResumeLayout(False)
         CType(Me.PictureBox2, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.TabPage14.ResumeLayout(False)
+        CType(Me.PictureBox3, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.Chart1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.StatusStrip1.ResumeLayout(False)
         Me.StatusStrip1.PerformLayout()
@@ -1999,4 +2025,6 @@ Partial Class Form1
     Friend WithEvents Histogram1 As AForge.Controls.Histogram
     Friend WithEvents Button32 As Button
     Friend WithEvents Button11 As Button
+    Friend WithEvents TabPage14 As TabPage
+    Friend WithEvents PictureBox3 As PictureBox
 End Class

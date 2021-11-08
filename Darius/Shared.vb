@@ -21,8 +21,10 @@ End Enum
 Public Enum ImagetypeEnum
     Brightfield
     Fluorescence
+    MUSE
     EDF_Fluorescence
     EDF_Brightfield
+    EDF_MUSE
 End Enum
 
 Public Structure ByteImage
