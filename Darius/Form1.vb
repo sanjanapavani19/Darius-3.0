@@ -410,6 +410,7 @@ Public Class Form1
 
             If Display.imagetype = ImagetypeEnum.Fluorescence Then Display.imagetype = ImagetypeEnum.EDF_Fluorescence : PictureBox2.Image = PictureBox1.Image
             If Display.imagetype = ImagetypeEnum.Brightfield Then Display.imagetype = ImagetypeEnum.EDF_Brightfield : PictureBox2.Image = PictureBox0.Image
+            If Display.imagetype = ImagetypeEnum.MUSE Then Display.imagetype = ImagetypeEnum.EDF_MUSE : PictureBox2.Image = PictureBox3.Image
             Dim ccMatrix As Single = Camera.CCMAtrix
             ExitLive() : Camera.ResetMatrix()
 
@@ -482,7 +483,7 @@ Public Class Form1
 
 
         GoLive()
-        Display.AdjustBrightness()
+        ' Display.AdjustBrightness()
 
     End Sub
 
@@ -1130,18 +1131,22 @@ Public Class Form1
         Stage.MoveAbsolute(Stage.Zaxe, 6)
     End Sub
     Public Sub GetPreview(Optional wait As Boolean = True)
-        MovetoPreview
-        Tracking.UpdateBmp(Preview.Capture(Val(TextBox_PrevieEXp.Text), Val(TextBox_PreviewFocus.Text)))
+        MovetoPreview()
         MsgBox("Load the sample and hit OK.")
-        Stage.MoveAbsolute(Stage.Zaxe, 0)
-        Stage.Go_Middle()
+        Tracking.UpdateBmp(Preview.Capture(Val(TextBox_PrevieEXp.Text), Val(TextBox_PreviewFocus.Text)))
+
         'stage.MoveAbsolute(stage.Zaxe, lastZ)
         Dim ID As String = Mid(Now.Year, 3).ToString & Now.Month.ToString & Now.Day.ToString & Now.Hour.ToString & Now.Minute.ToString & Now.Second.ToString
         Tracking.bmp.bmp.Save("C:\Previews\" + ID + ".png")
         Tracking.Pbox.Image = Tracking.bmp.bmp
 
+
+
+
         Slideloaded = True
         Button_Scan.Enabled = True
+        Stage.MoveAbsolute(Stage.Zaxe, 0)
+        Stage.Go_Middle()
 
         Stage.GoToFocus(block)
     End Sub

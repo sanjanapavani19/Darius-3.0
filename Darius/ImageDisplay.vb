@@ -42,9 +42,12 @@ Public Class ImageDisplay
 
     End Sub
     Public Sub AdjustBrightness()
+        Dim C As Integer
         Do Until RequestIbIc = 3
-
+            C += 1
+            If C > 10 Then Exit Do
         Loop
+        'MsgBox(C)
         RequestIbIc = 0
     End Sub
 

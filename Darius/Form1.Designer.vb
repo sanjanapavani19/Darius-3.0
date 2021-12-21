@@ -1525,7 +1525,7 @@ Partial Class Form1
         Me.TabPage14.Name = "TabPage14"
         Me.TabPage14.Size = New System.Drawing.Size(1076, 992)
         Me.TabPage14.TabIndex = 4
-        Me.TabPage14.Text = "Stupid MUSE"
+        Me.TabPage14.Text = "MUSE"
         Me.TabPage14.UseVisualStyleBackColor = True
         '
         'PictureBox3
