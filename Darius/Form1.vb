@@ -313,11 +313,6 @@ Public Class Form1
     End Sub
 
 
-    Private Sub GroupBox1_Enter(sender As Object, e As EventArgs)
-
-    End Sub
-
-
     Public Sub Live()
         Dim Charttest As New Chart
         Charttest = Chart1
@@ -398,7 +393,7 @@ Public Class Form1
                 TextBox_GainB.Text = Setting.Gett("GainB_MUSE")
                 TextBox_GainG.Text = Setting.Gett("GainG_MUSE")
                 TextBox_GainR.Text = Setting.Gett("GainR_MUSE")
-                Display.SetColorGain(Setting.Gett("GainR_MUSE"), Setting.Gett("GainG_MUSE"), Setting.Gett("GainB_MUSE"), ImagetypeEnum.Fluorescence)
+                Display.SetColorGain(Setting.Gett("GainR_MUSE"), Setting.Gett("GainG_MUSE"), Setting.Gett("GainB_MUSE"), ImagetypeEnum.MUSE)
                 ChangeExposure()
             End If
             Display.imagetype = ImagetypeEnum.MUSE
@@ -442,10 +437,8 @@ Public Class Form1
         If SaveFileDialog1.ShowDialog() = DialogResult.Cancel Then Exit Sub
 
 
-
         Select Case Display.imagetype
-            Case ImagetypeEnum.Brightfield
-
+            Case ImagetypeEnum.Brightfield, ImagetypeEnum.Fluorescence, ImagetypeEnum.MUSE
 
                 bmp.Save(SaveFileDialog1.FileName)
                 'Display.MakeFullsizeImage.Save(SaveFileDialog1.FileName + "_WD.jpg")
@@ -453,25 +446,8 @@ Public Class Form1
                 Filenames(fileN) = SaveFileDialog1.FileName
                 fileN += 1
                 ListBox1.Items.Add(Path.GetFileName(SaveFileDialog1.FileName))
-            Case ImagetypeEnum.Fluorescence
 
-
-                bmp.Save(SaveFileDialog1.FileName)
-
-                ReDim Preserve Filenames(fileN)
-                Filenames(fileN) = SaveFileDialog1.FileName
-                fileN += 1
-                ListBox1.Items.Add(Path.GetFileName(SaveFileDialog1.FileName))
-            Case ImagetypeEnum.EDF_Brightfield
-
-                ReDim Preserve Filenames(fileN)
-                bmp = New Bitmap(Camera.W, Camera.H, Imaging.PixelFormat.Format24bppRgb)
-                byteToBitmap(ZEDOF.OutputBytes, bmp)
-                bmp.Save(SaveFileDialog1.FileName)
-                ListBox1.Items.Add(Path.GetFileName(SaveFileDialog1.FileName))
-                Filenames(fileN) = SaveFileDialog1.FileName
-                '  GoLive()
-            Case ImagetypeEnum.EDF_Fluorescence
+            Case ImagetypeEnum.EDF_Fluorescence, ImagetypeEnum.EDF_Brightfield, ImagetypeEnum.EDF_MUSE
                 ReDim Preserve Filenames(fileN)
                 bmp = New Bitmap(Camera.W, Camera.H, Imaging.PixelFormat.Format24bppRgb)
                 byteToBitmap(ZEDOF.OutputBytes, bmp)
@@ -1715,7 +1691,9 @@ Public Class Form1
         Camera.Flatfield(0)
     End Sub
 
+    Private Sub TextBox_GainB_TextChanged(sender As Object, e As EventArgs) Handles TextBox_GainB.TextChanged
 
+    End Sub
 End Class
 
 

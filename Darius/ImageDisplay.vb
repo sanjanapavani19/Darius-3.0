@@ -105,25 +105,20 @@ Public Class ImageDisplay
         GainB = B
         GainG = G
         Select Case Imagingtype
-            Case ImagetypeEnum.Brightfield
+            Case ImagetypeEnum.Brightfield, ImagetypeEnum.EDF_Brightfield
                 Setting.Sett("GainB", B)
                 Setting.Sett("GainG", G)
                 Setting.Sett("GainR", R)
 
-            Case ImagetypeEnum.Fluorescence
+            Case ImagetypeEnum.Fluorescence, ImagetypeEnum.EDF_Fluorescence
                 Setting.Sett("GainB_FiBi", B)
                 Setting.Sett("GainG_FiBi", G)
                 Setting.Sett("GainR_FiBi", R)
 
-            Case ImagetypeEnum.EDF_Brightfield
-                Setting.Sett("GainB", B)
-                Setting.Sett("GainG", G)
-                Setting.Sett("GainR", R)
-
-            Case ImagetypeEnum.EDF_Fluorescence
-                Setting.Sett("GainB_FiBi", B)
-                Setting.Sett("GainG_FiBi", G)
-                Setting.Sett("GainR_FiBi", R)
+            Case ImagetypeEnum.MUSE, ImagetypeEnum.EDF_MUSE
+                Setting.Sett("GainB_MUSE", B)
+                Setting.Sett("GainG_MUSE", G)
+                Setting.Sett("GainR_MUSE", R)
         End Select
 
         Camera.SetColorGain(R, G, B)
