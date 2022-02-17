@@ -47,7 +47,7 @@ Public Class ZaberNew
 
         Xspeed = 65
         Yspeed = 65
-        Zspeed = 10
+        Zspeed = 20
 
 
         SetSpeed(Xaxe, Xspeed)
@@ -56,7 +56,7 @@ Public Class ZaberNew
 
         Xacc = 3000
         Yacc = 3000
-        Zacc = 50
+        Zacc = 100
 
         SetAcceleration(Xaxe, Xacc)
         SetAcceleration(Yaxe, Yacc)
