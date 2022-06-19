@@ -41,13 +41,13 @@ Public Structure ByteImage
 End Structure
 Module SharedResources
     Public Setting As New SettingStructure("Settings.xml")
-    Public Camera As XimeaColor
-    Public Stage As ZaberNew
+    Public Camera As XimeaXIq
+    Public Stage As ZaberASCII
     Public Piezo As EO
     Public EDF As ExtendedDepth5
     Public rr(), gg(), bb() As Single
     Public clrs(20) As Color
-    Public Preview As PreviewStructure
+    Public Preview As PreviewWebcam
     Public Triangle As TriangulationStructure
     Public Tracking As TrackingStructure
     Public ZEDOF As ZstackStructure

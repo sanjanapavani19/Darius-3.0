@@ -92,25 +92,31 @@
         Array.Clear(processDone, 0, Z)
 
         Dim Thread As New System.Threading.Thread(AddressOf ProcessThreaded)
+
         Thread.Start()
 
         For loopZ = 0 To Z - 1
             Camera.Trigger()
             MakeDelay()
 
-            Stage.MoveRelativeAsync(Stage.Zaxe, StepSize * direction, False)
-            Try
-                Camera.cam.GetImageByteArray(bytes(loopZ), Camera.timeout)
-            Catch ex As Exception
+            Dim MoveThread As New System.Threading.Thread(AddressOf MoveThreaded)
+            MoveThread.Start()
+            Camera.cam.GetImageByteArray(bytes(loopZ), Camera.timeout)
+            'Try
+            '    Camera.cam.GetImageByteArray(bytes(loopZ), Camera.timeout)
+            'Catch ex As Exception
 
-            End Try
+            'End Try
 
-            'Camera.TriggerOff()
+            ''Camera.TriggerOff()
             Imagecreated(loopZ) = 1
         Next
         If retrn Then Stage.MoveRelativeAsync(Stage.Zaxe, -StepSize * Z, False) Else direction = direction * -1
         If WithWrapup Then Wrapup()
 
+    End Sub
+    Public Sub MoveThreaded()
+        Stage.MoveRelativeAsync(Stage.Zaxe, StepSize * direction, False)
     End Sub
     Public Sub ProcessThreaded()
         For loopZ = 0 To Z - 1

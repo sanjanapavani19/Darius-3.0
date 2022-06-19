@@ -145,7 +145,7 @@ Public Class Relay
 
             FT_GetNumDevices(arg1, arg2, dwFlag)
             If FT_Open(1, lnghandle) <> FT_OK Then
-                ' Form1.logWinOutput("Error while opening")
+                MsgBox("Error while opening")
                 Exit Sub
             Else
 

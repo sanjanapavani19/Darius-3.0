@@ -107,11 +107,11 @@
     <Reference Include="AForge.Video.DirectShow, Version=2.2.5.0, Culture=neutral, PublicKeyToken=61ea4348d43881b7, processorArchitecture=MSIL">
       <HintPath>..\packages\AForge.Video.DirectShow.2.2.5\lib\AForge.Video.DirectShow.dll</HintPath>
     </Reference>
-    <Reference Include="BitMiracle.LibTiff.NET, Version=2.4.639.0, Culture=neutral, PublicKeyToken=53879b3e20e7a7d6, processorArchitecture=MSIL">
-      <HintPath>..\packages\BitMiracle.LibTiff.NET.2.4.639\lib\net40\BitMiracle.LibTiff.NET.dll</HintPath>
+    <Reference Include="BitMiracle.LibTiff.NET, Version=2.4.649.0, Culture=neutral, PublicKeyToken=53879b3e20e7a7d6, processorArchitecture=MSIL">
+      <HintPath>..\packages\BitMiracle.LibTiff.NET.2.4.649\lib\net40\BitMiracle.LibTiff.NET.dll</HintPath>
     </Reference>
-    <Reference Include="Google.Protobuf, Version=3.15.8.0, Culture=neutral, PublicKeyToken=a7d26565bac4d604, processorArchitecture=MSIL">
-      <HintPath>..\packages\Google.Protobuf.3.15.8\lib\net45\Google.Protobuf.dll</HintPath>
+    <Reference Include="Google.Protobuf, Version=3.19.4.0, Culture=neutral, PublicKeyToken=a7d26565bac4d604, processorArchitecture=MSIL">
+      <HintPath>..\packages\Google.Protobuf.3.19.4\lib\net45\Google.Protobuf.dll</HintPath>
     </Reference>
     <Reference Include="MathNet.Numerics, Version=4.15.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MathNet.Numerics.4.15.0\lib\net461\MathNet.Numerics.dll</HintPath>
@@ -134,8 +134,8 @@
     <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
     </Reference>
-    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.5.0.0\lib\net45\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.6.0.0\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
     </Reference>
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Windows.Forms" />
@@ -145,12 +145,16 @@
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Net.Http" />
+    <Reference Include="VimbaNET, Version=1.8.4.31002, Culture=neutral, PublicKeyToken=96b729f24f119b9a, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\x64\Debug\VimbaNET.dll</HintPath>
+    </Reference>
     <Reference Include="xiApi.NETX64, Version=4.20.5.0, Culture=neutral, PublicKeyToken=de3a45b66b18d392, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>bin\x64\Debug\xiApi.NETX64.dll</HintPath>
     </Reference>
-    <Reference Include="Zaber.Motion, Version=2.3.1.0, Culture=neutral, PublicKeyToken=65af8649611d1afa, processorArchitecture=MSIL">
-      <HintPath>..\packages\Zaber.Motion.2.3.1\lib\net45\Zaber.Motion.dll</HintPath>
+    <Reference Include="Zaber.Motion, Version=2.10.0.0, Culture=neutral, PublicKeyToken=65af8649611d1afa, processorArchitecture=MSIL">
+      <HintPath>..\packages\Zaber.Motion.2.10.0\lib\net45\Zaber.Motion.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -200,7 +204,8 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Preview.vb" />
+    <Compile Include="PreviewVimba.vb" />
+    <Compile Include="PreviewWebcam.vb" />
     <Compile Include="QuickPhasor.vb" />
     <Compile Include="Relay.vb" />
     <Compile Include="Scanning.Designer.vb">
@@ -226,7 +231,8 @@
     <Compile Include="XimeaXIq.vb" />
     <Compile Include="EO.vb" />
     <Compile Include="Zaber.vb" />
-    <Compile Include="ZaberNew.vb" />
+    <Compile Include="ZaberASCII.vb" />
+    <Compile Include="Zaber_Dover.vb" />
     <Compile Include="ZstackStructure.vb" />
   </ItemGroup>
   <ItemGroup>
@@ -294,11 +300,11 @@
     </BootstrapperPackage>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
-  <Import Project="..\packages\Zaber.Motion.2.3.1\build\net45\Zaber.Motion.targets" Condition="Exists('..\packages\Zaber.Motion.2.3.1\build\net45\Zaber.Motion.targets')" />
+  <Import Project="..\packages\Zaber.Motion.2.10.0\build\net45\Zaber.Motion.targets" Condition="Exists('..\packages\Zaber.Motion.2.10.0\build\net45\Zaber.Motion.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Zaber.Motion.2.3.1\build\net45\Zaber.Motion.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Zaber.Motion.2.3.1\build\net45\Zaber.Motion.targets'))" />
+    <Error Condition="!Exists('..\packages\Zaber.Motion.2.10.0\build\net45\Zaber.Motion.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Zaber.Motion.2.10.0\build\net45\Zaber.Motion.targets'))" />
   </Target>
 </Project>

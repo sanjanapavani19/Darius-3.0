@@ -2,27 +2,29 @@
 
 Imports System.Windows
 Public Class XimeaXIq
-    Private cam As New xiCam
+    Public cam As New xiCam
 
     Public readoutnoise As Single
     Public Name As String
-    Public Dim_X As Integer
-    Public Dim_Y As Integer
+    Public W As Integer
+    Public H As Integer
     Public status As Boolean
     Public FFsetup As Boolean
     Public Wbinned, Hbinned As Integer
-
+    Public ready As Boolean
     Public busy As Boolean
     Public gain As Single
     Public exp As Single
-
+    Public CCMAtrix As Single
     Public BmpRef As Bitmap
     Public bit_scale As Byte = 2 ^ 4
+    Dim ROI As Rectangle
+    Public OriginalW, OriginalH As Integer
 
 
-    Private timeout As Integer
-
-    Public frame As Byte()
+    Public timeout As Integer
+    Public Cropped As Boolean
+    Public Bytes As Byte()
     Public TRG_MODE As Integer
     Public ExposureChanged As Boolean
     Public Dostop As Boolean
@@ -41,61 +43,116 @@ Public Class XimeaXIq
 
             Name = cam.GetParamString(PRM.DEVICE_NAME)
             cam.SetParam(PRM.BUFFER_POLICY, BUFF_POLICY.SAFE)
-            cam.SetParam(PRM.IMAGE_DATA_FORMAT, IMG_FORMAT.RAW8)
+            cam.SetParam(PRM.IMAGE_DATA_FORMAT, IMG_FORMAT.RGB24)
 
             '    cam.SetParam(PRM.TRG_SELECTOR, 1)
-            'cam.SetParam(PRM.ACQ_TIMING_MODE, ACQ_TIMING_MODE.FRAME_RATE)
+            cam.SetParam(PRM.ACQ_TIMING_MODE, ACQ_TIMING_MODE.FREE_RUN)
             cam.SetParam(PRM.TRG_SOURCE, TRG_SOURCE.SOFTWARE)
-            cam.SetParam(PRM.VERTICAL_FLIP, 1)
-            cam.SetParam(PRM.HORIZONTAL_FLIP, 1)
+            cam.SetParam(PRM.OUTPUT_DATA_BIT_DEPTH, BIT_DEPTH.BPP_8)
 
-
-            'cam.SetParam(PRM.SENSOR_TAPS, 4)
-
-            gain = Setting.Gett("Gain")
-
-            setGain(gain)
-            'SetColorGain(Setting.Gett("GainR"), Setting.Gett("GainG"), Setting.Gett("GainB"))
-            setGammaY(1)
-            setGammaC(0)
-
-            exp = Setting.Gett("exposure")
-            SetExposure(exp, True)
-
-            SetBinning(False, 1)
-
+            OriginalW = cam.GetParamInt(PRM.WIDTH)
+            OriginalH = cam.GetParamInt(PRM.HEIGHT)
+            W = OriginalW
+            H = OriginalH
+            ReDim Bytes(W * H * 3 - 1)
             timeout = 5000
 
+            cam.SetParam(PRM.SHARPNESS, 2)
+            gain = Setting.Gett("Gain")
+            setGain(gain)
+            SetColorGain(Setting.Gett("GainR"), Setting.Gett("GainG"), Setting.Gett("GainB"))
+            setGammaY(1)
+            setGammaC(0)
+            exp = Setting.Gett("exposureb")
+            Dim val As Integer
+            cam.GetParam(PRM.EXPOSURE, Val)
 
-
+            SetExposure(exp, True)
+            ResetMatrix()
+            Cropped = False
+            BmpRef = New Bitmap(W, H, Imaging.PixelFormat.Format24bppRgb)
             busy = False
-
-
             status = True
-
-
-            cam.StartAcquisition()
+            StartAcqusition()
+            capture()
+            capture()
+            capture()
+            capture()
+            capture()
         End If
 
 
 
     End Sub
 
-    Public Sub SetBinning(yes As Boolean, size As Integer)
-        If yes Then
-            '        cam.SetParam(PRM.DOWNSAMPLING, size)
-            Wbinned = cam.GetParamInt(PRM.WIDTH)
-            Hbinned = cam.GetParamInt(PRM.HEIGHT)
+    Public Sub StartAcqusition()
+        cam.StartAcquisition()
+    End Sub
 
-            BmpRef = New Bitmap(Wbinned, Hbinned, Imaging.PixelFormat.Format24bppRgb)
-            ReDim frame(Wbinned * Hbinned)
-        Else
-            '      cam.SetParam(PRM.DOWNSAMPLING, 1)
-            Dim_X = cam.GetParamInt(PRM.WIDTH)
-            Dim_Y = cam.GetParamInt(PRM.HEIGHT)
-            BmpRef = New Bitmap(Dim_X, Dim_Y, Imaging.PixelFormat.Format24bppRgb)
-            ReDim frame(Dim_X * Dim_Y)
-        End If
+    Public Sub StopAcqusition()
+        cam.StopAcquisition()
+    End Sub
+
+    Public Sub SetROI()
+        If Not Cropped Then Return
+        cam.SetParam(PRM.DOWNSAMPLING, 1)
+        cam.SetParam(PRM.OFFSET_X, 0)
+        cam.SetParam(PRM.OFFSET_Y, 0)
+        cam.SetParam(PRM.WIDTH, ROI.Width)
+        cam.SetParam(PRM.HEIGHT, ROI.Height)
+        cam.SetParam(PRM.OFFSET_X, ROI.X)
+        cam.SetParam(PRM.OFFSET_Y, ROI.Y)
+        W = ROI.Width
+        H = ROI.Height
+
+    End Sub
+
+    Public Sub ReSetROI()
+        If Not Cropped Then Return
+        cam.SetParam(PRM.DOWNSAMPLING, 1)
+        cam.SetParam(PRM.OFFSET_X, 0)
+        cam.SetParam(PRM.OFFSET_Y, 0)
+        cam.SetParam(PRM.WIDTH, OriginalW)
+        cam.SetParam(PRM.HEIGHT, OriginalH)
+        W = OriginalW
+        H = OriginalH
+
+
+        Cropped = False
+
+    End Sub
+    Public Sub SetROI(ROI As Rectangle)
+        Me.ROI = ROI
+
+        cam.SetParam(PRM.DOWNSAMPLING, 1)
+        cam.SetParam(PRM.OFFSET_X, 0)
+        cam.SetParam(PRM.OFFSET_Y, 0)
+        cam.SetParam(PRM.WIDTH, ROI.Width)
+        cam.SetParam(PRM.HEIGHT, ROI.Height)
+        cam.SetParam(PRM.OFFSET_X, ROI.X)
+        cam.SetParam(PRM.OFFSET_Y, ROI.Y)
+        W = ROI.Width
+        H = ROI.Height
+        Cropped = True
+
+    End Sub
+
+    Public Sub SetColorGain(R As Single, G As Single, B As Single)
+        cam.SetParam(PRM.WB_KB, B)
+        cam.SetParam(PRM.WB_KG, G)
+        cam.SetParam(PRM.WB_KR, R)
+    End Sub
+    Public Sub SetBinning(size As Integer)
+
+
+        cam.SetParam(PRM.DOWNSAMPLING, size)
+        cam.SetParam(PRM.DOWNSAMPLING_TYPE, BINNING_MODE.SUM)
+        Wbinned = cam.GetParamInt(PRM.WIDTH)
+        Hbinned = cam.GetParamInt(PRM.HEIGHT)
+        BmpRef = New Bitmap(Wbinned, Hbinned, Imaging.PixelFormat.Format24bppRgb)
+        ReDim Bytes(Wbinned * Hbinned - 1)
+
+
     End Sub
     Public Sub Capture_Threaded()
         Dim Thread1 As New System.Threading.Thread(AddressOf captureBmp)
@@ -103,25 +160,48 @@ Public Class XimeaXIq
 
 
     End Sub
-
-
+    Public Sub ResetMatrix()
+        cam.SetParam(PRM.CC_MATRIX_00, 1)
+        cam.SetParam(PRM.CC_MATRIX_11, 1)
+        cam.SetParam(PRM.CC_MATRIX_22, 1)
+        CCMAtrix = 1
+    End Sub
+    Public Sub SetMatrix(CCMAtrix As Single)
+        If CCMAtrix > 8 Then CCMAtrix = 8
+        If CCMAtrix < 1 Then CCMAtrix = 1
+        cam.SetParam(PRM.CC_MATRIX_00, CCMAtrix)
+        cam.SetParam(PRM.CC_MATRIX_11, CCMAtrix)
+        cam.SetParam(PRM.CC_MATRIX_22, CCMAtrix)
+        Me.CCMAtrix = CCMAtrix
+    End Sub
     Public Sub capture()
         Try
             cam.SetParam(PRM.TRG_SOFTWARE, 1)
-            cam.GetImageByteArray(frame, timeout)
+            cam.GetImageByteArray(Bytes, timeout)
 
         Catch ex As Exception
 
         End Try
 
     End Sub
+    Public Sub Capture(ByRef Bytesin)
+        Try
+            cam.SetParam(PRM.TRG_SOFTWARE, 1)
+            cam.GetImageByteArray(Bytesin, timeout)
 
+        Catch ex As Exception
 
-    Public Sub SetFlatField(filename As String)
-        cam.SetParam(PRM.FFC_FLAT_FIELD_FILE_NAME, filename)
-        cam.SetParam(PRM.FFC_DARK_FIELD_FILE_NAME, "dark.tif")
-        cam.SetParam(PRM.FFC, 1)
-        FFsetup = True
+        End Try
+
+    End Sub
+    Public Sub Trigger()
+        cam.SetParam(PRM.TRG_SOFTWARE, 1)
+    End Sub
+    Public Sub SetFlatField(filename As String, bfilename As String)
+        'cam.SetParam(PRM.FFC_FLAT_FIELD_FILE_NAME, filename)
+        'cam.SetParam(PRM.FFC_DARK_FIELD_FILE_NAME, bfilename)
+        'cam.SetParam(PRM.FFC, 1)
+        'FFsetup = True
     End Sub
 
 
@@ -141,17 +221,11 @@ Public Class XimeaXIq
 
 
 
-    Public Sub captureBmp()
-
-        Try
-            cam.SetParam(PRM.TRG_SOFTWARE, 1)
-            cam.GetBitmap(BmpRef, timeout)
-
-        Catch ex As Exception
-
-        End Try
-
-    End Sub
+    Public Function captureBmp() As Bitmap
+        cam.SetParam(PRM.TRG_SOFTWARE, 1)
+        cam.GetBitmap(BmpRef, timeout)
+        Return BmpRef
+    End Function
 
     Public Sub SetDataMode(type As Colortype)
         Select Case type
@@ -194,8 +268,9 @@ Public Class XimeaXIq
 
     Public Sub SetExposure(ex As Single, save As Boolean)
         If ex = 0 Then MsgBox("Richard : Please Enter a valid value for exposure time.") : Exit Sub
-        cam.SetParam(PRM.EXPOSURE, ex * 1000000)
-        timeout = ex * 100000
+        cam.SetParam(PRM.EXPOSURE, ex * 1000)
+
+        timeout = ex * 1000
         If save Then Setting.Sett("exposure", ex)
         exp = ex
     End Sub
@@ -203,7 +278,7 @@ Public Class XimeaXIq
     Public Sub SetExposure()
         'Sets exposure time in microseconds.
         If exp = 0 Then MsgBox("Richard : Please Enter a valid value for exposure time." + vbCrLf + "Expsure is fixed!") : Exit Sub
-        cam.SetParam(PRM.EXPOSURE, exp * 1000000)
+        cam.SetParam(PRM.EXPOSURE, exp * 1000)
         timeout = exp * 100000
 
     End Sub

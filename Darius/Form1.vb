@@ -25,13 +25,17 @@ Public Class Form1
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
-        Preview = New PreviewStructure
+        LEDcontroller = New Relay
+        LEDcontroller.SetRelays(1, False)
+        LEDcontroller.SetRelays(2, False)
+
+        Preview = New PreviewWebcam
         TextBox_PrevieEXp.Text = Setting.Gett("PREVIEWEXP")
         TextBox_PreviewFocus.Text = Setting.Gett("PREVIEWFOCUS")
 
 
-        Camera = New XimeaColor
-        EDF = New ExtendedDepth5(Camera.W, Camera.H, 0.25, False)
+        Camera = New XimeaXIq
+        '        EDF = New ExtendedDepth5(Camera.W, Camera.H, 0.25, False)
         ZEDOF = New ZstackStructure(Camera.W, Camera.H, Setting.Gett("ZSTACRRANGE"), Setting.Gett("ZSTACKSTEPS"))
         TextBox21.Text = Setting.Gett("ZSTACRRANGE")
         TextBox22.Text = Setting.Gett("ZSTACKSTEPS")
@@ -43,7 +47,7 @@ Public Class Form1
             Display.imagetype = ImagetypeEnum.Brightfield
         End If
 
-        Stage = New ZaberNew(Setting.Gett("FOVX"), Setting.Gett("FOVY"))
+        Stage = New ZaberASCII(Setting.Gett("FOVX"), Setting.Gett("FOVY"))
         TextBox_FOVX.Text = Stage.FOVX
         TextBox_FOVY.Text = Stage.FOVY
 
@@ -59,17 +63,9 @@ Public Class Form1
 
 
         If Camera.status Then
-
-
-            Camera.SetFlatField("ff.tif", "dark.tif")
-
+            'Camera.SetFlatField("ff.tif", "dark.tif")
             GoLive()
-            LEDcontroller = New Relay
-            LEDcontroller.SetRelays(1, True)
-            LEDcontroller.SetRelays(2, False)
-
             ArrangeControls(10)
-
         End If
 
         GetPreview(True)
@@ -323,7 +319,7 @@ Public Class Form1
 
             If Camera.ExposureChanged = 0 Then Camera.SetExposure() : Display.AdjustBrightness() : Camera.ExposureChanged = 1
             If Display.RequestIbIc = 0 Then Camera.ResetMatrix() : Display.RequestIbIc = 1
-            Camera.Capture()
+            Camera.capture()
 
             If Display.imagetype = ImagetypeEnum.Brightfield Then PictureBox0.Image = Display.Preview(Camera.Bytes, True)
             If Display.imagetype = ImagetypeEnum.Fluorescence Then PictureBox1.Image = Display.Preview(Camera.Bytes, True)
@@ -362,7 +358,7 @@ Public Class Form1
 
         If TabControl1.SelectedIndex = 1 Then
             LEDcontroller.SetRelays(4, False)
-            LEDcontroller.SetRelays(3, False)
+            LEDcontroller.SetRelays(3, True)
             LEDcontroller.SetRelays(1, False)
             LEDcontroller.SetRelays(2, True)
 
@@ -477,13 +473,13 @@ Public Class Form1
         '   If Display.zoom Then Z = Display.sampeling Else Z = 1
 
         Stage.MoveRelativeAsync(Stage.Xaxe, (e.X - Stage.xp) * Stage.FOVX * (1 / Z) / PictureBox0.Width)
-        Stage.MoveRelativeAsync(Stage.Yaxe, -(e.Y - Stage.yp) * Stage.FOVY * (1 / Z) / PictureBox0.Height)
+        Stage.MoveRelativeAsync(Stage.Yaxe, (e.Y - Stage.yp) * Stage.FOVY * (1 / Z) / PictureBox0.Height)
         ExitEDOf()
 
     End Sub
 
     Public Function DoAutoFocus(DoInitialize As Boolean, DoRelease As Boolean) As Single
-        Stage.GoZero(Stage.Zaxe, block)
+        Stage.GoZero(block)
 
         Dim WasLive As Boolean
         If Camera.busy Then ExitLive() : WasLive = True
@@ -676,7 +672,7 @@ Public Class Form1
                     'Camera.Capture_Threaded()
                     'Thread.Sleep(Camera.exp * 1.2)
 
-                    Camera.Capture()
+                    Camera.capture()
                 End If
 
                 'Moves while it generates the preview and others.
@@ -896,7 +892,7 @@ Public Class Form1
         Pbar.Maximum = 50
 
 
-        Camera.Capture()
+        Camera.capture()
         For y = 1 To 5
             For x = 1 To 5
 
@@ -929,7 +925,7 @@ Public Class Form1
         For y = 1 To 5
             For x = 1 To 5
                 'Stage.MoveRelative(Stage.Xaxe, direction * Stage.FOVX / 10)
-                Camera.Capture()
+                Camera.capture()
                 Pbar.Increment(1)
                 For i = 0 To Camera.W * Camera.H - 1
                     Flatfield(i) += Camera.Bytes(i)
@@ -966,7 +962,7 @@ Public Class Form1
         Camera.SetDataMode(Colortype.RGB)
         Camera.SetROI()
         Camera.SetDataMode(Colortype.RGB)
-        Camera.Capture()
+        Camera.capture()
 
 
         Select Case Display.imagetype
@@ -988,7 +984,7 @@ Public Class Form1
         Dim WasLive As Boolean
         If Camera.busy Then ExitLive() : WasLive = True
 
-        Camera.Capture()
+        Camera.capture()
 
         Camera.Flatfield(0)
         Camera.SetROI()
@@ -1009,7 +1005,7 @@ Public Class Form1
 
         Pbar.Maximum = 50
 
-        Camera.Capture()
+        Camera.capture()
 
         For y = 1 To 5
             For x = 1 To 5
@@ -1034,7 +1030,7 @@ Public Class Form1
         For y = 1 To 5
             For x = 1 To 5
                 'Stage.MoveRelative(Stage.Xaxe, direction * Stage.FOVX / 10)
-                Camera.Capture()
+                Camera.capture()
                 Pbar.Increment(1)
                 For i = 0 To Camera.W * Camera.H - 1
                     Flatfield(i) += Camera.Bytes(i)
@@ -1071,7 +1067,7 @@ Public Class Form1
         Camera.SetDataMode(Colortype.RGB)
         Camera.SetROI()
         Camera.SetDataMode(Colortype.RGB)
-        Camera.Capture()
+        Camera.capture()
 
 
         Select Case Display.imagetype
@@ -1088,7 +1084,7 @@ Public Class Form1
 
         Display.SetColorGain(Val(TextBox_GainR.Text), Val(TextBox_GainG.Text), Val(TextBox_GainB.Text), Display.imagetype)
         Pbar.Value = 0
-        Camera.Capture()
+        Camera.capture()
         If WasLive Then GoLive()
     End Sub
 
@@ -1104,7 +1100,7 @@ Public Class Form1
         Stage.MoveAbsolute(Stage.Zaxe, 0)
         Stage.MoveAbsolute(Stage.Yaxe, 0)
         Stage.MoveAbsolute(Stage.Xaxe, 12)
-        Stage.MoveAbsolute(Stage.Zaxe, 6)
+
     End Sub
     Public Sub GetPreview(Optional wait As Boolean = True)
         MovetoPreview()
@@ -1121,10 +1117,10 @@ Public Class Form1
 
         Slideloaded = True
         Button_Scan.Enabled = True
-        Stage.MoveAbsolute(Stage.Zaxe, 0)
+        'Stage.MoveAbsolute(Stage.Zaxe, 0)
         Stage.Go_Middle()
 
-        Stage.GoToFocus(block)
+        ' Stage.GoToFocus(block)
     End Sub
     Private Sub Button7_Click(sender As Object, e As EventArgs) Handles Button7.Click
         Stage.GoToFocus(block)
@@ -1692,6 +1688,10 @@ Public Class Form1
     End Sub
 
     Private Sub TextBox_GainB_TextChanged(sender As Object, e As EventArgs) Handles TextBox_GainB.TextChanged
+
+    End Sub
+
+    Private Sub PictureBox0_Click(sender As Object, e As EventArgs) Handles PictureBox0.Click
 
     End Sub
 End Class

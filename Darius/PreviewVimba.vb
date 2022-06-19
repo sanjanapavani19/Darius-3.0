@@ -3,23 +3,24 @@ Imports AForge.Imaging.Filters
 Imports AForge.Video.DirectShow
 Imports AForge.Imaging
 Imports AForge.Math.Geometry
+Imports AVT.VmbAPINET
 Imports AForge
 
-Public Class PreviewStructure
-    Dim V As AForge.Controls.VideoSourcePlayer
+Public Class PrevieVimba
+
     Public Width, Height As Integer
     Public Bmp, bmpf, BmpLabel As Bitmap
     Public Exposure As Single
     Public R As Rectangle
-    Dim videoDevices As New FilterInfoCollection(FilterCategory.VideoInputDevice)
+
     ' create video source
-    Dim videoSource As New VideoCaptureDevice(videoDevices(0).MonikerString)
+
 
     Public Sub New()
 
 
-        videoSource.VideoResolution = videoSource.VideoCapabilities(10)
-        videoSource.SnapshotResolution = videoSource.VideoCapabilities(10)
+        videoSource.VideoResolution = videoSource.VideoCapabilities(1)
+        videoSource.SnapshotResolution = videoSource.VideoCapabilities(1)
         Dim minVal, maxVal, stepSize, defaultVal As Integer
         Dim flags As CameraControlFlags
         videoSource.GetCameraPropertyRange(CameraControlProperty.Exposure, minVal, maxVal, stepSize, defaultVal, flags)
@@ -58,7 +59,7 @@ Public Class PreviewStructure
 
 
         bmpf = New Bitmap(V.GetCurrentVideoFrame)
-        Bmp = New Bitmap(Bmpf.width, Bmpf.height, System.Drawing.Imaging.PixelFormat.Format24bppRgb)
+        Bmp = New Bitmap(bmpf.Width, bmpf.Height, System.Drawing.Imaging.PixelFormat.Format24bppRgb)
         Bmp = bmpf.Clone(New Rectangle(0, 0, bmpf.Width, bmpf.Height), System.Drawing.Imaging.PixelFormat.Format24bppRgb)
 
 
