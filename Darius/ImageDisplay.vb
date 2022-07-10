@@ -8,9 +8,10 @@ Public Class ImageDisplay
 
     Public Width, Height As Integer
     Dim Bayer As AForge.Imaging.Filters.BayerFilter
-    Dim rawImage(21)() As Byte
+    Dim Bucketsize As Integer = 10
+    Dim rawImage(Bucketsize)() As Byte
     Public zoom As Boolean
-    Public BmpPreview(21) As FastBMP
+    Public BmpPreview(Bucketsize) As FastBMP
 
     Dim f As Integer
     Public GainR, GainG, GainB As Single
@@ -31,8 +32,8 @@ Public Class ImageDisplay
         ReDim Histogram(HistBin)
         ' Get Raw Data
         ImageSize = W * H * 3 - 1
-        ReDim rawImage(21)
-        For i = 0 To 20
+        ReDim rawImage(Bucketsize)
+        For i = 0 To Bucketsize - 1
             BmpPreview(i) = New FastBMP(W, H, Imaging.PixelFormat.Format24bppRgb)
             ReDim rawImage(i)(W * H * 3 - 1)
         Next
@@ -62,10 +63,10 @@ Public Class ImageDisplay
 
     End Sub
 
-    Public Function Preview(rawin As Byte(), Gained As Boolean) As Bitmap
+    Public Function Preview(ByRef rawin As Byte(), Gained As Boolean) As Bitmap
         If RequestIbIc = 2 Then RequestIbIc = 3
         f += 1
-        If f = 20 Then f = 0
+        If f = Bucketsize - 1 Then f = 0
         Buffer.BlockCopy(rawin, 0, rawImage(f), 0, rawin.GetLength(0))
 
         BmpPreview(f).MakeFromBytes(rawImage(f))

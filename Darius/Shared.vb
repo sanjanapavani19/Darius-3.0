@@ -45,9 +45,9 @@ Module SharedResources
     Public Stage As ZaberASCII
     Public Piezo As EO
     Public EDF As ExtendedDepth5
-    Public rr(), gg(), bb() As Single
+    Public rr(), gg(), bb() As Byte
     Public clrs(20) As Color
-    Public Preview As PreviewWebcam
+    Public Preview As PreviewVimba
     Public Triangle As TriangulationStructure
     Public Tracking As TrackingStructure
     Public ZEDOF As ZstackStructure

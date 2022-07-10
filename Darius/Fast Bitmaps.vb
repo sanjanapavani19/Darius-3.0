@@ -15,8 +15,10 @@ Public Class FastBMP
     Public height As Integer
     Public bytes() As Byte
     Public byteCopy() As Byte
+    Public Greyimage() As Single
     Public GR As Graphics
     Public stride As Integer
+    Public offset As Integer
     Public format As PixelFormat
     Public ROI() As Rectangle
     Public ROIindex As Integer
@@ -31,11 +33,12 @@ Public Class FastBMP
 
         Dim bmpData As BitmapData = bmp.LockBits(New Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadWrite, bmp.PixelFormat)
         stride = bmpData.Stride
+        offset = stride - W * 3
         bmp.UnlockBits(bmpData)
 
         ReDim bytes(stride * height - 1)
         ReDim byteCopy(stride * height * 3 - 1)
-
+        ReDim Greyimage(width * height - 1)
         ResetROI()
     End Sub
 
@@ -51,14 +54,14 @@ Public Class FastBMP
         Dim bmpData As BitmapData = b.LockBits(New Rectangle(0, 0, b.Width, b.Height), ImageLockMode.ReadWrite, b.PixelFormat)
         stride = bmpData.Stride
         b.UnlockBits(bmpData)
-
+        offset = stride - width * 3
         ReDim bytes(stride * height - 1)
-        ReDim byteCopy(stride * height * 3 - 1)
+        ReDim byteCopy(stride * height - 1)
 
 
         BitmapToBytes(b, bytes)
         byteToBitmap(bytes, bmp)
-
+        ReDim Greyimage(width * height - 1)
         ResetROI()
         Unlock()
 
@@ -175,12 +178,26 @@ Public Class FastBMP
 
     Public Sub FillOriginalPixel(x As Integer, y As Integer, byteR As Byte, byteG As Byte, byteB As Byte)
         Dim index As Integer = y * stride + x * 3
-        bytes(index) = byteR
+        bytes(index) = byteB
         bytes(index + 1) = byteG
-        bytes(index + 2) = byteB
+        bytes(index + 2) = byteR
 
     End Sub
-
+    Public Function GetGraysacleArray() As Single()
+        Dim p As Integer = 0
+        Dim i As Integer
+        For y = 0 To height - 1
+            For x = 0 To width - 1
+                Greyimage(i) += bytes(p)
+                Greyimage(i) += bytes(p + 1)
+                Greyimage(i) = bytes(p + 2)
+                i += 1
+                p += 3
+            Next
+            p += offset
+        Next
+        Return Greyimage
+    End Function
     Public Sub lock()
         byteToBitmap(byteCopy, bmp)
     End Sub

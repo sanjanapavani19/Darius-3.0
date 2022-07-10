@@ -12,10 +12,8 @@ Public Class Form1
     Public Display As ImageDisplay
     Public LEDcontroller As Relay
     Dim IsDragging As Boolean
-
     Dim AutoFocus As FocusStructure
     Dim Slideloaded As Boolean
-
     Dim StopAlign As Boolean
     Dim panel As Integer
     Dim Focusing As Boolean
@@ -25,11 +23,7 @@ Public Class Form1
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
-        LEDcontroller = New Relay
-        LEDcontroller.SetRelays(1, False)
-        LEDcontroller.SetRelays(2, False)
-
-        Preview = New PreviewWebcam
+        Preview = New PreviewVimba(60, 0.1, Pbar)
         TextBox_PrevieEXp.Text = Setting.Gett("PREVIEWEXP")
         TextBox_PreviewFocus.Text = Setting.Gett("PREVIEWFOCUS")
 
@@ -63,12 +57,18 @@ Public Class Form1
 
 
         If Camera.status Then
-            'Camera.SetFlatField("ff.tif", "dark.tif")
+
+            Camera.SetFlatField("ff.tif", "dark.tif")
             GoLive()
             ArrangeControls(10)
         End If
 
-        GetPreview(True)
+
+        LEDcontroller = New Relay
+        'LEDcontroller.SetRelays(1, True)
+        'LEDcontroller.SetRelays(2, False)
+
+        'GetPreview(True)
     End Sub
 
 
@@ -95,11 +95,6 @@ Public Class Form1
         PictureBox2.Top = d
         PictureBox2.Left = d
 
-        PictureBox3.Width = Display.Width * scale
-        PictureBox3.Height = Display.Height * scale
-        PictureBox3.SizeMode = PictureBoxSizeMode.Zoom
-        PictureBox3.Top = d
-        PictureBox3.Left = d
 
 
 
@@ -109,8 +104,11 @@ Public Class Form1
         TabControl2.Left = TabControl1.Width + d
         TabControl2.Width = Me.ClientSize.Width - TabControl1.Width - d
         TabControl2.Height = TabControl1.Height
+
+
+
         PictureBox_Preview.Left = d
-        PictureBox_Preview.Top = d
+        PictureBox_Preview.Top = d + GroupBox2.Top + GroupBox2.Height
         PictureBox_Preview.Width = (TabControl2.Width - 2 * d - GroupBox3.Height * 1.5) * 0.8
 
         Tracking = New TrackingStructure(PictureBox_Preview)
@@ -198,13 +196,13 @@ Public Class Form1
 
     Private Sub Button_top_Click(sender As Object, e As EventArgs) Handles Button_top.Click
 
-        Stage.MoveRelative(Stage.Yaxe, -Stage.FOVY)
+        Stage.MoveRelative(Stage.Yaxe, Stage.FOVY)
         ExitEDOf()
     End Sub
 
     Private Sub Button_bottom_Click(sender As Object, e As EventArgs) Handles Button_bottom.Click
 
-        Stage.MoveRelative(Stage.Yaxe, Stage.FOVY)
+        Stage.MoveRelative(Stage.Yaxe, -Stage.FOVY)
         ExitEDOf()
     End Sub
 
@@ -222,6 +220,7 @@ Public Class Form1
     End Sub
 
     Private Sub Form1_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
+        Stage.MoveAbsolute(Stage.Zaxe, 25)
         If Camera.status = True Then
             ExitLive()
 
@@ -236,12 +235,12 @@ Public Class Form1
             PictureBox0.SizeMode = PictureBoxSizeMode.CenterImage
             PictureBox1.SizeMode = PictureBoxSizeMode.CenterImage
             PictureBox2.SizeMode = PictureBoxSizeMode.CenterImage
-            PictureBox3.SizeMode = PictureBoxSizeMode.CenterImage
+
         Else
             PictureBox0.SizeMode = PictureBoxSizeMode.Zoom
             PictureBox1.SizeMode = PictureBoxSizeMode.Zoom
             PictureBox2.SizeMode = PictureBoxSizeMode.Zoom
-            PictureBox3.SizeMode = PictureBoxSizeMode.Zoom
+
         End If
     End Sub
 
@@ -321,9 +320,9 @@ Public Class Form1
             If Display.RequestIbIc = 0 Then Camera.ResetMatrix() : Display.RequestIbIc = 1
             Camera.capture()
 
-            If Display.imagetype = ImagetypeEnum.Brightfield Then PictureBox0.Image = Display.Preview(Camera.Bytes, True)
-            If Display.imagetype = ImagetypeEnum.Fluorescence Then PictureBox1.Image = Display.Preview(Camera.Bytes, True)
-            If Display.imagetype = ImagetypeEnum.MUSE Then PictureBox3.Image = Display.Preview(Camera.Bytes, True)
+            If Display.imagetype = ImagetypeEnum.Brightfield Then PictureBox0.Image = Display.Preview(Camera.Bytes, True).Clone
+            If Display.imagetype = ImagetypeEnum.Fluorescence Then PictureBox1.Image = Display.Preview(Camera.Bytes, True).Clone
+
 
             Application.DoEvents()
         Loop
@@ -401,7 +400,7 @@ Public Class Form1
 
             If Display.imagetype = ImagetypeEnum.Fluorescence Then Display.imagetype = ImagetypeEnum.EDF_Fluorescence : PictureBox2.Image = PictureBox1.Image
             If Display.imagetype = ImagetypeEnum.Brightfield Then Display.imagetype = ImagetypeEnum.EDF_Brightfield : PictureBox2.Image = PictureBox0.Image
-            If Display.imagetype = ImagetypeEnum.MUSE Then Display.imagetype = ImagetypeEnum.EDF_MUSE : PictureBox2.Image = PictureBox3.Image
+
             Dim ccMatrix As Single = Camera.CCMAtrix
             ExitLive() : Camera.ResetMatrix()
 
@@ -461,13 +460,13 @@ Public Class Form1
 
 
 
-    Private Sub PictureBox0_MouseDown(sender As Object, e As MouseEventArgs) Handles PictureBox0.MouseDown, PictureBox1.MouseDown, PictureBox2.MouseDown, PictureBox3.MouseDown
+    Private Sub PictureBox0_MouseDown(sender As Object, e As MouseEventArgs) Handles PictureBox0.MouseDown, PictureBox1.MouseDown, PictureBox2.MouseDown
         Stage.xp = e.X
         Stage.yp = e.Y
 
     End Sub
 
-    Private Sub PictureBox0_MouseUp(sender As Object, e As MouseEventArgs) Handles PictureBox0.MouseUp, PictureBox1.MouseUp, PictureBox2.MouseUp, PictureBox3.MouseUp
+    Private Sub PictureBox0_MouseUp(sender As Object, e As MouseEventArgs) Handles PictureBox0.MouseUp, PictureBox1.MouseUp, PictureBox2.MouseUp
 
         Dim Z As Integer = 1
         '   If Display.zoom Then Z = Display.sampeling Else Z = 1
@@ -608,53 +607,9 @@ Public Class Form1
 
         Dim ColorBytes(Camera.W * Camera.H * 3 - 1)
 
-        'Dim Fit As New Polynomial_fit
-        Dim A(4) As Double
 
 
 
-        'If Tracking.ROI.IsMade And Not CheckBox2.Checked Then
-
-
-        '    Dim vx(Tracking.ROI.numDots * 2 - 1) As Single
-        '    Dim vy(Tracking.ROI.numDots - 1) As Single
-
-        '    AutoFocus.Initialize()
-        '    For i = 0 To Tracking.ROI.numDots - 1
-        '        Tracking.MovetoDots(i)
-
-        '        vy(i) = DoAutoFocus(False, False)
-
-
-        '        vx(i * 2) = Stage.X
-        '        vx(i * 2 + 1) = Stage.Y
-        '        Dim imgtest(Camera.Wbinned * Camera.Hbinned - 1) As Byte
-        '        Camera.Capture()
-        '        SaveSinglePageTiff("c:\temp\" + i.ToString + ".tif", Camera.Bytes, Camera.Wbinned, Camera.Hbinned)
-        '        If Scanning = False Then AutoFocus.Release() : GoTo 1
-
-        '    Next
-        '    AutoFocus.Release()
-        '    A = Fit.Main(vx, vy, 1000, 0.0000001)
-        '    If A.Sum = 0 Then
-        '        MsgBox("Predicytive focus couldn't be estimated. Try moving your points inside the tissue.")
-        '        Scanning = False : GoTo 1
-        '    End If
-
-        '    Tracking.MovetoROIEdge()
-        '    Dim X0 As Single = Stage.X
-        '    Dim Y0 As Single = Stage.Y
-
-        'End If
-
-
-        'Stage.SetAcceleration(Stage.Zaxe, AutoFocus.Zacceleration)
-        'If Tracking.ROI.IsMade Then
-        '    Tracking.MovetoROIEdge()
-        '    If Not CheckBox2.Checked Then Stage.MoveAbsolute(Stage.Zaxe, Fit.ComputeE({Stage.X, Stage.Y}, A))
-
-
-        'End If
         If Tracking.ROI.IsMade Then
             Tracking.MovetoROIEdge()
         End If
@@ -664,14 +619,13 @@ Public Class Form1
             For loop_x = 1 To X
                 Pbar.Increment(1)
                 If Scanning = False Then GoTo 1
+
+
                 If CheckBox2.Checked Then
                     ZEDOF.AcquireThreaded(False, False)
-
                 Else
-
                     'Camera.Capture_Threaded()
                     'Thread.Sleep(Camera.exp * 1.2)
-
                     Camera.capture()
                 End If
 
@@ -683,22 +637,16 @@ Public Class Form1
                     Else
                         Stage.MoveRelative(Stage.Xaxe, -AdjustedStepX * direction, False) : Axis = "X"
                     End If
-
-
                     Stage.X += -AdjustedStepX * direction
-
 
                 Else
                     If loop_y < y Then
                         If CheckBox2.Checked Then
-                            Stage.MoveRelativeAsync(Stage.Yaxe, AdjustedStepY, False) : Axis = "y"
+                            Stage.MoveRelativeAsync(Stage.Yaxe, -AdjustedStepY, False) : Axis = "y"
                         Else
-                            Stage.MoveRelative(Stage.Yaxe, AdjustedStepY, False) : Axis = "y"
+                            Stage.MoveRelative(Stage.Yaxe, -AdjustedStepY, False) : Axis = "y"
                         End If
-
-
                         Stage.Y += AdjustedStepY
-
 
                     End If
                 End If
@@ -857,129 +805,7 @@ Public Class Form1
     Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Button3.Click
         AcquireFlatFieldOld()
     End Sub
-    Public Sub AcquireFlatfieldNew()
-        Dim WasLive As Boolean
-        If Camera.busy Then ExitLive() : WasLive = True
-        Pbar.Value = 0
 
-        Select Case Display.imagetype
-            Case ImagetypeEnum.Brightfield
-                Stage.MoveAbsolute(Stage.Xaxe, Setting.Gett("FLATFIEDX_WD"))
-                Stage.MoveAbsolute(Stage.Yaxe, Setting.Gett("FLATFIEDY_WD"))
-                Stage.MoveAbsolute(Stage.Zaxe, Setting.Gett("FLATFIEDZ_WD"))
-                Camera.SetExposure(Setting.Gett("FLATFIELD_EXP_WD"), False)
-            Case ImagetypeEnum.Fluorescence
-                '
-                'Camera.SetExposure(Setting.Gett("FLATFIELD_EXP_FIBI"), False)
-        End Select
-
-
-
-        'Camera.SensorType(1)
-        'Camera.Capture()
-
-        Camera.Flatfield(0)
-        Camera.SetROI()
-        Camera.SetDataMode(Colortype.Grey)
-        Camera.SetROI()
-
-        'Camera.SetColorGain(1, 1, 1)
-        Camera.ResetMatrix()
-
-        CheckBoxLED.Checked = False
-        Thread.Sleep(500)
-        Dim dark(Camera.W * Camera.H - 1) As Single
-        Pbar.Maximum = 50
-
-
-        Camera.capture()
-        For y = 1 To 5
-            For x = 1 To 5
-
-
-                Pbar.Increment(1)
-                For i = 0 To Camera.W * Camera.H - 1
-                    dark(i) += Camera.Bytes(i)
-                    'dark(i) = 0
-                Next
-            Next
-
-        Next
-
-        'Dim BLure = New FFTW_VB_Real(Camera.W, Camera.H)
-        'BLure.MakeGaussianReal(0.5, BLure.MTF, 2)
-        'BLure.UpLoad(dark)
-        'BLure.Process_FT_MTF()
-        'BLure.DownLoad(dark)
-
-
-        SaveSinglePageTiff16("dark.tif", dark, Camera.W, Camera.H)
-        CheckBoxLED.Checked = True
-        Thread.Sleep(500)
-
-
-
-        Dim Flatfield(Camera.W * Camera.H - 1) As Single
-        Dim Flatfieldbytes(Camera.W * Camera.H - 1) As Byte
-        Dim direction As Integer = 1
-        For y = 1 To 5
-            For x = 1 To 5
-                'Stage.MoveRelative(Stage.Xaxe, direction * Stage.FOVX / 10)
-                Camera.capture()
-                Pbar.Increment(1)
-                For i = 0 To Camera.W * Camera.H - 1
-                    Flatfield(i) += Camera.Bytes(i)
-                Next
-            Next
-            'Stage.MoveRelative(Stage.Yaxe, Stage.FOVY / 10)
-            direction *= -1
-        Next
-        'Stage.MoveRelative(Stage.Yaxe, -5 * Stage.FOVY / 10)
-        'Stage.MoveRelative(Stage.Xaxe, -5 * Stage.FOVX / 10)
-
-
-        'BLure.UpLoad(Flatfield)
-        'BLure.Process_FT_MTF()
-        'BLure.DownLoad(Flatfield)
-
-
-        'For i = 0 To Camera.W * Camera.H - 1
-        '    If Flatfield(i) > 255 Then Flatfield(i) = 255
-        '    Flatfieldbytes(i) = Flatfield(i)
-        'Next
-
-        Select Case Display.imagetype
-            Case ImagetypeEnum.Brightfield
-                SaveSinglePageTiff16("ff.tif", Flatfield, Camera.W, Camera.H)
-                Camera.SetExposure(Setting.Gett("EXPOSUREB"), True)
-            Case ImagetypeEnum.Fluorescence
-                SaveSinglePageTiff16("ff_FiBi.tif", Flatfield, Camera.W, Camera.H)
-                Camera.SetExposure(Setting.Gett("EXPOSUREF"), True)
-        End Select
-
-
-        'Camera.SensorType(4)
-        Camera.SetDataMode(Colortype.RGB)
-        Camera.SetROI()
-        Camera.SetDataMode(Colortype.RGB)
-        Camera.capture()
-
-
-        Select Case Display.imagetype
-            Case ImagetypeEnum.Brightfield
-                Camera.SetFlatField("ff.tif", "dark.tif")
-
-            Case ImagetypeEnum.Fluorescence
-                Camera.SetFlatField("ff_FiBi.tif", "dark.tif")
-
-        End Select
-        ' setting back the color gain 
-
-        Display.SetColorGain(Val(TextBox_GainR.Text), Val(TextBox_GainG.Text), Val(TextBox_GainB.Text), Display.imagetype)
-        Pbar.Value = 0
-        'Camera.Capture()
-        If WasLive Then GoLive()
-    End Sub
     Public Sub AcquireFlatFieldOld()
         Dim WasLive As Boolean
         If Camera.busy Then ExitLive() : WasLive = True
@@ -1000,20 +826,21 @@ Public Class Form1
 
 
         'Turning off the color Gains
-        Camera.SetColorGain(1, 1, 1)
+        'Camera.SetColorGain(1, 1, 1)
 
 
-        Pbar.Maximum = 50
+        Pbar.Maximum = 100
 
-        Camera.capture()
 
-        For y = 1 To 5
-            For x = 1 To 5
+
+        For y = 1 To 10
+            For x = 1 To 10
                 'Stage.MoveRelative(Stage.Xaxe, direction * Stage.FOVX / 10)
-
+                'Camera.capture()
                 Pbar.Increment(1)
                 For i = 0 To Camera.W * Camera.H - 1
-                    dark(i) += Camera.Bytes(i)
+
+                    dark(i) += Camera.Bytes(i) * 0
                 Next
             Next
 
@@ -1027,8 +854,8 @@ Public Class Form1
         Dim Flatfield(Camera.W * Camera.H - 1) As Single
         Dim Flatfieldbytes(Camera.W * Camera.H - 1) As Byte
         Dim direction As Integer = 1
-        For y = 1 To 5
-            For x = 1 To 5
+        For y = 1 To 10
+            For x = 1 To 10
                 'Stage.MoveRelative(Stage.Xaxe, direction * Stage.FOVX / 10)
                 Camera.capture()
                 Pbar.Increment(1)
@@ -1049,8 +876,8 @@ Public Class Form1
 
 
         'For i = 0 To Camera.W * Camera.H - 1
-        '    If Flatfield(i) > 255 Then Flatfield(i) = 255
-        '    Flatfieldbytes(i) = Flatfield(i)
+        '    'If Flatfield(i) > 255 Then Flatfield(i) = 255
+        '    Flatfield(i) = Flatfield(i)
         'Next
 
         Select Case Display.imagetype
@@ -1066,8 +893,7 @@ Public Class Form1
 
         Camera.SetDataMode(Colortype.RGB)
         Camera.SetROI()
-        Camera.SetDataMode(Colortype.RGB)
-        Camera.capture()
+
 
 
         Select Case Display.imagetype
@@ -1096,23 +922,22 @@ Public Class Form1
         GetPreview()
 
     End Sub
-    Public Sub MovetoPreview()
-        Stage.MoveAbsolute(Stage.Zaxe, 0)
-        Stage.MoveAbsolute(Stage.Yaxe, 0)
-        Stage.MoveAbsolute(Stage.Xaxe, 12)
 
-    End Sub
     Public Sub GetPreview(Optional wait As Boolean = True)
-        MovetoPreview()
+        Preview.MovetoPreview()
         MsgBox("Load the sample and hit OK.")
+
+        UpdateLED(False)
+        LEDcontroller.SetRelays(4, True)
         Tracking.UpdateBmp(Preview.Capture(Val(TextBox_PrevieEXp.Text), Val(TextBox_PreviewFocus.Text)))
+        LEDcontroller.SetRelays(4, False)
+        UpdateLED(CheckBoxLED.Checked)
+
 
         'stage.MoveAbsolute(stage.Zaxe, lastZ)
         Dim ID As String = Mid(Now.Year, 3).ToString & Now.Month.ToString & Now.Day.ToString & Now.Hour.ToString & Now.Minute.ToString & Now.Second.ToString
         Tracking.bmp.bmp.Save("C:\Previews\" + ID + ".png")
         Tracking.Pbox.Image = Tracking.bmp.bmp
-
-
 
 
         Slideloaded = True
@@ -1150,12 +975,6 @@ Public Class Form1
                     LEDcontroller.SetRelays(4, False)
                 End If
 
-                If Display.imagetype = ImagetypeEnum.MUSE Then
-                    LEDcontroller.SetRelays(1, False)
-                    LEDcontroller.SetRelays(2, False)
-                    LEDcontroller.SetRelays(3, True)
-                    LEDcontroller.SetRelays(4, True)
-                End If
 
             Else
                 LEDcontroller.SetRelays(1, False)
@@ -1181,9 +1000,7 @@ Public Class Form1
     End Sub
 
     Private Sub Button8_Click(sender As Object, e As EventArgs) Handles Button8.Click
-        MovetoPreview()
-
-
+        Preview.MovetoPreview()
     End Sub
 
     Private Sub Button13_Click(sender As Object, e As EventArgs) Handles Button13.Click
@@ -1193,11 +1010,16 @@ Public Class Form1
     End Sub
 
     Private Sub Button12_Click(sender As Object, e As EventArgs) Handles Button12.Click
-        Preview.CaptureWhole(Val(TextBox_PrevieEXp.Text), Val(TextBox_PreviewFocus.Text)).Save("c:\temp\whole.jpg")
 
+        UpdateLED(False)
+        LEDcontroller.SetRelays(4, True)
+
+        Preview.CaptureWhole(Val(TextBox_PrevieEXp.Text), Val(TextBox_PreviewFocus.Text)).Save("c:\temp\whole.jpg")
         Tracking.UpdateBmp(Preview.Capture(Val(TextBox_PrevieEXp.Text), Val(TextBox_PreviewFocus.Text)))
-        Preview.bmpf.Save("C:\temp\preview.jpg")
+        Preview.Bmp.Save("C:\temp\preview.jpg")
         PictureBox_Preview.Image = Tracking.bmp.bmp
+        LEDcontroller.SetRelays(4, False)
+        UpdateLED(CheckBoxLED.Checked)
 
     End Sub
 
@@ -1205,6 +1027,7 @@ Public Class Form1
     Private Sub TextBox_PrevieEXp_KeyDown(sender As Object, e As KeyEventArgs) Handles TextBox_PrevieEXp.KeyDown
         If e.KeyCode = Keys.Return Then
             Setting.Sett("PREVIEWEXP", TextBox_PrevieEXp.Text)
+            Preview.SetExposure(TextBox_PrevieEXp.Text)
         End If
 
     End Sub
@@ -1286,7 +1109,7 @@ Public Class Form1
 
 
 
-    Private Sub PictureBox_MouseWheel(sender As Object, e As MouseEventArgs) Handles PictureBox0.MouseWheel, PictureBox1.MouseWheel, PictureBox2.MouseWheel, PictureBox3.MouseWheel
+    Private Sub PictureBox_MouseWheel(sender As Object, e As MouseEventArgs) Handles PictureBox0.MouseWheel, PictureBox1.MouseWheel, PictureBox2.MouseWheel
         If Focusing = True Then Exit Sub
         Focusing = True
         ExitEDOf()
@@ -1295,9 +1118,9 @@ Public Class Form1
 
         'If XYZ.name = "NewPort" Then
         If e.Delta > 0 Then
-            Stage.MoveRelative(Stage.Zaxe, speed * 0.001 * Math.Abs(e.Delta) / 120)
+            Stage.MoveRelativeAsync(Stage.Zaxe, speed * 0.001 * Math.Abs(e.Delta) / 120)
         Else
-            Stage.MoveRelative(Stage.Zaxe, speed * -0.001 * Math.Abs(e.Delta) / 120)
+            Stage.MoveRelativeAsync(Stage.Zaxe, speed * -0.001 * Math.Abs(e.Delta) / 120)
         End If
         Focusing = False
     End Sub
@@ -1680,19 +1503,49 @@ Public Class Form1
 
 
     Private Sub Button11_Click(sender As Object, e As EventArgs) Handles Button11.Click
-        Camera.Flatfield(1)
+
+
+
+        Select Case Display.imagetype
+            Case ImagetypeEnum.Brightfield
+                Camera.SetFlatField("ff.tif", "dark.tif")
+
+            Case ImagetypeEnum.Fluorescence
+                Camera.SetFlatField("ff_FiBi.tif", "dark.tif")
+
+        End Select
+
     End Sub
 
     Private Sub Button32_Click(sender As Object, e As EventArgs) Handles Button32.Click
         Camera.Flatfield(0)
     End Sub
 
-    Private Sub TextBox_GainB_TextChanged(sender As Object, e As EventArgs) Handles TextBox_GainB.TextChanged
+
+    Private Sub TextBox_PrevieEXp_MouseDown(sender As Object, e As MouseEventArgs) Handles TextBox_PrevieEXp.MouseDown
 
     End Sub
 
-    Private Sub PictureBox0_Click(sender As Object, e As EventArgs) Handles PictureBox0.Click
+    Private Sub Button33_Click(sender As Object, e As EventArgs) Handles Button33.Click
+        UpdateLED(False)
+        LEDcontroller.SetRelays(4, True)
+        Preview.MovetoPreview()
+        Preview.EstimateProfile()
+        LEDcontroller.SetRelays(4, False)
+        UpdateLED(CheckBoxLED.Checked)
+    End Sub
 
+    Private Sub CheckBox3_CheckedChanged(sender As Object, e As EventArgs) Handles CheckBox3.CheckedChanged
+        UpdateLED(False)
+        LEDcontroller.SetRelays(4, CheckBox3.Checked)
+    End Sub
+
+    Private Sub RadioButton2_CheckedChanged(sender As Object, e As EventArgs) Handles RadioButton2.CheckedChanged
+        If RadioButton2.Checked Then
+            PictureBox_Preview.Image = Preview.ZmapBmp.bmp
+        Else
+            PictureBox_Preview.Image = Preview.Bmp
+        End If
     End Sub
 End Class
 

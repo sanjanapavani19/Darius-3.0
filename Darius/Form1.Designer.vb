@@ -113,6 +113,8 @@ Partial Class Form1
         Me.Button_experiment = New System.Windows.Forms.Button()
         Me.Button_OpenHtml = New System.Windows.Forms.Button()
         Me.TabPage2 = New System.Windows.Forms.TabPage()
+        Me.CheckBox3 = New System.Windows.Forms.CheckBox()
+        Me.Button33 = New System.Windows.Forms.Button()
         Me.Button16 = New System.Windows.Forms.Button()
         Me.Button13 = New System.Windows.Forms.Button()
         Me.Button12 = New System.Windows.Forms.Button()
@@ -148,8 +150,6 @@ Partial Class Form1
         Me.PictureBox1 = New System.Windows.Forms.PictureBox()
         Me.TabPage10 = New System.Windows.Forms.TabPage()
         Me.PictureBox2 = New System.Windows.Forms.PictureBox()
-        Me.TabPage14 = New System.Windows.Forms.TabPage()
-        Me.PictureBox3 = New System.Windows.Forms.PictureBox()
         Me.Button_Brightfield_Acquire = New System.Windows.Forms.Button()
         Me.OpenFileDialog1 = New System.Windows.Forms.OpenFileDialog()
         Me.SaveFileDialog1 = New System.Windows.Forms.SaveFileDialog()
@@ -172,6 +172,9 @@ Partial Class Form1
         Me.Timer1 = New System.Windows.Forms.Timer(Me.components)
         Me.TabControl2 = New System.Windows.Forms.TabControl()
         Me.TabPage6 = New System.Windows.Forms.TabPage()
+        Me.GroupBox2 = New System.Windows.Forms.GroupBox()
+        Me.RadioButton2 = New System.Windows.Forms.RadioButton()
+        Me.RadioButton1 = New System.Windows.Forms.RadioButton()
         Me.Button_Sedeen = New System.Windows.Forms.Button()
         Me.PictureBox_Preview = New System.Windows.Forms.PictureBox()
         Me.Button_Luigi = New System.Windows.Forms.Button()
@@ -196,12 +199,11 @@ Partial Class Form1
         CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.TabPage10.SuspendLayout()
         CType(Me.PictureBox2, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.TabPage14.SuspendLayout()
-        CType(Me.PictureBox3, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.Chart1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.StatusStrip1.SuspendLayout()
         Me.TabControl2.SuspendLayout()
         Me.TabPage6.SuspendLayout()
+        Me.GroupBox2.SuspendLayout()
         CType(Me.PictureBox_Preview, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.TabPage7.SuspendLayout()
         Me.SuspendLayout()
@@ -213,7 +215,7 @@ Partial Class Form1
         Me.GroupBox3.Controls.Add(Me.Button_top)
         Me.GroupBox3.Controls.Add(Me.Button_left)
         Me.GroupBox3.Controls.Add(Me.Button_right)
-        Me.GroupBox3.Location = New System.Drawing.Point(36, 188)
+        Me.GroupBox3.Location = New System.Drawing.Point(36, 233)
         Me.GroupBox3.Name = "GroupBox3"
         Me.GroupBox3.Size = New System.Drawing.Size(165, 170)
         Me.GroupBox3.TabIndex = 106
@@ -1157,6 +1159,8 @@ Partial Class Form1
         '
         'TabPage2
         '
+        Me.TabPage2.Controls.Add(Me.CheckBox3)
+        Me.TabPage2.Controls.Add(Me.Button33)
         Me.TabPage2.Controls.Add(Me.Button16)
         Me.TabPage2.Controls.Add(Me.Button13)
         Me.TabPage2.Controls.Add(Me.Button12)
@@ -1169,6 +1173,25 @@ Partial Class Form1
         Me.TabPage2.TabIndex = 6
         Me.TabPage2.Text = "Preview"
         Me.TabPage2.UseVisualStyleBackColor = True
+        '
+        'CheckBox3
+        '
+        Me.CheckBox3.AutoSize = True
+        Me.CheckBox3.Location = New System.Drawing.Point(203, 94)
+        Me.CheckBox3.Name = "CheckBox3"
+        Me.CheckBox3.Size = New System.Drawing.Size(47, 17)
+        Me.CheckBox3.TabIndex = 139
+        Me.CheckBox3.Text = "LED"
+        Me.CheckBox3.UseVisualStyleBackColor = True
+        '
+        'Button33
+        '
+        Me.Button33.Location = New System.Drawing.Point(363, 57)
+        Me.Button33.Name = "Button33"
+        Me.Button33.Size = New System.Drawing.Size(119, 23)
+        Me.Button33.TabIndex = 8
+        Me.Button33.Text = "Estimate Profile"
+        Me.Button33.UseVisualStyleBackColor = True
         '
         'Button16
         '
@@ -1450,7 +1473,6 @@ Partial Class Form1
         Me.TabControl1.Controls.Add(Me.TabPage3)
         Me.TabControl1.Controls.Add(Me.TabPage4)
         Me.TabControl1.Controls.Add(Me.TabPage10)
-        Me.TabControl1.Controls.Add(Me.TabPage14)
         Me.TabControl1.ItemSize = New System.Drawing.Size(71, 15)
         Me.TabControl1.Location = New System.Drawing.Point(0, 47)
         Me.TabControl1.Multiline = True
@@ -1518,25 +1540,6 @@ Partial Class Form1
         Me.PictureBox2.TabIndex = 3
         Me.PictureBox2.TabStop = False
         '
-        'TabPage14
-        '
-        Me.TabPage14.Controls.Add(Me.PictureBox3)
-        Me.TabPage14.Location = New System.Drawing.Point(19, 4)
-        Me.TabPage14.Name = "TabPage14"
-        Me.TabPage14.Size = New System.Drawing.Size(1076, 992)
-        Me.TabPage14.TabIndex = 4
-        Me.TabPage14.Text = "MUSE"
-        Me.TabPage14.UseVisualStyleBackColor = True
-        '
-        'PictureBox3
-        '
-        Me.PictureBox3.BackColor = System.Drawing.Color.Black
-        Me.PictureBox3.Location = New System.Drawing.Point(6, 6)
-        Me.PictureBox3.Name = "PictureBox3"
-        Me.PictureBox3.Size = New System.Drawing.Size(966, 946)
-        Me.PictureBox3.TabIndex = 4
-        Me.PictureBox3.TabStop = False
-        '
         'Button_Brightfield_Acquire
         '
         Me.Button_Brightfield_Acquire.Location = New System.Drawing.Point(227, 10)
@@ -1563,7 +1566,7 @@ Partial Class Form1
         Me.Chart1.ChartAreas.Add(ChartArea1)
         Legend1.Name = "Legend1"
         Me.Chart1.Legends.Add(Legend1)
-        Me.Chart1.Location = New System.Drawing.Point(249, 217)
+        Me.Chart1.Location = New System.Drawing.Point(249, 262)
         Me.Chart1.Name = "Chart1"
         Series1.ChartArea = "ChartArea1"
         Series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Area
@@ -1661,7 +1664,7 @@ Partial Class Form1
         'ListBox1
         '
         Me.ListBox1.FormattingEnabled = True
-        Me.ListBox1.Location = New System.Drawing.Point(572, 34)
+        Me.ListBox1.Location = New System.Drawing.Point(572, 79)
         Me.ListBox1.Name = "ListBox1"
         Me.ListBox1.Size = New System.Drawing.Size(153, 251)
         Me.ListBox1.TabIndex = 139
@@ -1669,7 +1672,7 @@ Partial Class Form1
         'Button_GIMP
         '
         Me.Button_GIMP.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Button_GIMP.Location = New System.Drawing.Point(543, 345)
+        Me.Button_GIMP.Location = New System.Drawing.Point(543, 390)
         Me.Button_GIMP.Name = "Button_GIMP"
         Me.Button_GIMP.Size = New System.Drawing.Size(50, 50)
         Me.Button_GIMP.TabIndex = 140
@@ -1735,6 +1738,7 @@ Partial Class Form1
         '
         'TabPage6
         '
+        Me.TabPage6.Controls.Add(Me.GroupBox2)
         Me.TabPage6.Controls.Add(Me.Button_Sedeen)
         Me.TabPage6.Controls.Add(Me.PictureBox_Preview)
         Me.TabPage6.Controls.Add(Me.ListBox1)
@@ -1750,10 +1754,43 @@ Partial Class Form1
         Me.TabPage6.Text = "Preview"
         Me.TabPage6.UseVisualStyleBackColor = True
         '
+        'GroupBox2
+        '
+        Me.GroupBox2.Controls.Add(Me.RadioButton2)
+        Me.GroupBox2.Controls.Add(Me.RadioButton1)
+        Me.GroupBox2.Location = New System.Drawing.Point(16, 25)
+        Me.GroupBox2.Name = "GroupBox2"
+        Me.GroupBox2.Size = New System.Drawing.Size(550, 48)
+        Me.GroupBox2.TabIndex = 148
+        Me.GroupBox2.TabStop = False
+        Me.GroupBox2.Text = "GroupBox2"
+        '
+        'RadioButton2
+        '
+        Me.RadioButton2.AutoSize = True
+        Me.RadioButton2.Location = New System.Drawing.Point(90, 19)
+        Me.RadioButton2.Name = "RadioButton2"
+        Me.RadioButton2.Size = New System.Drawing.Size(54, 17)
+        Me.RadioButton2.TabIndex = 1
+        Me.RadioButton2.Text = "Profile"
+        Me.RadioButton2.UseVisualStyleBackColor = True
+        '
+        'RadioButton1
+        '
+        Me.RadioButton1.AutoSize = True
+        Me.RadioButton1.Checked = True
+        Me.RadioButton1.Location = New System.Drawing.Point(20, 20)
+        Me.RadioButton1.Name = "RadioButton1"
+        Me.RadioButton1.Size = New System.Drawing.Size(54, 17)
+        Me.RadioButton1.TabIndex = 0
+        Me.RadioButton1.TabStop = True
+        Me.RadioButton1.Text = "Image"
+        Me.RadioButton1.UseVisualStyleBackColor = True
+        '
         'Button_Sedeen
         '
         Me.Button_Sedeen.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Button_Sedeen.Location = New System.Drawing.Point(572, 450)
+        Me.Button_Sedeen.Location = New System.Drawing.Point(572, 495)
         Me.Button_Sedeen.Name = "Button_Sedeen"
         Me.Button_Sedeen.Size = New System.Drawing.Size(50, 50)
         Me.Button_Sedeen.TabIndex = 147
@@ -1763,7 +1800,7 @@ Partial Class Form1
         'PictureBox_Preview
         '
         Me.PictureBox_Preview.BackColor = System.Drawing.Color.Black
-        Me.PictureBox_Preview.Location = New System.Drawing.Point(16, 34)
+        Me.PictureBox_Preview.Location = New System.Drawing.Point(16, 79)
         Me.PictureBox_Preview.Name = "PictureBox_Preview"
         Me.PictureBox_Preview.Size = New System.Drawing.Size(550, 134)
         Me.PictureBox_Preview.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom
@@ -1775,7 +1812,7 @@ Partial Class Form1
         Me.Button_Luigi.BackgroundImage = CType(resources.GetObject("Button_Luigi.BackgroundImage"), System.Drawing.Image)
         Me.Button_Luigi.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
         Me.Button_Luigi.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Button_Luigi.Location = New System.Drawing.Point(599, 345)
+        Me.Button_Luigi.Location = New System.Drawing.Point(599, 390)
         Me.Button_Luigi.Name = "Button_Luigi"
         Me.Button_Luigi.Size = New System.Drawing.Size(50, 50)
         Me.Button_Luigi.TabIndex = 146
@@ -1865,13 +1902,13 @@ Partial Class Form1
         CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.TabPage10.ResumeLayout(False)
         CType(Me.PictureBox2, System.ComponentModel.ISupportInitialize).EndInit()
-        Me.TabPage14.ResumeLayout(False)
-        CType(Me.PictureBox3, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.Chart1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.StatusStrip1.ResumeLayout(False)
         Me.StatusStrip1.PerformLayout()
         Me.TabControl2.ResumeLayout(False)
         Me.TabPage6.ResumeLayout(False)
+        Me.GroupBox2.ResumeLayout(False)
+        Me.GroupBox2.PerformLayout()
         CType(Me.PictureBox_Preview, System.ComponentModel.ISupportInitialize).EndInit()
         Me.TabPage7.ResumeLayout(False)
         Me.ResumeLayout(False)
@@ -2025,6 +2062,9 @@ Partial Class Form1
     Friend WithEvents Histogram1 As AForge.Controls.Histogram
     Friend WithEvents Button32 As Button
     Friend WithEvents Button11 As Button
-    Friend WithEvents TabPage14 As TabPage
-    Friend WithEvents PictureBox3 As PictureBox
+    Friend WithEvents Button33 As Button
+    Friend WithEvents CheckBox3 As CheckBox
+    Friend WithEvents GroupBox2 As GroupBox
+    Friend WithEvents RadioButton2 As RadioButton
+    Friend WithEvents RadioButton1 As RadioButton
 End Class

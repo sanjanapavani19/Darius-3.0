@@ -17,14 +17,14 @@ Public Class ZaberASCII
     Public Sub New(FOVX As Single, FOVY As Single)
         Dim com As Connection = Connection.OpenSerialPort("COM4")
         Dim Devicelist = com.DetectDevices()
-        Xaxe = Devicelist(2).GetAxis(1)
-        Yaxe = Devicelist(1).GetAxis(1)
+        Xaxe = Devicelist(1).GetAxis(1)
+        Yaxe = Devicelist(2).GetAxis(1)
         Zaxe = Devicelist(0).GetAxis(1)
         Me.FOVX = FOVX
         Me.FOVY = FOVY
         Home()
         'MoveAbsolute(Xaxe, 3.7, False)
-        'MoveAbsolute(Yaxe, 23, False)
+        MoveAbsolute(Yaxe, 9.9, False)
         'MoveAbsolute(Zaxe, 3, False)
 
     End Sub
@@ -39,8 +39,10 @@ Public Class ZaberASCII
         Zaxe.Home()
         Xaxe.Home()
         Yaxe.Home()
-
-
+        SetAcceleration(Zaxe, 1)
+        SetSpeed(Zaxe, 100)
+        MoveAbsolute(Zaxe, Setting.Gett("Focus"), False)
+        MoveAbsolute(Xaxe, 34, False)
     End Sub
     Public Sub MoveRelative(ByRef Axe As Axis, R As Single, Optional update As Boolean = True)
 
@@ -49,7 +51,7 @@ Public Class ZaberASCII
             Axe.MoveRelative(R, Units.Length_Millimetres)
             If update Then
                 UpdatePositions()
-
+                Tracking.Update()
             End If
         Catch ex As Exception
 
@@ -61,7 +63,7 @@ Public Class ZaberASCII
         Axe.MoveRelativeAsync(R, Units.Length_Millimetres)
         If update Then
             UpdatePositions()
-
+            Tracking.Update()
         Else
 
         End If
@@ -71,7 +73,7 @@ Public Class ZaberASCII
             Axe.MoveAbsolute(A, Units.Length_Millimetres)
             If update Then
                 UpdatePositions()
-
+                Tracking.Update()
             End If
         Catch ex As Exception
 
@@ -85,7 +87,7 @@ Public Class ZaberASCII
             Axe.MoveAbsoluteAsync(A, Units.Length_Millimetres)
             If update Then
                 UpdatePositions()
-
+                Tracking.Update()
             End If
         Catch ex As Exception
 
@@ -104,7 +106,7 @@ Public Class ZaberASCII
     End Sub
 
     Public Sub SetAcceleration(ByRef Axe As Axis, A As Integer)
-        Axe.Settings.Set("accel", A, Units.Acceleration_MillimetresPerSecondSquared)
+        Axe.Settings.Set("accel", A, Units.Acceleration_MetresPerSecondSquared)
     End Sub
 
     Public Function GetPosition(ByRef Axe As Axis) As Single

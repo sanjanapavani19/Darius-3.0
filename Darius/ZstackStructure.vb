@@ -11,7 +11,7 @@
     Dim processDone() As Integer
     Dim Imagecreated() As Integer
     Public direction As Integer
-    Dim Central As CentralDerivitavie
+    Dim Deivative As CentralDerivitavie
     Dim StepSize As Single = 0.01
     Dim Range As Single
     Public OutputBytes() As Byte
@@ -35,7 +35,7 @@
         ReDim GreenBytes(W / 2 * H / 2 - 1)
         BLure = New FFTW_VB_Real(W / 2, H / 2)
         BLure.MakeGaussianReal(0.01, BLure.MTF, 2)
-        Central = New CentralDerivitavie(W / 2, H / 2)
+        Deivative = New CentralDerivitavie(W / 2, H / 2)
 
         'For some stupid reason, the 2D rotates when it copied to a 1D array. It is wiered.... 
         ReDim Pattern2D(H - 1, W - 1)
@@ -99,8 +99,7 @@
             Camera.Trigger()
             MakeDelay()
 
-            Dim MoveThread As New System.Threading.Thread(AddressOf MoveThreaded)
-            MoveThread.Start()
+            Stage.MoveRelativeAsync(Stage.Zaxe, StepSize * direction, False)
             Camera.cam.GetImageByteArray(bytes(loopZ), Camera.timeout)
             'Try
             '    Camera.cam.GetImageByteArray(bytes(loopZ), Camera.timeout)
@@ -124,7 +123,7 @@
                 'Application.DoEvents()
             Loop
             GetColorBytes(bytes(loopZ), GreenBytes, W / 2, H / 2)
-            Central.AnalyzeX(GreenBytes, GreenEdgeBytes(loopZ))
+            Deivative.AnalyzeX(GreenBytes, GreenEdgeBytes(loopZ))
             BLure.UpLoad(GreenEdgeBytes(loopZ))
             BLure.Process_FT_MTF()
             BLure.DownLoad(GreenEdgeBytes(loopZ))
@@ -136,7 +135,7 @@
 
     Public Sub Process()
         GetColorBytes(bytes(zc), GreenBytes, W / 2, H / 2)
-        Central.AnalyzeX(GreenBytes, GreenEdgeBytes(zc))
+        Deivative.AnalyzeX(GreenBytes, GreenEdgeBytes(zc))
         BLure.UpLoad(GreenEdgeBytes(zc))
         BLure.Process_FT_MTF()
         BLure.DownLoad(GreenEdgeBytes(zc))
@@ -156,7 +155,7 @@
     Public Sub Acquire()
         For loopZ = 0 To Z - 1
             '56 ms of transfer time
-            Camera.Capture()
+            Camera.capture()
             ' 38 ms moving to the next field
             Stage.MoveRelative(Stage.Zaxe, StepSize, False)
             ' 7ms upload
@@ -177,7 +176,7 @@
         For zi = 0 To Z - 1
 
             GetColorBytes(bytes(zi), GreenBytes, W / 2, H / 2)
-            Central.AnalyzeX(GreenBytes, GreenEdgeBytes(zi))
+            Deivative.AnalyzeX(GreenBytes, GreenEdgeBytes(zi))
             BLure.UpLoad(GreenEdgeBytes(zi))
             BLure.Process_FT_MTF()
             BLure.DownLoad(GreenEdgeBytes(zi))

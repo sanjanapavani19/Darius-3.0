@@ -47,6 +47,7 @@ Public Class XimeaXIq
 
             '    cam.SetParam(PRM.TRG_SELECTOR, 1)
             cam.SetParam(PRM.ACQ_TIMING_MODE, ACQ_TIMING_MODE.FREE_RUN)
+
             cam.SetParam(PRM.TRG_SOURCE, TRG_SOURCE.SOFTWARE)
             cam.SetParam(PRM.OUTPUT_DATA_BIT_DEPTH, BIT_DEPTH.BPP_8)
 
@@ -55,14 +56,14 @@ Public Class XimeaXIq
             W = OriginalW
             H = OriginalH
             ReDim Bytes(W * H * 3 - 1)
-            timeout = 5000
+            timeout = 50
 
             cam.SetParam(PRM.SHARPNESS, 2)
             gain = Setting.Gett("Gain")
             setGain(gain)
             SetColorGain(Setting.Gett("GainR"), Setting.Gett("GainG"), Setting.Gett("GainB"))
             setGammaY(1)
-            setGammaC(0)
+            setGammaC(1)
             exp = Setting.Gett("exposureb")
             Dim val As Integer
             cam.GetParam(PRM.EXPOSURE, Val)
@@ -74,11 +75,7 @@ Public Class XimeaXIq
             busy = False
             status = True
             StartAcqusition()
-            capture()
-            capture()
-            capture()
-            capture()
-            capture()
+
         End If
 
 
@@ -198,10 +195,17 @@ Public Class XimeaXIq
         cam.SetParam(PRM.TRG_SOFTWARE, 1)
     End Sub
     Public Sub SetFlatField(filename As String, bfilename As String)
-        'cam.SetParam(PRM.FFC_FLAT_FIELD_FILE_NAME, filename)
-        'cam.SetParam(PRM.FFC_DARK_FIELD_FILE_NAME, bfilename)
-        'cam.SetParam(PRM.FFC, 1)
-        'FFsetup = True
+        Try
+            SetDataMode(Colortype.RGB)
+            cam.SetParam(PRM.FFC_FLAT_FIELD_FILE_NAME, filename)
+            cam.SetParam(PRM.FFC_DARK_FIELD_FILE_NAME, bfilename)
+            cam.SetParam(PRM.FFC, 1)
+            FFsetup = True
+        Catch ex As Exception
+            cam.SetParam(PRM.FFC, 0)
+            FFsetup = False
+        End Try
+
     End Sub
 
 
