@@ -48,8 +48,12 @@ Public Class XimeaXIq
             '    cam.SetParam(PRM.TRG_SELECTOR, 1)
             cam.SetParam(PRM.ACQ_TIMING_MODE, ACQ_TIMING_MODE.FREE_RUN)
 
+
             cam.SetParam(PRM.TRG_SOURCE, TRG_SOURCE.SOFTWARE)
             cam.SetParam(PRM.OUTPUT_DATA_BIT_DEPTH, BIT_DEPTH.BPP_8)
+
+            cam.SetParam(PRM.HORIZONTAL_FLIP, 0)
+            cam.SetParam(PRM.VERTICAL_FLIP, 1)
 
             OriginalW = cam.GetParamInt(PRM.WIDTH)
             OriginalH = cam.GetParamInt(PRM.HEIGHT)
@@ -58,7 +62,7 @@ Public Class XimeaXIq
             ReDim Bytes(W * H * 3 - 1)
             timeout = 50
 
-            cam.SetParam(PRM.SHARPNESS, 2)
+            cam.SetParam(PRM.SHARPNESS, 4)
             gain = Setting.Gett("Gain")
             setGain(gain)
             SetColorGain(Setting.Gett("GainR"), Setting.Gett("GainG"), Setting.Gett("GainB"))
@@ -195,6 +199,7 @@ Public Class XimeaXIq
         cam.SetParam(PRM.TRG_SOFTWARE, 1)
     End Sub
     Public Sub SetFlatField(filename As String, bfilename As String)
+        Exit Sub
         Try
             SetDataMode(Colortype.RGB)
             cam.SetParam(PRM.FFC_FLAT_FIELD_FILE_NAME, filename)

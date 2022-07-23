@@ -13,7 +13,7 @@ Public Class ImageDisplay
     Public zoom As Boolean
     Public BmpPreview(Bucketsize) As FastBMP
 
-    Dim f As Integer
+    Public f As Integer
     Public GainR, GainG, GainB As Single
     Public busy As Boolean
     Public HistBin As Integer = 255
@@ -63,7 +63,7 @@ Public Class ImageDisplay
 
     End Sub
 
-    Public Function Preview(ByRef rawin As Byte(), Gained As Boolean) As Bitmap
+    Public Function MakePreview(ByRef rawin As Byte(), Gained As Boolean) As Bitmap
         If RequestIbIc = 2 Then RequestIbIc = 3
         f += 1
         If f = Bucketsize - 1 Then f = 0
@@ -73,7 +73,7 @@ Public Class ImageDisplay
         If RequestIbIc = 1 Then SetIbIc() : RequestIbIc = 2
         '  PlotHistogram()
 
-        Return BmpPreview(f).bmp
+
     End Function
 
     Public Sub ApplyBrightness(rawin As Byte(), CCMAtrix As Single, ByRef bmp As Bitmap)

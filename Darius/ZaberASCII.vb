@@ -15,7 +15,7 @@ Public Class ZaberASCII
     Public Xaxe, Yaxe, Zaxe As Axis
 
     Public Sub New(FOVX As Single, FOVY As Single)
-        Dim com As Connection = Connection.OpenSerialPort("COM4")
+        Dim com As Connection = Connection.OpenSerialPort("COM3")
         Dim Devicelist = com.DetectDevices()
         Xaxe = Devicelist(1).GetAxis(1)
         Yaxe = Devicelist(2).GetAxis(1)
@@ -129,8 +129,8 @@ Public Class ZaberASCII
     End Sub
 
     Public Sub Go_Middle()
-        MoveAbsolute(Xaxe, 12.7)
-        MoveAbsolute(Yaxe, 38)
+        MoveAbsolute(Yaxe, 12.7)
+        MoveAbsolute(Xaxe, 38)
     End Sub
 
     Public Sub SetSweptZ(SweptZ As Single)
@@ -170,15 +170,13 @@ Public Class ZaberASCII
         'StorePosition(Stage.Zaxe, 2)
     End Sub
 
-    Public Sub GoToFocus(block As Boolean)
+    Public Sub GoToFocus()
         Try
 
             Dim ZZ As String = Setting.Gett("Focus")
-            If block Then
-                MoveAbsolute(Zaxe, ZZ - 5, True)
-            Else
-                MoveAbsolute(Zaxe, ZZ, True)
-            End If
+
+            MoveAbsolute(Zaxe, ZZ, True)
+
 
         Catch ex As Exception
 

@@ -350,7 +350,7 @@ Public Class TrackingStructure
     End Sub
     Private Sub Navigate(sender As Object, e As MouseEventArgs) Handles pb.MouseDoubleClick
         Form1.ExitEDOf()
-        Stage.MoveAbsoluteAsync(Stage.Xaxe, ConvertPixeltoCoordinateX(e.X))
+        Stage.MoveAbsolute(Stage.Xaxe, ConvertPixeltoCoordinateX(e.X), False)
         Stage.MoveAbsolute(Stage.Yaxe, ConvertPixeltoCoordinateY(e.Y))
     End Sub
     Public Sub MovetoROIEdge()

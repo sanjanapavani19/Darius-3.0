@@ -24,11 +24,11 @@ Partial Class Form1
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Form1))
-        Dim ChartArea1 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
-        Dim Legend1 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
-        Dim Series1 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
-        Dim Series2 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
-        Dim Series3 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
+        Dim ChartArea2 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
+        Dim Legend2 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
+        Dim Series4 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
+        Dim Series5 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
+        Dim Series6 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
         Me.GroupBox3 = New System.Windows.Forms.GroupBox()
         Me.Button_Home = New System.Windows.Forms.Button()
         Me.Button_bottom = New System.Windows.Forms.Button()
@@ -114,7 +114,6 @@ Partial Class Form1
         Me.Button_OpenHtml = New System.Windows.Forms.Button()
         Me.TabPage2 = New System.Windows.Forms.TabPage()
         Me.CheckBox3 = New System.Windows.Forms.CheckBox()
-        Me.Button33 = New System.Windows.Forms.Button()
         Me.Button16 = New System.Windows.Forms.Button()
         Me.Button13 = New System.Windows.Forms.Button()
         Me.Button12 = New System.Windows.Forms.Button()
@@ -130,6 +129,9 @@ Partial Class Form1
         Me.Button27 = New System.Windows.Forms.Button()
         Me.Button26 = New System.Windows.Forms.Button()
         Me.TabPage11 = New System.Windows.Forms.TabPage()
+        Me.Button34 = New System.Windows.Forms.Button()
+        Me.TextBox23 = New System.Windows.Forms.TextBox()
+        Me.Label24 = New System.Windows.Forms.Label()
         Me.TextBox22 = New System.Windows.Forms.TextBox()
         Me.Label23 = New System.Windows.Forms.Label()
         Me.Label22 = New System.Windows.Forms.Label()
@@ -142,14 +144,11 @@ Partial Class Form1
         Me.Button18 = New System.Windows.Forms.Button()
         Me.Button30 = New System.Windows.Forms.Button()
         Me.Button29 = New System.Windows.Forms.Button()
-        Me.Button4 = New System.Windows.Forms.Button()
+        Me.Button33 = New System.Windows.Forms.Button()
         Me.TabControl1 = New System.Windows.Forms.TabControl()
         Me.TabPage3 = New System.Windows.Forms.TabPage()
-        Me.PictureBox0 = New System.Windows.Forms.PictureBox()
         Me.TabPage4 = New System.Windows.Forms.TabPage()
-        Me.PictureBox1 = New System.Windows.Forms.PictureBox()
         Me.TabPage10 = New System.Windows.Forms.TabPage()
-        Me.PictureBox2 = New System.Windows.Forms.PictureBox()
         Me.Button_Brightfield_Acquire = New System.Windows.Forms.Button()
         Me.OpenFileDialog1 = New System.Windows.Forms.OpenFileDialog()
         Me.SaveFileDialog1 = New System.Windows.Forms.SaveFileDialog()
@@ -173,14 +172,16 @@ Partial Class Form1
         Me.TabControl2 = New System.Windows.Forms.TabControl()
         Me.TabPage6 = New System.Windows.Forms.TabPage()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
-        Me.RadioButton2 = New System.Windows.Forms.RadioButton()
-        Me.RadioButton1 = New System.Windows.Forms.RadioButton()
+        Me.RadioButton_Zprofile = New System.Windows.Forms.RadioButton()
+        Me.RadioButton_Preview = New System.Windows.Forms.RadioButton()
         Me.Button_Sedeen = New System.Windows.Forms.Button()
         Me.PictureBox_Preview = New System.Windows.Forms.PictureBox()
         Me.Button_Luigi = New System.Windows.Forms.Button()
         Me.TabPage7 = New System.Windows.Forms.TabPage()
         Me.CheckBox2 = New System.Windows.Forms.CheckBox()
         Me.Histogram1 = New AForge.Controls.Histogram()
+        Me.Label25 = New System.Windows.Forms.Label()
+        Me.PictureBox0 = New System.Windows.Forms.PictureBox()
         Me.GroupBox3.SuspendLayout()
         Me.TabControl_Settings.SuspendLayout()
         Me.TabPage13.SuspendLayout()
@@ -193,12 +194,6 @@ Partial Class Form1
         Me.TabPage11.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
         Me.TabControl1.SuspendLayout()
-        Me.TabPage3.SuspendLayout()
-        CType(Me.PictureBox0, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.TabPage4.SuspendLayout()
-        CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.TabPage10.SuspendLayout()
-        CType(Me.PictureBox2, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.Chart1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.StatusStrip1.SuspendLayout()
         Me.TabControl2.SuspendLayout()
@@ -206,6 +201,7 @@ Partial Class Form1
         Me.GroupBox2.SuspendLayout()
         CType(Me.PictureBox_Preview, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.TabPage7.SuspendLayout()
+        CType(Me.PictureBox0, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'GroupBox3
@@ -1160,7 +1156,6 @@ Partial Class Form1
         'TabPage2
         '
         Me.TabPage2.Controls.Add(Me.CheckBox3)
-        Me.TabPage2.Controls.Add(Me.Button33)
         Me.TabPage2.Controls.Add(Me.Button16)
         Me.TabPage2.Controls.Add(Me.Button13)
         Me.TabPage2.Controls.Add(Me.Button12)
@@ -1183,15 +1178,6 @@ Partial Class Form1
         Me.CheckBox3.TabIndex = 139
         Me.CheckBox3.Text = "LED"
         Me.CheckBox3.UseVisualStyleBackColor = True
-        '
-        'Button33
-        '
-        Me.Button33.Location = New System.Drawing.Point(363, 57)
-        Me.Button33.Name = "Button33"
-        Me.Button33.Size = New System.Drawing.Size(119, 23)
-        Me.Button33.TabIndex = 8
-        Me.Button33.Text = "Estimate Profile"
-        Me.Button33.UseVisualStyleBackColor = True
         '
         'Button16
         '
@@ -1331,6 +1317,9 @@ Partial Class Form1
         '
         'TabPage11
         '
+        Me.TabPage11.Controls.Add(Me.Button34)
+        Me.TabPage11.Controls.Add(Me.TextBox23)
+        Me.TabPage11.Controls.Add(Me.Label24)
         Me.TabPage11.Controls.Add(Me.TextBox22)
         Me.TabPage11.Controls.Add(Me.Label23)
         Me.TabPage11.Controls.Add(Me.Label22)
@@ -1347,18 +1336,46 @@ Partial Class Form1
         Me.TabPage11.Text = "EDOF SandBoX"
         Me.TabPage11.UseVisualStyleBackColor = True
         '
+        'Button34
+        '
+        Me.Button34.Location = New System.Drawing.Point(457, 160)
+        Me.Button34.Name = "Button34"
+        Me.Button34.Size = New System.Drawing.Size(155, 23)
+        Me.Button34.TabIndex = 161
+        Me.Button34.Text = "Estimate single field Zprofile"
+        Me.Button34.UseVisualStyleBackColor = True
+        '
+        'TextBox23
+        '
+        Me.TextBox23.Location = New System.Drawing.Point(360, 225)
+        Me.TextBox23.Name = "TextBox23"
+        Me.TextBox23.Size = New System.Drawing.Size(36, 20)
+        Me.TextBox23.TabIndex = 160
+        Me.TextBox23.Text = "4"
+        Me.TextBox23.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        '
+        'Label24
+        '
+        Me.Label24.AutoSize = True
+        Me.Label24.Location = New System.Drawing.Point(254, 225)
+        Me.Label24.Name = "Label24"
+        Me.Label24.Size = New System.Drawing.Size(34, 13)
+        Me.Label24.TabIndex = 159
+        Me.Label24.Text = "Scale"
+        '
         'TextBox22
         '
-        Me.TextBox22.Location = New System.Drawing.Point(377, 228)
+        Me.TextBox22.Location = New System.Drawing.Point(360, 192)
         Me.TextBox22.Name = "TextBox22"
         Me.TextBox22.Size = New System.Drawing.Size(36, 20)
         Me.TextBox22.TabIndex = 158
         Me.TextBox22.Text = "10"
+        Me.TextBox22.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
         'Label23
         '
         Me.Label23.AutoSize = True
-        Me.Label23.Location = New System.Drawing.Point(271, 231)
+        Me.Label23.Location = New System.Drawing.Point(254, 195)
         Me.Label23.Name = "Label23"
         Me.Label23.Size = New System.Drawing.Size(73, 13)
         Me.Label23.TabIndex = 157
@@ -1367,7 +1384,7 @@ Partial Class Form1
         'Label22
         '
         Me.Label22.AutoSize = True
-        Me.Label22.Location = New System.Drawing.Point(271, 202)
+        Me.Label22.Location = New System.Drawing.Point(254, 166)
         Me.Label22.Name = "Label22"
         Me.Label22.Size = New System.Drawing.Size(65, 13)
         Me.Label22.TabIndex = 156
@@ -1375,11 +1392,12 @@ Partial Class Form1
         '
         'TextBox21
         '
-        Me.TextBox21.Location = New System.Drawing.Point(377, 199)
+        Me.TextBox21.Location = New System.Drawing.Point(360, 163)
         Me.TextBox21.Name = "TextBox21"
         Me.TextBox21.Size = New System.Drawing.Size(36, 20)
         Me.TextBox21.TabIndex = 155
         Me.TextBox21.Text = "100"
+        Me.TextBox21.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
         'Button31
         '
@@ -1451,21 +1469,21 @@ Partial Class Form1
         '
         'Button29
         '
-        Me.Button29.Location = New System.Drawing.Point(66, 51)
+        Me.Button29.Location = New System.Drawing.Point(75, 51)
         Me.Button29.Name = "Button29"
         Me.Button29.Size = New System.Drawing.Size(75, 23)
         Me.Button29.TabIndex = 152
         Me.Button29.Text = "Stop LIve"
         Me.Button29.UseVisualStyleBackColor = True
         '
-        'Button4
+        'Button33
         '
-        Me.Button4.Location = New System.Drawing.Point(1275, 13)
-        Me.Button4.Name = "Button4"
-        Me.Button4.Size = New System.Drawing.Size(75, 23)
-        Me.Button4.TabIndex = 121
-        Me.Button4.Text = "AutoFocus"
-        Me.Button4.UseVisualStyleBackColor = True
+        Me.Button33.Location = New System.Drawing.Point(1275, 11)
+        Me.Button33.Name = "Button33"
+        Me.Button33.Size = New System.Drawing.Size(119, 28)
+        Me.Button33.TabIndex = 8
+        Me.Button33.Text = "Estimate Profile"
+        Me.Button33.UseVisualStyleBackColor = True
         '
         'TabControl1
         '
@@ -1478,67 +1496,36 @@ Partial Class Form1
         Me.TabControl1.Multiline = True
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
-        Me.TabControl1.Size = New System.Drawing.Size(1099, 1000)
+        Me.TabControl1.Size = New System.Drawing.Size(31, 1000)
         Me.TabControl1.TabIndex = 118
         '
         'TabPage3
         '
-        Me.TabPage3.Controls.Add(Me.PictureBox0)
         Me.TabPage3.Location = New System.Drawing.Point(19, 4)
         Me.TabPage3.Name = "TabPage3"
         Me.TabPage3.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage3.Size = New System.Drawing.Size(1076, 992)
+        Me.TabPage3.Size = New System.Drawing.Size(8, 992)
         Me.TabPage3.TabIndex = 1
         Me.TabPage3.Text = "White Dwarf"
         Me.TabPage3.UseVisualStyleBackColor = True
         '
-        'PictureBox0
-        '
-        Me.PictureBox0.BackColor = System.Drawing.Color.Black
-        Me.PictureBox0.Location = New System.Drawing.Point(6, 6)
-        Me.PictureBox0.Name = "PictureBox0"
-        Me.PictureBox0.Size = New System.Drawing.Size(1024, 1024)
-        Me.PictureBox0.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom
-        Me.PictureBox0.TabIndex = 2
-        Me.PictureBox0.TabStop = False
-        '
         'TabPage4
         '
-        Me.TabPage4.Controls.Add(Me.PictureBox1)
         Me.TabPage4.Location = New System.Drawing.Point(19, 4)
         Me.TabPage4.Name = "TabPage4"
-        Me.TabPage4.Size = New System.Drawing.Size(1076, 992)
+        Me.TabPage4.Size = New System.Drawing.Size(8, 992)
         Me.TabPage4.TabIndex = 2
         Me.TabPage4.Text = "FiBi"
         Me.TabPage4.UseVisualStyleBackColor = True
         '
-        'PictureBox1
-        '
-        Me.PictureBox1.BackColor = System.Drawing.Color.Black
-        Me.PictureBox1.Location = New System.Drawing.Point(6, 6)
-        Me.PictureBox1.Name = "PictureBox1"
-        Me.PictureBox1.Size = New System.Drawing.Size(966, 946)
-        Me.PictureBox1.TabIndex = 2
-        Me.PictureBox1.TabStop = False
-        '
         'TabPage10
         '
-        Me.TabPage10.Controls.Add(Me.PictureBox2)
         Me.TabPage10.Location = New System.Drawing.Point(19, 4)
         Me.TabPage10.Name = "TabPage10"
-        Me.TabPage10.Size = New System.Drawing.Size(1076, 992)
+        Me.TabPage10.Size = New System.Drawing.Size(8, 992)
         Me.TabPage10.TabIndex = 3
         Me.TabPage10.Text = "EDOF"
         Me.TabPage10.UseVisualStyleBackColor = True
-        '
-        'PictureBox2
-        '
-        Me.PictureBox2.BackColor = System.Drawing.Color.Black
-        Me.PictureBox2.Location = New System.Drawing.Point(6, 6)
-        Me.PictureBox2.Name = "PictureBox2"
-        Me.PictureBox2.Size = New System.Drawing.Size(966, 946)
-        Me.PictureBox2.TabIndex = 3
-        Me.PictureBox2.TabStop = False
         '
         'Button_Brightfield_Acquire
         '
@@ -1556,34 +1543,34 @@ Partial Class Form1
         'Chart1
         '
         Me.Chart1.BackColor = System.Drawing.Color.Transparent
-        ChartArea1.AxisX.LabelStyle.Enabled = False
-        ChartArea1.AxisX.MajorGrid.Enabled = False
-        ChartArea1.AxisX.MajorTickMark.Enabled = False
-        ChartArea1.AxisY.LabelStyle.Enabled = False
-        ChartArea1.AxisY.MajorGrid.Enabled = False
-        ChartArea1.BackColor = System.Drawing.Color.Transparent
-        ChartArea1.Name = "ChartArea1"
-        Me.Chart1.ChartAreas.Add(ChartArea1)
-        Legend1.Name = "Legend1"
-        Me.Chart1.Legends.Add(Legend1)
+        ChartArea2.AxisX.LabelStyle.Enabled = False
+        ChartArea2.AxisX.MajorGrid.Enabled = False
+        ChartArea2.AxisX.MajorTickMark.Enabled = False
+        ChartArea2.AxisY.LabelStyle.Enabled = False
+        ChartArea2.AxisY.MajorGrid.Enabled = False
+        ChartArea2.BackColor = System.Drawing.Color.Transparent
+        ChartArea2.Name = "ChartArea1"
+        Me.Chart1.ChartAreas.Add(ChartArea2)
+        Legend2.Name = "Legend1"
+        Me.Chart1.Legends.Add(Legend2)
         Me.Chart1.Location = New System.Drawing.Point(249, 262)
         Me.Chart1.Name = "Chart1"
-        Series1.ChartArea = "ChartArea1"
-        Series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Area
-        Series1.IsVisibleInLegend = False
-        Series1.Legend = "Legend1"
-        Series1.Name = "Series1"
-        Series2.ChartArea = "ChartArea1"
-        Series2.IsVisibleInLegend = False
-        Series2.Legend = "Legend1"
-        Series2.Name = "Series2"
-        Series3.ChartArea = "ChartArea1"
-        Series3.IsVisibleInLegend = False
-        Series3.Legend = "Legend1"
-        Series3.Name = "Series3"
-        Me.Chart1.Series.Add(Series1)
-        Me.Chart1.Series.Add(Series2)
-        Me.Chart1.Series.Add(Series3)
+        Series4.ChartArea = "ChartArea1"
+        Series4.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Area
+        Series4.IsVisibleInLegend = False
+        Series4.Legend = "Legend1"
+        Series4.Name = "Series1"
+        Series5.ChartArea = "ChartArea1"
+        Series5.IsVisibleInLegend = False
+        Series5.Legend = "Legend1"
+        Series5.Name = "Series2"
+        Series6.ChartArea = "ChartArea1"
+        Series6.IsVisibleInLegend = False
+        Series6.Legend = "Legend1"
+        Series6.Name = "Series3"
+        Me.Chart1.Series.Add(Series4)
+        Me.Chart1.Series.Add(Series5)
+        Me.Chart1.Series.Add(Series6)
         Me.Chart1.Size = New System.Drawing.Size(317, 122)
         Me.Chart1.TabIndex = 120
         Me.Chart1.Text = "Chart1"
@@ -1652,8 +1639,6 @@ Partial Class Form1
         'CheckBoxLED
         '
         Me.CheckBoxLED.AutoSize = True
-        Me.CheckBoxLED.Checked = True
-        Me.CheckBoxLED.CheckState = System.Windows.Forms.CheckState.Checked
         Me.CheckBoxLED.Location = New System.Drawing.Point(1048, 17)
         Me.CheckBoxLED.Name = "CheckBoxLED"
         Me.CheckBoxLED.Size = New System.Drawing.Size(47, 17)
@@ -1756,36 +1741,35 @@ Partial Class Form1
         '
         'GroupBox2
         '
-        Me.GroupBox2.Controls.Add(Me.RadioButton2)
-        Me.GroupBox2.Controls.Add(Me.RadioButton1)
+        Me.GroupBox2.Controls.Add(Me.RadioButton_Zprofile)
+        Me.GroupBox2.Controls.Add(Me.RadioButton_Preview)
         Me.GroupBox2.Location = New System.Drawing.Point(16, 25)
         Me.GroupBox2.Name = "GroupBox2"
-        Me.GroupBox2.Size = New System.Drawing.Size(550, 48)
+        Me.GroupBox2.Size = New System.Drawing.Size(130, 31)
         Me.GroupBox2.TabIndex = 148
         Me.GroupBox2.TabStop = False
-        Me.GroupBox2.Text = "GroupBox2"
         '
-        'RadioButton2
+        'RadioButton_Zprofile
         '
-        Me.RadioButton2.AutoSize = True
-        Me.RadioButton2.Location = New System.Drawing.Point(90, 19)
-        Me.RadioButton2.Name = "RadioButton2"
-        Me.RadioButton2.Size = New System.Drawing.Size(54, 17)
-        Me.RadioButton2.TabIndex = 1
-        Me.RadioButton2.Text = "Profile"
-        Me.RadioButton2.UseVisualStyleBackColor = True
+        Me.RadioButton_Zprofile.AutoSize = True
+        Me.RadioButton_Zprofile.Location = New System.Drawing.Point(64, 9)
+        Me.RadioButton_Zprofile.Name = "RadioButton_Zprofile"
+        Me.RadioButton_Zprofile.Size = New System.Drawing.Size(54, 17)
+        Me.RadioButton_Zprofile.TabIndex = 1
+        Me.RadioButton_Zprofile.Text = "Profile"
+        Me.RadioButton_Zprofile.UseVisualStyleBackColor = True
         '
-        'RadioButton1
+        'RadioButton_Preview
         '
-        Me.RadioButton1.AutoSize = True
-        Me.RadioButton1.Checked = True
-        Me.RadioButton1.Location = New System.Drawing.Point(20, 20)
-        Me.RadioButton1.Name = "RadioButton1"
-        Me.RadioButton1.Size = New System.Drawing.Size(54, 17)
-        Me.RadioButton1.TabIndex = 0
-        Me.RadioButton1.TabStop = True
-        Me.RadioButton1.Text = "Image"
-        Me.RadioButton1.UseVisualStyleBackColor = True
+        Me.RadioButton_Preview.AutoSize = True
+        Me.RadioButton_Preview.Checked = True
+        Me.RadioButton_Preview.Location = New System.Drawing.Point(4, 9)
+        Me.RadioButton_Preview.Name = "RadioButton_Preview"
+        Me.RadioButton_Preview.Size = New System.Drawing.Size(54, 17)
+        Me.RadioButton_Preview.TabIndex = 0
+        Me.RadioButton_Preview.TabStop = True
+        Me.RadioButton_Preview.Text = "Image"
+        Me.RadioButton_Preview.UseVisualStyleBackColor = True
         '
         'Button_Sedeen
         '
@@ -1848,15 +1832,36 @@ Partial Class Form1
         Me.Histogram1.Text = "Histogram1"
         Me.Histogram1.Values = Nothing
         '
+        'Label25
+        '
+        Me.Label25.AutoSize = True
+        Me.Label25.Location = New System.Drawing.Point(1677, 10)
+        Me.Label25.Name = "Label25"
+        Me.Label25.Size = New System.Drawing.Size(45, 13)
+        Me.Label25.TabIndex = 152
+        Me.Label25.Text = "Label25"
+        '
+        'PictureBox0
+        '
+        Me.PictureBox0.BackColor = System.Drawing.Color.Black
+        Me.PictureBox0.Location = New System.Drawing.Point(37, 47)
+        Me.PictureBox0.Name = "PictureBox0"
+        Me.PictureBox0.Size = New System.Drawing.Size(1024, 1024)
+        Me.PictureBox0.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom
+        Me.PictureBox0.TabIndex = 153
+        Me.PictureBox0.TabStop = False
+        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1905, 1061)
+        Me.Controls.Add(Me.PictureBox0)
+        Me.Controls.Add(Me.Label25)
+        Me.Controls.Add(Me.Button33)
         Me.Controls.Add(Me.Histogram1)
         Me.Controls.Add(Me.CheckBox2)
         Me.Controls.Add(Me.TabControl2)
-        Me.Controls.Add(Me.Button4)
         Me.Controls.Add(Me.Label9)
         Me.Controls.Add(Me.TextBox_exposure)
         Me.Controls.Add(Me.CheckBoxLED)
@@ -1896,12 +1901,6 @@ Partial Class Form1
         Me.GroupBox1.ResumeLayout(False)
         Me.GroupBox1.PerformLayout()
         Me.TabControl1.ResumeLayout(False)
-        Me.TabPage3.ResumeLayout(False)
-        CType(Me.PictureBox0, System.ComponentModel.ISupportInitialize).EndInit()
-        Me.TabPage4.ResumeLayout(False)
-        CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).EndInit()
-        Me.TabPage10.ResumeLayout(False)
-        CType(Me.PictureBox2, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.Chart1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.StatusStrip1.ResumeLayout(False)
         Me.StatusStrip1.PerformLayout()
@@ -1911,6 +1910,7 @@ Partial Class Form1
         Me.GroupBox2.PerformLayout()
         CType(Me.PictureBox_Preview, System.ComponentModel.ISupportInitialize).EndInit()
         Me.TabPage7.ResumeLayout(False)
+        CType(Me.PictureBox0, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -1953,14 +1953,11 @@ Partial Class Form1
     Friend WithEvents Label17 As Label
     Friend WithEvents TabControl1 As TabControl
     Friend WithEvents TabPage3 As TabPage
-    Friend WithEvents PictureBox0 As PictureBox
     Friend WithEvents TabPage4 As TabPage
-    Friend WithEvents PictureBox1 As PictureBox
     Friend WithEvents OpenFileDialog1 As OpenFileDialog
     Friend WithEvents SaveFileDialog1 As SaveFileDialog
     Friend WithEvents Button_Brightfield_Acquire As Button
     Friend WithEvents Chart1 As DataVisualization.Charting.Chart
-    Friend WithEvents Button4 As Button
     Friend WithEvents PictureBox_Preview As PictureBox
     Friend WithEvents Button_Scan As Button
     Friend WithEvents Pbar As ProgressBar
@@ -2048,7 +2045,6 @@ Partial Class Form1
     Friend WithEvents TextBox19 As TextBox
     Friend WithEvents TextBox20 As TextBox
     Friend WithEvents TabPage10 As TabPage
-    Friend WithEvents PictureBox2 As PictureBox
     Friend WithEvents CheckBox2 As CheckBox
     Friend WithEvents Button29 As Button
     Friend WithEvents TabPage11 As TabPage
@@ -2065,6 +2061,11 @@ Partial Class Form1
     Friend WithEvents Button33 As Button
     Friend WithEvents CheckBox3 As CheckBox
     Friend WithEvents GroupBox2 As GroupBox
-    Friend WithEvents RadioButton2 As RadioButton
-    Friend WithEvents RadioButton1 As RadioButton
+    Friend WithEvents RadioButton_Zprofile As RadioButton
+    Friend WithEvents RadioButton_Preview As RadioButton
+    Friend WithEvents TextBox23 As TextBox
+    Friend WithEvents Label24 As Label
+    Friend WithEvents Button34 As Button
+    Friend WithEvents Label25 As Label
+    Friend WithEvents PictureBox0 As PictureBox
 End Class

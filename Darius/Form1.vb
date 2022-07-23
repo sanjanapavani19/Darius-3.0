@@ -20,8 +20,19 @@ Public Class Form1
     Dim Filenames() As String
     Dim Scanning As Boolean
     Dim fileN As Integer
+    Const WhiteLED = 2
+    Const BlueLED = 1
+    Const PreviewLED = 3
+
+
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+
+        LEDcontroller = New Relay
+        LEDcontroller.SetRelays(WhiteLED, False)
+        LEDcontroller.SetRelays(BlueLED, False)
+        LEDcontroller.SetRelays(PreviewLED, False)
+
 
         Preview = New PreviewVimba(60, 0.1, Pbar)
         TextBox_PrevieEXp.Text = Setting.Gett("PREVIEWEXP")
@@ -30,13 +41,15 @@ Public Class Form1
 
         Camera = New XimeaXIq
         '        EDF = New ExtendedDepth5(Camera.W, Camera.H, 0.25, False)
-        ZEDOF = New ZstackStructure(Camera.W, Camera.H, Setting.Gett("ZSTACRRANGE"), Setting.Gett("ZSTACKSTEPS"))
+        ZEDOF = New ZstackStructure(Camera.W, Camera.H, Setting.Gett("ZSTACRRANGE"), Setting.Gett("ZSTACKSTEPS"), Setting.Gett("ZSTACKSCALE"))
+        Zprofiler = New ZstackStructure(Camera.W, Camera.H, Setting.Gett("ZSTACRRANGE"), Setting.Gett("ZSTACKSTEPS"), 4)
         TextBox21.Text = Setting.Gett("ZSTACRRANGE")
         TextBox22.Text = Setting.Gett("ZSTACKSTEPS")
+        TextBox23.Text = Setting.Gett("ZSTACKSCALE")
         'Triangle = New TriangulationStructure(340, 1078, 2600, 700)
         If Camera.status Then
             TextBox_exposure.Text = Camera.exp
-            AutoFocus = New FocusStructure(2, 0.1, 4)
+            'AutoFocus = New FocusStructure(2, 0.1, 4)
             Display = New ImageDisplay(Camera.W, Camera.H, Chart1)
             Display.imagetype = ImagetypeEnum.Brightfield
         End If
@@ -64,9 +77,7 @@ Public Class Form1
         End If
 
 
-        LEDcontroller = New Relay
-        'LEDcontroller.SetRelays(1, True)
-        'LEDcontroller.SetRelays(2, False)
+
 
         'GetPreview(True)
     End Sub
@@ -78,23 +89,8 @@ Public Class Form1
         PictureBox0.Width = Display.Width * scale
         PictureBox0.Height = Display.Height * scale
         PictureBox0.SizeMode = PictureBoxSizeMode.Zoom
-        PictureBox0.Top = d
-        PictureBox0.Left = d
-
-        PictureBox1.Width = Display.Width * scale
-        PictureBox1.Height = Display.Height * scale
-        PictureBox1.SizeMode = PictureBoxSizeMode.Zoom
-        PictureBox1.Top = d
-        PictureBox1.Left = d
-
-
-
-        PictureBox2.Width = Display.Width * scale
-        PictureBox2.Height = Display.Height * scale
-        PictureBox2.SizeMode = PictureBoxSizeMode.Zoom
-        PictureBox2.Top = d
-        PictureBox2.Left = d
-
+        PictureBox0.Top = TabControl1.Top + d
+        PictureBox0.Left = TabControl1.Left + TabControl1.Width - d
 
 
 
@@ -108,8 +104,8 @@ Public Class Form1
 
 
         PictureBox_Preview.Left = d
-        PictureBox_Preview.Top = d + GroupBox2.Top + GroupBox2.Height
-        PictureBox_Preview.Width = (TabControl2.Width - 2 * d - GroupBox3.Height * 1.5) * 0.8
+        PictureBox_Preview.Top = d
+        PictureBox_Preview.Width = (TabControl2.Width - 2 * d)
 
         Tracking = New TrackingStructure(PictureBox_Preview)
         Tracking.Update()
@@ -132,6 +128,13 @@ Public Class Form1
 
         Button_Sedeen.Left = Button_GIMP.Left
         Button_Sedeen.Top = Button_Luigi.Top + Button_Luigi.Height
+
+        GroupBox2.Top = Button_Sedeen.Top
+        GroupBox2.Left = Button_Sedeen.Left + Button_Sedeen.Width + d
+
+
+
+
     End Sub
 
     Public Sub ChangeExposure()
@@ -196,13 +199,13 @@ Public Class Form1
 
     Private Sub Button_top_Click(sender As Object, e As EventArgs) Handles Button_top.Click
 
-        Stage.MoveRelative(Stage.Yaxe, Stage.FOVY)
+        Stage.MoveRelative(Stage.Yaxe, -Stage.FOVY)
         ExitEDOf()
     End Sub
 
     Private Sub Button_bottom_Click(sender As Object, e As EventArgs) Handles Button_bottom.Click
 
-        Stage.MoveRelative(Stage.Yaxe, -Stage.FOVY)
+        Stage.MoveRelative(Stage.Yaxe, Stage.FOVY)
         ExitEDOf()
     End Sub
 
@@ -233,13 +236,11 @@ Public Class Form1
         If RadioButton_zoom_in.Checked Then
             Display.zoom = True
             PictureBox0.SizeMode = PictureBoxSizeMode.CenterImage
-            PictureBox1.SizeMode = PictureBoxSizeMode.CenterImage
-            PictureBox2.SizeMode = PictureBoxSizeMode.CenterImage
+
 
         Else
             PictureBox0.SizeMode = PictureBoxSizeMode.Zoom
-            PictureBox1.SizeMode = PictureBoxSizeMode.Zoom
-            PictureBox2.SizeMode = PictureBoxSizeMode.Zoom
+
 
         End If
     End Sub
@@ -309,20 +310,16 @@ Public Class Form1
 
 
     Public Sub Live()
-        Dim Charttest As New Chart
-        Charttest = Chart1
-        Dim BmpPreview As New Bitmap(Camera.W, Camera.H, Imaging.PixelFormat.Format24bppRgb)
+
         Do
             Camera.busy = True
             If Camera.Dostop Then Exit Do
 
             If Camera.ExposureChanged = 0 Then Camera.SetExposure() : Display.AdjustBrightness() : Camera.ExposureChanged = 1
             If Display.RequestIbIc = 0 Then Camera.ResetMatrix() : Display.RequestIbIc = 1
-            Camera.capture()
+            Camera.capture() : Display.MakePreview(Camera.Bytes, True)
 
-            If Display.imagetype = ImagetypeEnum.Brightfield Then PictureBox0.Image = Display.Preview(Camera.Bytes, True).Clone
-            If Display.imagetype = ImagetypeEnum.Fluorescence Then PictureBox1.Image = Display.Preview(Camera.Bytes, True).Clone
-
+            PictureBox0.Image = Display.BmpPreview(Display.f).bmp.Clone
 
             Application.DoEvents()
         Loop
@@ -336,10 +333,9 @@ Public Class Form1
         CheckBoxLED.Checked = True
 
         If TabControl1.SelectedIndex = 0 Then
-            LEDcontroller.SetRelays(4, False)
-            LEDcontroller.SetRelays(3, False)
-            LEDcontroller.SetRelays(2, False)
-            LEDcontroller.SetRelays(1, True)
+            LEDcontroller.SetRelays(PreviewLED, False)
+            LEDcontroller.SetRelays(BlueLED, False)
+            LEDcontroller.SetRelays(WhiteLED, True)
             If Display.imagetype <> ImagetypeEnum.Brightfield Then
                 Display.imagetype = ImagetypeEnum.Brightfield
                 Camera.SetFlatField("ff.tif", "dark.tif")
@@ -356,10 +352,9 @@ Public Class Form1
         End If
 
         If TabControl1.SelectedIndex = 1 Then
-            LEDcontroller.SetRelays(4, False)
-            LEDcontroller.SetRelays(3, True)
-            LEDcontroller.SetRelays(1, False)
-            LEDcontroller.SetRelays(2, True)
+            LEDcontroller.SetRelays(PreviewLED, False)
+            LEDcontroller.SetRelays(BlueLED, True)
+            LEDcontroller.SetRelays(WhiteLED, False)
 
             If Display.imagetype <> ImagetypeEnum.Fluorescence Then
                 Display.imagetype = ImagetypeEnum.Fluorescence
@@ -375,31 +370,11 @@ Public Class Form1
 
         End If
 
-        If TabControl1.SelectedIndex = 3 Then
-            LEDcontroller.SetRelays(4, True)
-            LEDcontroller.SetRelays(3, True)
-            LEDcontroller.SetRelays(1, False)
-            LEDcontroller.SetRelays(2, False)
-
-            If Display.imagetype <> ImagetypeEnum.MUSE Then
-                Display.imagetype = ImagetypeEnum.MUSE
-                Camera.SetFlatField("ff_MUSE.tif", "dark.tif")
-                TextBox_exposure.Text = Setting.Gett("ExposureM")
-                TextBox_GainB.Text = Setting.Gett("GainB_MUSE")
-                TextBox_GainG.Text = Setting.Gett("GainG_MUSE")
-                TextBox_GainR.Text = Setting.Gett("GainR_MUSE")
-                Display.SetColorGain(Setting.Gett("GainR_MUSE"), Setting.Gett("GainG_MUSE"), Setting.Gett("GainB_MUSE"), ImagetypeEnum.MUSE)
-                ChangeExposure()
-            End If
-            Display.imagetype = ImagetypeEnum.MUSE
-
-        End If
-
 
         If TabControl1.SelectedIndex = 2 Then
 
-            If Display.imagetype = ImagetypeEnum.Fluorescence Then Display.imagetype = ImagetypeEnum.EDF_Fluorescence : PictureBox2.Image = PictureBox1.Image
-            If Display.imagetype = ImagetypeEnum.Brightfield Then Display.imagetype = ImagetypeEnum.EDF_Brightfield : PictureBox2.Image = PictureBox0.Image
+            If Display.imagetype = ImagetypeEnum.Fluorescence Then Display.imagetype = ImagetypeEnum.EDF_Fluorescence
+            If Display.imagetype = ImagetypeEnum.Brightfield Then Display.imagetype = ImagetypeEnum.EDF_Brightfield
 
             Dim ccMatrix As Single = Camera.CCMAtrix
             ExitLive() : Camera.ResetMatrix()
@@ -411,7 +386,7 @@ Public Class Form1
             'byteToBitmap(ZEDOF.OutputBytes, bmp)
 
             Display.ApplyBrightness(ZEDOF.OutputBytes, ccMatrix, bmp)
-            PictureBox2.Image = bmp
+            PictureBox0.Image = bmp
             CheckBoxLED.Checked = False
             GoLive()
 
@@ -460,23 +435,6 @@ Public Class Form1
 
 
 
-    Private Sub PictureBox0_MouseDown(sender As Object, e As MouseEventArgs) Handles PictureBox0.MouseDown, PictureBox1.MouseDown, PictureBox2.MouseDown
-        Stage.xp = e.X
-        Stage.yp = e.Y
-
-    End Sub
-
-    Private Sub PictureBox0_MouseUp(sender As Object, e As MouseEventArgs) Handles PictureBox0.MouseUp, PictureBox1.MouseUp, PictureBox2.MouseUp
-
-        Dim Z As Integer = 1
-        '   If Display.zoom Then Z = Display.sampeling Else Z = 1
-
-        Stage.MoveRelativeAsync(Stage.Xaxe, (e.X - Stage.xp) * Stage.FOVX * (1 / Z) / PictureBox0.Width)
-        Stage.MoveRelativeAsync(Stage.Yaxe, (e.Y - Stage.yp) * Stage.FOVY * (1 / Z) / PictureBox0.Height)
-        ExitEDOf()
-
-    End Sub
-
     Public Function DoAutoFocus(DoInitialize As Boolean, DoRelease As Boolean) As Single
         Stage.GoZero(block)
 
@@ -494,11 +452,6 @@ Public Class Form1
 
         Return focus
     End Function
-
-    Private Sub Button4_Click(sender As Object, e As EventArgs) Handles Button4.Click
-        DoAutoFocus(True, True)
-    End Sub
-
 
 
     Private Sub Button_Home_Click(sender As Object, e As EventArgs) Handles Button_Home.Click
@@ -928,9 +881,9 @@ Public Class Form1
         MsgBox("Load the sample and hit OK.")
 
         UpdateLED(False)
-        LEDcontroller.SetRelays(4, True)
+        LEDcontroller.SetRelays(PreviewLED, True)
         Tracking.UpdateBmp(Preview.Capture(Val(TextBox_PrevieEXp.Text), Val(TextBox_PreviewFocus.Text)))
-        LEDcontroller.SetRelays(4, False)
+        LEDcontroller.SetRelays(PreviewLED, False)
         UpdateLED(CheckBoxLED.Checked)
 
 
@@ -945,10 +898,10 @@ Public Class Form1
         'Stage.MoveAbsolute(Stage.Zaxe, 0)
         Stage.Go_Middle()
 
-        ' Stage.GoToFocus(block)
+        Stage.GoToFocus()
     End Sub
     Private Sub Button7_Click(sender As Object, e As EventArgs) Handles Button7.Click
-        Stage.GoToFocus(block)
+        Stage.GoToFocus()
     End Sub
 
     Private Sub CheckBox1_CheckedChanged(sender As Object, e As EventArgs) Handles CheckBoxLED.CheckedChanged
@@ -962,25 +915,24 @@ Public Class Form1
         If Display IsNot Nothing Then
             If status Then
                 If Display.imagetype = ImagetypeEnum.Brightfield Then
-                    LEDcontroller.SetRelays(4, False)
-                    LEDcontroller.SetRelays(3, False)
-                    LEDcontroller.SetRelays(2, False)
-                    LEDcontroller.SetRelays(1, True)
+
+                    LEDcontroller.SetRelays(PreviewLED, False)
+                    LEDcontroller.SetRelays(BlueLED, False)
+                    LEDcontroller.SetRelays(WhiteLED, True)
                 End If
 
                 If Display.imagetype = ImagetypeEnum.Fluorescence Then
-                    LEDcontroller.SetRelays(1, False)
-                    LEDcontroller.SetRelays(2, True)
-                    LEDcontroller.SetRelays(3, False)
-                    LEDcontroller.SetRelays(4, False)
+                    LEDcontroller.SetRelays(PreviewLED, True)
+                    LEDcontroller.SetRelays(BlueLED, False)
+                    LEDcontroller.SetRelays(WhiteLED, False)
                 End If
 
 
             Else
-                LEDcontroller.SetRelays(1, False)
-                LEDcontroller.SetRelays(2, False)
-                LEDcontroller.SetRelays(3, False)
-                LEDcontroller.SetRelays(4, False)
+                LEDcontroller.SetRelays(PreviewLED, False)
+                LEDcontroller.SetRelays(BlueLED, False)
+                LEDcontroller.SetRelays(WhiteLED, False)
+
             End If
         End If
     End Sub
@@ -1006,19 +958,19 @@ Public Class Form1
     Private Sub Button13_Click(sender As Object, e As EventArgs) Handles Button13.Click
         Stage.MoveAbsolute(Stage.Zaxe, 0)
         Stage.Go_Middle()
-        Stage.GoToFocus(block)
+        Stage.GoToFocus()
     End Sub
 
     Private Sub Button12_Click(sender As Object, e As EventArgs) Handles Button12.Click
 
         UpdateLED(False)
-        LEDcontroller.SetRelays(4, True)
+        LEDcontroller.SetRelays(PreviewLED, True)
 
         Preview.CaptureWhole(Val(TextBox_PrevieEXp.Text), Val(TextBox_PreviewFocus.Text)).Save("c:\temp\whole.jpg")
         Tracking.UpdateBmp(Preview.Capture(Val(TextBox_PrevieEXp.Text), Val(TextBox_PreviewFocus.Text)))
         Preview.Bmp.Save("C:\temp\preview.jpg")
         PictureBox_Preview.Image = Tracking.bmp.bmp
-        LEDcontroller.SetRelays(4, False)
+        LEDcontroller.SetRelays(PreviewLED, False)
         UpdateLED(CheckBoxLED.Checked)
 
     End Sub
@@ -1109,21 +1061,6 @@ Public Class Form1
 
 
 
-    Private Sub PictureBox_MouseWheel(sender As Object, e As MouseEventArgs) Handles PictureBox0.MouseWheel, PictureBox1.MouseWheel, PictureBox2.MouseWheel
-        If Focusing = True Then Exit Sub
-        Focusing = True
-        ExitEDOf()
-        Dim speed As Single
-        If System.Windows.Forms.Control.ModifierKeys = Keys.Control Then speed = 20 Else speed = 5
-
-        'If XYZ.name = "NewPort" Then
-        If e.Delta > 0 Then
-            Stage.MoveRelativeAsync(Stage.Zaxe, speed * 0.001 * Math.Abs(e.Delta) / 120)
-        Else
-            Stage.MoveRelativeAsync(Stage.Zaxe, speed * -0.001 * Math.Abs(e.Delta) / 120)
-        End If
-        Focusing = False
-    End Sub
 
 
 
@@ -1135,7 +1072,7 @@ Public Class Form1
 
     Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
         'Display.MakeHistogram()
-        Display.PlotHistogram()
+        'Display.PlotHistogram()
     End Sub
 
 
@@ -1235,9 +1172,7 @@ Public Class Form1
         Slideloaded = True
         Button_Scan.Enabled = True
 
-        Stage.GoToFocus(block)
-
-
+        Stage.GoToFocus()
 
     End Sub
 
@@ -1311,7 +1246,7 @@ Public Class Form1
         Pbar.Maximum = 11
         For loop_Z = 0 To numZ - 1
             ReDim ZupperFrame(loop_Z)(Camera.W * Camera.H - 1)
-            Camera.Capture()
+            Camera.capture()
 
             Buffer.BlockCopy(Camera.Bytes, 0, ZupperFrame(loop_Z), 0, Camera.Bytes.Length)
             Pbar.Increment(1)
@@ -1384,7 +1319,7 @@ Public Class Form1
         Camera.StartAcqusition()
 
         Piezo.MoveAbsolute(0)
-        Camera.Capture()
+        Camera.capture()
 
         Piezo.setSleep(Camera.exp)
 
@@ -1393,7 +1328,7 @@ Public Class Form1
         Thread2.Start()
         'Piezo.Scan()
         'Camera.Capture_Threaded()
-        Camera.Capture()
+        Camera.capture()
 
         SaveSinglePageTiff(SaveFileDialog1.FileName + ".tif", Camera.Bytes, Camera.W, Camera.H)
         Piezo.MoveAbsolute(0)
@@ -1437,9 +1372,9 @@ Public Class Form1
 
     Private Sub CheckBox1_CheckedChanged_1(sender As Object, e As EventArgs) Handles CheckBox1.CheckedChanged
         If CheckBox1.Checked Then
-            LEDcontroller.SetRelays(3, True)
+            LEDcontroller.SetRelays(PreviewLED, True)
         Else
-            LEDcontroller.SetRelays(3, False)
+            LEDcontroller.SetRelays(PreviewLED, False)
         End If
     End Sub
 
@@ -1478,7 +1413,7 @@ Public Class Form1
     Private Sub Button30_Click(sender As Object, e As EventArgs) Handles Button30.Click
 
 
-        ZEDOF.Acquire 
+        ZEDOF.Acquire()
         Dim bmp As New Bitmap(Camera.W, Camera.H, Imaging.PixelFormat.Format24bppRgb)
         byteToBitmap(ZEDOF.OutputBytes, bmp)
         PictureBox0.Image = bmp
@@ -1494,9 +1429,10 @@ Public Class Form1
 
     Private Sub TextBox21_KeyDown(sender As Object, e As KeyEventArgs) Handles TextBox21.KeyDown, TextBox22.KeyDown
         If e.KeyCode = Keys.Return Then
-            ZEDOF = New ZstackStructure(Camera.W, Camera.H, TextBox21.Text, TextBox22.Text)
+            ZEDOF = New ZstackStructure(Camera.W, Camera.H, TextBox21.Text, TextBox22.Text, TextBox23.Text)
             Setting.Sett("ZSTACRRANGE", TextBox21.Text)
             Setting.Sett("ZSTACKSTEPS", TextBox22.Text)
+            Setting.Sett("ZSTACKSCALE", TextBox23.Text)
         End If
     End Sub
 
@@ -1527,25 +1463,115 @@ Public Class Form1
     End Sub
 
     Private Sub Button33_Click(sender As Object, e As EventArgs) Handles Button33.Click
+        ExitLive()
         UpdateLED(False)
-        LEDcontroller.SetRelays(4, True)
+        LEDcontroller.SetRelays(PreviewLED, True)
         Preview.MovetoPreview()
         Preview.EstimateProfile()
-        LEDcontroller.SetRelays(4, False)
+        LEDcontroller.SetRelays(PreviewLED, False)
         UpdateLED(CheckBoxLED.Checked)
+        Stage.GoToFocus()
+        GoLive()
     End Sub
 
     Private Sub CheckBox3_CheckedChanged(sender As Object, e As EventArgs) Handles CheckBox3.CheckedChanged
         UpdateLED(False)
-        LEDcontroller.SetRelays(4, CheckBox3.Checked)
+        LEDcontroller.SetRelays(PreviewLED, CheckBox3.Checked)
     End Sub
 
-    Private Sub RadioButton2_CheckedChanged(sender As Object, e As EventArgs) Handles RadioButton2.CheckedChanged
-        If RadioButton2.Checked Then
+    Private Sub RadioButton2_CheckedChanged(sender As Object, e As EventArgs) Handles RadioButton_Zprofile.CheckedChanged
+        If RadioButton_Zprofile.Checked Then
             PictureBox_Preview.Image = Preview.ZmapBmp.bmp
         Else
             PictureBox_Preview.Image = Preview.Bmp
         End If
+    End Sub
+
+    Private Sub PictureBox0_Click(sender As Object, e As EventArgs)
+
+    End Sub
+
+    Private Sub Button34_Click(sender As Object, e As EventArgs) Handles Button34.Click
+        ExitLive() : Camera.ResetMatrix()
+
+        For xx = 1 To 20
+            Zprofiler.AcquireThreaded(True, False)
+
+            Zprofiler.EstimateZ()
+            Stage.MoveRelative(Stage.Xaxe, -Stage.FOVX)
+            saveSinglePage32("c:\temp\" + xx.ToString("D4") + ".tif", Zprofiler.MaxMap2D)
+        Next
+
+
+        GoLive()
+    End Sub
+
+
+
+    Private Sub PictureBox_Preview_MouseMove(sender As Object, e As MouseEventArgs) Handles PictureBox_Preview.MouseMove
+        If RadioButton_Zprofile.Checked Then
+            Chart1.Series(0).Points.Clear()
+            Chart1.Series(1).Points.Clear()
+
+            Dim x, y As Integer
+            Dim min, max As Single
+            max = 0
+            min = Single.MaxValue
+
+            x = e.X * Tracking.bmp.width / Tracking.Pbox.Width
+            y = e.Y * Tracking.bmp.height / Tracking.Pbox.Height
+
+            For zz = 0 To Preview.Z - 1
+                If Preview.GreyEdge2D(zz)(y, x) > max Then max = Preview.GreyEdge2D(zz)(y, x)
+                If Preview.GreyEdge2D(zz)(y, x) < min Then min = Preview.GreyEdge2D(zz)(y, x)
+            Next
+
+
+            For zz = 0 To Preview.Z - 1
+                Chart1.Series(0).Points.AddXY(Preview.Zx(zz), Preview.GreyEdge2D(zz)(y, x) - min)
+            Next
+
+            Chart1.Series(1).Points.AddXY(Preview.Zmap(x, y), max - min)
+            Label25.Text = Preview.Zmap(x, y)
+            Application.DoEvents()
+        End If
+    End Sub
+
+    Private Sub PictureBox0_MouseDown(sender As Object, e As MouseEventArgs) Handles PictureBox0.MouseDown
+        Stage.xp = e.X
+        Stage.yp = e.Y
+
+    End Sub
+
+    Private Sub PictureBox0_MouseUp(sender As Object, e As MouseEventArgs) Handles PictureBox0.MouseUp
+
+        Dim Z As Integer = 1
+        '   If Display.zoom Then Z = Display.sampeling Else Z = 1
+
+        Stage.MoveRelativeAsync(Stage.Xaxe, (e.X - Stage.xp) * Stage.FOVX * (1 / Z) / PictureBox0.Width)
+        Stage.MoveRelativeAsync(Stage.Yaxe, -(e.Y - Stage.yp) * Stage.FOVY * (1 / Z) / PictureBox0.Height)
+        ExitEDOf()
+
+    End Sub
+
+    Private Sub PictureBox_MouseWheel(sender As Object, e As MouseEventArgs) Handles PictureBox0.MouseWheel
+        If Focusing = True Then Exit Sub
+        Focusing = True
+        ExitEDOf()
+        Dim speed As Single
+        If System.Windows.Forms.Control.ModifierKeys = Keys.Control Then speed = 20 Else speed = 5
+
+        'If XYZ.name = "NewPort" Then
+        If e.Delta > 0 Then
+            Stage.MoveRelativeAsync(Stage.Zaxe, speed * 0.001 * Math.Abs(e.Delta) / 120)
+        Else
+            Stage.MoveRelativeAsync(Stage.Zaxe, speed * -0.001 * Math.Abs(e.Delta) / 120)
+        End If
+        Focusing = False
+    End Sub
+
+    Private Sub PictureBox_Preview_Click(sender As Object, e As EventArgs) Handles PictureBox_Preview.Click
+
     End Sub
 End Class
 

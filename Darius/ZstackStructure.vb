@@ -3,6 +3,7 @@
     Dim Pattern2D(,), ScalingUpPattern(), ScalingDownPattern() As Integer
     Dim GreenBytes(), GreenEdgeBytes()() As Single
     Public MaxMap() As Single
+    Public MaxMap2D(,) As Single
     Dim BLure As FFTW_VB_Real
     Dim bytes()() As Byte
     Dim zc As Integer
@@ -14,11 +15,14 @@
     Dim Deivative As CentralDerivitavie
     Dim StepSize As Single = 0.01
     Dim Range As Single
+    Dim Scale As Integer
+    Dim Zstart As Single
     Public OutputBytes() As Byte
 
-    Public Sub New(W As Integer, H As Integer, Range As Single, Stepsize As Single)
+    Public Sub New(W As Integer, H As Integer, Range As Single, Stepsize As Single, scale As Integer)
         Me.W = W
         Me.H = H
+        Me.Scale = scale
         Me.Range = (Range / 1000)
         Me.StepSize = (Stepsize / 1000)
         Z = Int(Range / Stepsize)
@@ -29,21 +33,21 @@
         ReDim Imagecreated(Z - 1)
         For zi = 0 To Z - 1
 
-            ReDim GreenEdgeBytes(zi)(W / 2 * H / 2 - 1)
+            ReDim GreenEdgeBytes(zi)(W / scale * H / scale - 1)
             ReDim bytes(zi)(W * H * 3 - 1)
         Next
-        ReDim GreenBytes(W / 2 * H / 2 - 1)
-        BLure = New FFTW_VB_Real(W / 2, H / 2)
+        ReDim GreenBytes(W / scale * H / scale - 1)
+        BLure = New FFTW_VB_Real(W / scale, H / scale)
         BLure.MakeGaussianReal(0.01, BLure.MTF, 2)
-        Deivative = New CentralDerivitavie(W / 2, H / 2)
+        Deivative = New CentralDerivitavie(W / scale, H / scale)
 
         'For some stupid reason, the 2D rotates when it copied to a 1D array. It is wiered.... 
         ReDim Pattern2D(H - 1, W - 1)
         ReDim ScalingUpPattern(W * H - 1)
-        ReDim ScalingDownPattern(W / 2 * H / 2 - 1)
+        ReDim ScalingDownPattern(W / scale * H / scale - 1)
         Dim j As Integer = 0
-        For y = 0 To H - 1 Step 2
-            For x = 0 To W - 1 Step 2
+        For y = 0 To H - 1 Step scale
+            For x = 0 To W - 1 Step scale
 
                 For yb = y To y + 1
                     For xb = x To x + 1
@@ -58,25 +62,26 @@
 
         Dim i As Integer = 0
         Dim p As Integer = 1
-        For Y = 0 To H / 2 - 1
-            For X = 0 To W / 2 - 1
+        For Y = 0 To H / scale - 1
+            For X = 0 To W / scale - 1
                 ScalingDownPattern(i) = p
                 p = p + 6
                 i += 1
             Next
-            p = Y * W * 3 * 2 + 1
+            p = Y * W * 3 * scale + 1
         Next
-        ReDim MaxMap(W / 2 * H / 2 - 1)
+        ReDim MaxMap(W / scale * H / scale - 1)
+        ReDim MaxMap2D(W / scale - 1, H / scale - 1)
         direction = 1
     End Sub
     Public Sub Clear()
         ReDim GreenEdgeBytes(Z - 1)
         ReDim bytes(Z - 1)
         For zi = 0 To Z - 1
-            ReDim GreenEdgeBytes(zi)(W / 2 * H / 2 - 1)
+            ReDim GreenEdgeBytes(zi)(W / Scale * H / Scale - 1)
             ReDim bytes(zi)(W * H * 3 - 1)
         Next
-        ReDim GreenBytes(W / 2 * H / 2 - 1)
+        ReDim GreenBytes(W / Scale * H / Scale - 1)
     End Sub
     Public Sub Upload(bytesin() As Byte, zi As Integer)
 
@@ -86,6 +91,7 @@
 
     Public Sub AcquireThreaded(retrn As Boolean, Optional WithWrapup As Boolean = True)
         ticks = (Camera.exp * Stopwatch.Frequency / 1000)
+        Zstart = Stage.Z
         'MakeDelay()
         If retrn Then direction = 1
         Array.Clear(Imagecreated, 0, Z)
@@ -122,7 +128,7 @@
             Do Until Imagecreated(loopZ) = 1
                 'Application.DoEvents()
             Loop
-            GetColorBytes(bytes(loopZ), GreenBytes, W / 2, H / 2)
+            GetColorBytes(bytes(loopZ), GreenBytes, W / Scale, H / Scale)
             Deivative.AnalyzeX(GreenBytes, GreenEdgeBytes(loopZ))
             BLure.UpLoad(GreenEdgeBytes(loopZ))
             BLure.Process_FT_MTF()
@@ -134,7 +140,7 @@
 
 
     Public Sub Process()
-        GetColorBytes(bytes(zc), GreenBytes, W / 2, H / 2)
+        GetColorBytes(bytes(zc), GreenBytes, W / Scale, H / Scale)
         Deivative.AnalyzeX(GreenBytes, GreenEdgeBytes(zc))
         BLure.UpLoad(GreenEdgeBytes(zc))
         BLure.Process_FT_MTF()
@@ -175,7 +181,7 @@
 
         For zi = 0 To Z - 1
 
-            GetColorBytes(bytes(zi), GreenBytes, W / 2, H / 2)
+            GetColorBytes(bytes(zi), GreenBytes, W / Scale, H / Scale)
             Deivative.AnalyzeX(GreenBytes, GreenEdgeBytes(zi))
             BLure.UpLoad(GreenEdgeBytes(zi))
             BLure.Process_FT_MTF()
@@ -189,9 +195,9 @@
     Public Function Wrapup() As Byte()
         ReDim OutputBytes(W * H * 3 - 1)
         Dim max, maxZ As Single
-        Dim maxi As Integer = W / 2 * H / 2 - 1
+        Dim maxi As Integer = W / Scale * H / Scale - 1
         Dim i As Integer
-        ReDim MaxMap(W / 2 * H / 2 - 1)
+        ReDim MaxMap(W / Scale * H / Scale - 1)
 
         Do Until (processDone.Sum = Z)
 
@@ -222,6 +228,48 @@
             i += 1
         Next
         Return OutputBytes
+    End Function
+    Public Function EstimateZ() As Single(,)
+        ReDim OutputBytes(W * H * 3 - 1)
+        Dim max, maxZ As Single
+        Dim X As Integer = W / Scale
+        Dim Y As Integer = H / Scale
+        Dim maxi As Integer = W / Scale * H / Scale - 1
+        Dim i As Integer
+        ReDim MaxMap(W / Scale * H / Scale - 1)
+
+        Do Until (processDone.Sum = Z)
+
+        Loop
+
+
+        If direction = 1 Then
+            i = 0
+            For yy = 0 To Y - 1
+                For xx = 0 To X - 1
+                    max = 0
+                    For Zi = 0 To Z - 1
+                        If GreenEdgeBytes(Zi)(i) > max Then max = GreenEdgeBytes(Zi)(i) : maxZ = Zi : MaxMap(i) = maxZ : MaxMap2D(xx, yy) = maxZ * StepSize + Zstart
+                    Next
+                    i += 1
+                Next
+            Next
+        Else
+            i = 0
+            For yy = 0 To Y - 1
+                For xx = 0 To X - 1
+                    max = 0
+                    For Zi = 0 To Z - 1
+                        If GreenEdgeBytes(Zi)(i) > max Then max = GreenEdgeBytes(Zi)(i) : maxZ = Zi : MaxMap(i) = maxZ : MaxMap2D(xx, yy) = Zstart - maxZ * StepSize
+                    Next
+                    i += 1
+                Next
+            Next
+
+
+        End If
+
+        Return MaxMap2D
     End Function
     Sub GetColorBytes(BytesIn() As Byte, ByRef BytesOut() As Single, Wb As Integer, Hb As Integer)
         'to read green 
