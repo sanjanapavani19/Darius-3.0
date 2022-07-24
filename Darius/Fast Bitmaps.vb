@@ -189,8 +189,8 @@ Public Class FastBMP
         For y = 0 To height - 1
             For x = 0 To width - 1
                 'Greyimage(i) += bytes(p)
-                Greyimage(i) += bytes(p + 1)
-                Greyimage(i) += bytes(p + 2)
+                Greyimage(i) = bytes(p + 1)
+                'Greyimage(i) += bytes(p + 2)
                 i += 1
                 p += 3
             Next

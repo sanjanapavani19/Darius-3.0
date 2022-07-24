@@ -20,6 +20,7 @@ Public Class Form1
     Dim Filenames() As String
     Dim Scanning As Boolean
     Dim fileN As Integer
+
     Const WhiteLED = 2
     Const BlueLED = 1
     Const PreviewLED = 3
@@ -380,7 +381,7 @@ Public Class Form1
             Camera.ResetMatrix()
 
 
-            ZEDOF.AcquireThreaded(True)
+            ZEDOF.Acquire(True)
             'ZEDOF.Acquire()
             Dim bmp As New Bitmap(Camera.W, Camera.H, Imaging.PixelFormat.Format24bppRgb)
             byteToBitmap(ZEDOF.OutputBytes, bmp)
@@ -483,7 +484,8 @@ Public Class Form1
 
     Private Sub Button_Scan_Click(sender As Object, e As EventArgs) Handles Button_Scan.Click
         ExitLive()
-        If Scanning Then Scanning = False : Button_Scan.Text = "Scan" :GoLive: Exit Sub
+        If Scanning Then Scanning = False : Button_Scan.Text = "Scan" : GoLive() :
+        Exit Sub
         SaveFileDialog1.DefaultExt = ".tif"
         If SaveFileDialog1.ShowDialog = DialogResult.Cancel Then GoLive() : Exit Sub
         SaveFileDialog1.AddExtension = True
@@ -494,7 +496,9 @@ Public Class Form1
         CheckBoxLED.Checked = True
         Scanning = True
         Button_Scan.Text = "Cancel"
-        FastScan(TextBoxX.Text, TextBoxY.Text, 0.00, SaveFileDialog1.FileName)
+
+        'FastScan(TextBoxX.Text, TextBoxY.Text, 0.00, SaveFileDialog1.FileName)
+
         If Scanning = True Then CheckBoxLED.Checked = False Else CheckBoxLED.Checked = True
         If Scanning = False Then GoTo 2
         watch.Stop()
@@ -511,7 +515,7 @@ Public Class Form1
         Button_Scan.Text = "Scan"
     End Sub
 
-    Public Sub FastScan(X As Integer, y As Integer, overlap As Single, Address As String)
+    Public Sub FastScanOlD(X As Integer, y As Integer, overlap As Single, Address As String)
 
         Camera.ResetMatrix()
 
@@ -576,7 +580,7 @@ Public Class Form1
 
 
                 If CheckBox2.Checked Then
-                    ZEDOF.AcquireThreaded(False, False)
+                    ZEDOF.Acquire(False, True)
                 Else
                     'Camera.Capture_Threaded()
                     'Thread.Sleep(Camera.exp * 1.2)
@@ -604,7 +608,7 @@ Public Class Form1
 
                     End If
                 End If
-                If CheckBox2.Checked Then ZEDOF.Wrapup()
+
                 If Tracking.ROI.IsMade And Not CheckBox2.Checked Then
                     'Stage.MoveAbsolute(Stage.Zaxe, Fit.ComputeE({Stage.X, Stage.Y}, A), False)
 
@@ -1406,25 +1410,6 @@ Public Class Form1
 
 
 
-    Private Sub Button29_Click(sender As Object, e As EventArgs) Handles Button29.Click
-        ExitLive() : Camera.ResetMatrix()
-    End Sub
-
-    Private Sub Button30_Click(sender As Object, e As EventArgs) Handles Button30.Click
-
-
-        ZEDOF.Acquire()
-        Dim bmp As New Bitmap(Camera.W, Camera.H, Imaging.PixelFormat.Format24bppRgb)
-        byteToBitmap(ZEDOF.OutputBytes, bmp)
-        PictureBox0.Image = bmp
-
-
-    End Sub
-
-    Private Sub Button31_Click(sender As Object, e As EventArgs) Handles Button31.Click
-        GoLive()
-    End Sub
-
 
 
     Private Sub TextBox21_KeyDown(sender As Object, e As KeyEventArgs) Handles TextBox21.KeyDown, TextBox22.KeyDown
@@ -1495,7 +1480,7 @@ Public Class Form1
         ExitLive() : Camera.ResetMatrix()
 
         For xx = 1 To 20
-            Zprofiler.AcquireThreaded(True, False)
+            Zprofiler.Acquire(True, False)
 
             Zprofiler.EstimateZ()
             Stage.MoveRelative(Stage.Xaxe, -Stage.FOVX)

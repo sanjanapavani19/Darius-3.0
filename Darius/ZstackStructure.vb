@@ -2,7 +2,9 @@
     Public W, H, Z As Integer
     Dim Pattern2D(,), ScalingUpPattern(), ScalingDownPattern() As Integer
     Dim GreenBytes(), GreenEdgeBytes()() As Single
-    Public MaxMap() As Single
+    Public MaxMapValue() As Single
+    Public MaxMapPosition() As Single
+
     Public MaxMap2D(,) As Single
     Dim BLure As FFTW_VB_Real
     Dim bytes()() As Byte
@@ -70,7 +72,9 @@
             Next
             p = Y * W * 3 * scale + 1
         Next
-        ReDim MaxMap(W / scale * H / scale - 1)
+        ReDim MaxMapValue(W / scale * H / scale - 1)
+        ReDim MaxMapPosition(W / scale * H / scale - 1)
+
         ReDim MaxMap2D(W / scale - 1, H / scale - 1)
         direction = 1
     End Sub
@@ -89,7 +93,8 @@
         zc = zi
     End Sub
 
-    Public Sub AcquireThreaded(retrn As Boolean, Optional WithWrapup As Boolean = True)
+    Public Sub Acquire(retrn As Boolean, Optional WithWrapup As Boolean = True)
+
         ticks = (Camera.exp * Stopwatch.Frequency / 1000)
         Zstart = Stage.Z
         'MakeDelay()
@@ -117,28 +122,67 @@
             Imagecreated(loopZ) = 1
         Next
         If retrn Then Stage.MoveRelativeAsync(Stage.Zaxe, -StepSize * Z, False) Else direction = direction * -1
-        If WithWrapup Then Wrapup()
+
 
     End Sub
     Public Sub MoveThreaded()
         Stage.MoveRelativeAsync(Stage.Zaxe, StepSize * direction, False)
     End Sub
     Public Sub ProcessThreaded()
-        For loopZ = 0 To Z - 1
-            Do Until Imagecreated(loopZ) = 1
+
+        Dim i As Integer
+        ReDim OutputBytes(W * H * 3 - 1)
+        Dim max, maxZ As Single
+        Dim maxi As Integer = W / Scale * H / Scale - 1
+
+        ReDim MaxMapValue(W / Scale * H / Scale - 1)
+        ReDim MaxMapPosition(W / Scale * H / Scale - 1)
+
+        Dim Zi As Integer = 0
+
+        For Zi = 0 To Z - 1
+            Do Until Imagecreated(Zi) = 1
                 'Application.DoEvents()
             Loop
-            GetColorBytes(bytes(loopZ), GreenBytes, W / Scale, H / Scale)
-            Deivative.AnalyzeX(GreenBytes, GreenEdgeBytes(loopZ))
-            BLure.UpLoad(GreenEdgeBytes(loopZ))
+            GetColorBytes(bytes(Zi), GreenBytes, W / Scale, H / Scale)
+            Deivative.AnalyzeX(GreenBytes, GreenEdgeBytes(Zi))
+            BLure.UpLoad(GreenEdgeBytes(Zi))
             BLure.Process_FT_MTF()
-            BLure.DownLoad(GreenEdgeBytes(loopZ))
-            processDone(loopZ) = 1
-        Next
+            BLure.DownLoad(GreenEdgeBytes(Zi))
 
+            For i = 0 To maxi
+                If GreenEdgeBytes(Zi)(i) > MaxMapValue(i) Then MaxMapValue(i) = GreenEdgeBytes(Zi)(i) : maxZ = Zi : MaxMapPosition(i) = maxZ
+            Next
+
+            processDone(Zi) = 1
+        Next
+        Wrapup()
     End Sub
 
+    Public Function Wrapup() As Byte()
+        Dim i As Integer
 
+
+        'SaveSinglePageTiff16("c:\temp\maxmap.tif", MaxMap, W / 2, H / 2)
+        'saveSinglePage32("c:\temp\maxtest.tif", maxtest, W / 2, H / 2)
+        'For Zi = 0 To Z - 1
+        '    saveSinglePage32("c:\temp\d\" + Zi.ToString, GreenEdgeBytes(Zi), W / 2, H / 2)
+        '    SaveSinglePageTiff16("c:\temp\i\" + Zi.ToString, bytes(Zi), W, H)
+        'Next
+        i = 0
+        Dim index As Integer
+        Dim j As Integer
+        Dim maxj = W * H * 3 - 1
+        ' 78 ms 
+        For j = 0 To maxj Step 3
+            index = MaxMapPosition(ScalingUpPattern(i))
+            OutputBytes(j) = bytes(index)(j)
+            OutputBytes(j + 1) = bytes(index)(j + 1)
+            OutputBytes(j + 2) = bytes(index)(j + 2)
+            i += 1
+        Next
+        Return OutputBytes
+    End Function
     Public Sub Process()
         GetColorBytes(bytes(zc), GreenBytes, W / Scale, H / Scale)
         Deivative.AnalyzeX(GreenBytes, GreenEdgeBytes(zc))
@@ -158,22 +202,7 @@
         End While
 
     End Sub
-    Public Sub Acquire()
-        For loopZ = 0 To Z - 1
-            '56 ms of transfer time
-            Camera.capture()
-            ' 38 ms moving to the next field
-            Stage.MoveRelative(Stage.Zaxe, StepSize, False)
-            ' 7ms upload
-            Upload(Camera.Bytes, loopZ)
-            ' 30 ms process
-            zc = loopZ
-            Process()
-        Next
-        Stage.MoveRelative(Stage.Zaxe, -StepSize * Z, False)
-        Wrapup()
 
-    End Sub
 
     Public Sub ProcessAll(bytesin()() As Byte)
 
@@ -188,43 +217,7 @@
         Next
 
     End Sub
-    Public Function Wrapup() As Byte()
-        ReDim OutputBytes(W * H * 3 - 1)
-        Dim max, maxZ As Single
-        Dim maxi As Integer = W / Scale * H / Scale - 1
-        Dim i As Integer
-        ReDim MaxMap(W / Scale * H / Scale - 1)
 
-        Do Until (processDone.Sum = Z)
-
-        Loop
-
-        For i = 0 To maxi
-            max = 0
-            For Zi = 0 To Z - 1
-                If GreenEdgeBytes(Zi)(i) > max Then max = GreenEdgeBytes(Zi)(i) : maxZ = Zi : MaxMap(i) = maxZ
-            Next
-        Next
-        'SaveSinglePageTiff16("c:\temp\maxmap.tif", MaxMap, W / 2, H / 2)
-        'saveSinglePage32("c:\temp\maxtest.tif", maxtest, W / 2, H / 2)
-        'For Zi = 0 To Z - 1
-        '    saveSinglePage32("c:\temp\d\" + Zi.ToString, GreenEdgeBytes(Zi), W / 2, H / 2)
-        '    SaveSinglePageTiff16("c:\temp\i\" + Zi.ToString, bytes(Zi), W, H)
-        'Next
-        i = 0
-        Dim index As Integer
-        Dim j As Integer
-        Dim maxj = W * H * 3 - 1
-        ' 78 ms 
-        For j = 0 To maxj Step 3
-            index = MaxMap(ScalingUpPattern(i))
-            OutputBytes(j) = bytes(index)(j)
-            OutputBytes(j + 1) = bytes(index)(j + 1)
-            OutputBytes(j + 2) = bytes(index)(j + 2)
-            i += 1
-        Next
-        Return OutputBytes
-    End Function
     Public Function EstimateZ() As Single(,)
         ReDim OutputBytes(W * H * 3 - 1)
         Dim max, maxZ As Single
@@ -232,7 +225,7 @@
         Dim Y As Integer = H / Scale
         Dim maxi As Integer = W / Scale * H / Scale - 1
         Dim i As Integer
-        ReDim MaxMap(W / Scale * H / Scale - 1)
+        ReDim MaxMapPosition(W / Scale * H / Scale - 1)
 
         Do Until (processDone.Sum = Z)
 
@@ -245,7 +238,7 @@
                 For xx = 0 To X - 1
                     max = 0
                     For Zi = 0 To Z - 1
-                        If GreenEdgeBytes(Zi)(i) > max Then max = GreenEdgeBytes(Zi)(i) : maxZ = Zi : MaxMap(i) = maxZ : MaxMap2D(xx, yy) = maxZ * StepSize + Zstart
+                        If GreenEdgeBytes(Zi)(i) > max Then max = GreenEdgeBytes(Zi)(i) : maxZ = Zi : MaxMapPosition(i) = maxZ : MaxMap2D(xx, yy) = maxZ * StepSize + Zstart
                     Next
                     i += 1
                 Next
@@ -256,7 +249,7 @@
                 For xx = 0 To X - 1
                     max = 0
                     For Zi = 0 To Z - 1
-                        If GreenEdgeBytes(Zi)(i) > max Then max = GreenEdgeBytes(Zi)(i) : maxZ = Zi : MaxMap(i) = maxZ : MaxMap2D(xx, yy) = Zstart - maxZ * StepSize
+                        If GreenEdgeBytes(Zi)(i) > max Then max = GreenEdgeBytes(Zi)(i) : maxZ = Zi : MaxMapPosition(i) = maxZ : MaxMap2D(xx, yy) = Zstart - maxZ * StepSize
                     Next
                     i += 1
                 Next
