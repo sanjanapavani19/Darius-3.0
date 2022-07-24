@@ -20,7 +20,7 @@ Public Class XimeaXIq
     Public bit_scale As Byte = 2 ^ 4
     Dim ROI As Rectangle
     Public OriginalW, OriginalH As Integer
-
+    Public readout_time As Single
 
     Public timeout As Integer
     Public Cropped As Boolean
@@ -78,6 +78,7 @@ Public Class XimeaXIq
             BmpRef = New Bitmap(W, H, Imaging.PixelFormat.Format24bppRgb)
             busy = False
             status = True
+            readout_time = 20
             StartAcqusition()
 
         End If

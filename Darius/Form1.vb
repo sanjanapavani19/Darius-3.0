@@ -152,8 +152,7 @@ Public Class Form1
                 Setting.Sett("EXPOSUREM", Camera.exp)
         End Select
         Setting.Sett("EXPOSURE", Camera.exp)
-        Timer1.Interval = 1
-        If Camera.exp > 1 Then Timer1.Interval = Camera.exp
+
         Camera.ExposureChanged = 0
 
         'Do Until Camera.ExposureChanged = False
@@ -165,26 +164,52 @@ Public Class Form1
 
 
     Public Sub GoLive()
-        Timer1.Interval = 1
-        If Camera.exp > 1 Then Timer1.Interval = Camera.exp
-        Timer1.Enabled = True
 
-        Dim Thread1 As New System.Threading.Thread(AddressOf Live)
-        Thread1.Start()
+        If (Camera.exp + Camera.readout_time) < 50 Then Timer1.Interval = 50 Else Timer1.Interval = Camera.exp + Camera.readout_time
+        Timer1.Start()
+
+        'Dim Thread1 As New System.Threading.Thread(AddressOf Live)
+        'Thread1.Start()
 
 
     End Sub
 
     Public Sub ExitLive()
-        If Camera.status = False Then Exit Sub
-        Camera.Dostop = True
-        Do Until Camera.busy = False
+        'If Camera.status = False Then Exit Sub
+        'Camera.Dostop = True
+        Timer1.Stop()
+        'Do Until Camera.busy = False
+        '    Application.DoEvents()
+        'Loop
+        'Camera.Dostop = False
 
-        Loop
-        Camera.Dostop = False
-        Timer1.Enabled = False
+    End Sub
+    Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
+
+        CaptureLive()
+
+
     End Sub
 
+    Public Sub CaptureLive()
+
+
+        Camera.busy = True
+        ' If Camera.Dostop Then Exit Do
+
+        If Camera.ExposureChanged = 0 Then Camera.SetExposure() : Display.AdjustBrightness() : Camera.ExposureChanged = 1
+        If Display.RequestIbIc = 0 Then Camera.ResetMatrix() : Display.RequestIbIc = 1
+        Camera.capture() : Display.MakePreview(Camera.Bytes, True)
+
+        PictureBox0.Image = Display.BmpPreview(Display.f).bmp
+
+        Application.DoEvents()
+        Display.MakeHistogram()
+        Display.PlotHistogram()
+
+        Camera.busy = False
+
+    End Sub
     Private Sub Button_right_Click(sender As Object, e As EventArgs) Handles Button_right.Click
 
         Stage.MoveRelative(Stage.Xaxe, -Stage.FOVX)
@@ -223,11 +248,8 @@ Public Class Form1
     End Sub
 
     Private Sub Form1_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
+        ExitLive()
         Stage.MoveAbsolute(Stage.Zaxe, 25)
-        If Camera.status = True Then
-            ExitLive()
-
-        End If
         Preview.StopPreview()
         LEDcontroller.LED_OFF()
     End Sub
@@ -309,86 +331,64 @@ Public Class Form1
     End Sub
 
 
-    Public Sub Live()
-
-        Do
-            Camera.busy = True
-            If Camera.Dostop Then Exit Do
-
-            If Camera.ExposureChanged = 0 Then Camera.SetExposure() : Display.AdjustBrightness() : Camera.ExposureChanged = 1
-            If Display.RequestIbIc = 0 Then Camera.ResetMatrix() : Display.RequestIbIc = 1
-            Camera.capture() : Display.MakePreview(Camera.Bytes, True)
-
-            PictureBox0.Image = Display.BmpPreview(Display.f).bmp.Clone
-
-            Application.DoEvents()
-        Loop
-        Camera.busy = False
-
-    End Sub
 
     Private Sub TabControl1_SelectedIndexChanged(sender As Object, e As EventArgs) Handles TabControl1.SelectedIndexChanged
-        If Not Camera.busy Then Exit Sub
 
+        ExitLive()
         CheckBoxLED.Checked = True
 
         If TabControl1.SelectedIndex = 0 Then
             LEDcontroller.SetRelays(PreviewLED, False)
             LEDcontroller.SetRelays(BlueLED, False)
             LEDcontroller.SetRelays(WhiteLED, True)
-            If Display.imagetype <> ImagetypeEnum.Brightfield Then
-                Display.imagetype = ImagetypeEnum.Brightfield
-                Camera.SetFlatField("ff.tif", "dark.tif")
-                TextBox_exposure.Text = Setting.Gett("Exposureb")
-                TextBox_GainB.Text = Setting.Gett("GainB")
-                TextBox_GainG.Text = Setting.Gett("GainG")
-                TextBox_GainR.Text = Setting.Gett("GainR")
-                Display.SetColorGain(Setting.Gett("GainR"), Setting.Gett("GainG"), Setting.Gett("GainB"), ImagetypeEnum.Brightfield)
-                ChangeExposure()
-            End If
+
             Display.imagetype = ImagetypeEnum.Brightfield
+            Camera.SetFlatField("ff.tif", "dark.tif")
+            TextBox_exposure.Text = Setting.Gett("Exposureb")
+            TextBox_GainB.Text = Setting.Gett("GainB")
+            TextBox_GainG.Text = Setting.Gett("GainG")
+            TextBox_GainR.Text = Setting.Gett("GainR")
+            Display.SetColorGain(Setting.Gett("GainR"), Setting.Gett("GainG"), Setting.Gett("GainB"), ImagetypeEnum.Brightfield)
 
-
+            ChangeExposure()
+            GoLive()
         End If
 
         If TabControl1.SelectedIndex = 1 Then
             LEDcontroller.SetRelays(PreviewLED, False)
             LEDcontroller.SetRelays(BlueLED, True)
             LEDcontroller.SetRelays(WhiteLED, False)
-
-            If Display.imagetype <> ImagetypeEnum.Fluorescence Then
-                Display.imagetype = ImagetypeEnum.Fluorescence
-                Camera.SetFlatField("ff_FiBi.tif", "dark.tif")
-                TextBox_exposure.Text = Setting.Gett("Exposuref")
-                TextBox_GainB.Text = Setting.Gett("GainB_FiBi")
-                TextBox_GainG.Text = Setting.Gett("GainG_FiBi")
-                TextBox_GainR.Text = Setting.Gett("GainR_FiBi")
-                Display.SetColorGain(Setting.Gett("GainR_FiBi"), Setting.Gett("GainG_FiBi"), Setting.Gett("GainB_FiBi"), ImagetypeEnum.Fluorescence)
-                ChangeExposure()
-            End If
             Display.imagetype = ImagetypeEnum.Fluorescence
+            Camera.SetFlatField("ff_FiBi.tif", "dark.tif")
+            TextBox_exposure.Text = Setting.Gett("Exposuref")
+            TextBox_GainB.Text = Setting.Gett("GainB_FiBi")
+            TextBox_GainG.Text = Setting.Gett("GainG_FiBi")
+            TextBox_GainR.Text = Setting.Gett("GainR_FiBi")
+            Display.SetColorGain(Setting.Gett("GainR_FiBi"), Setting.Gett("GainG_FiBi"), Setting.Gett("GainB_FiBi"), ImagetypeEnum.Fluorescence)
 
+            ChangeExposure()
+            GoLive()
         End If
 
 
         If TabControl1.SelectedIndex = 2 Then
-
+            ExitLive()
             If Display.imagetype = ImagetypeEnum.Fluorescence Then Display.imagetype = ImagetypeEnum.EDF_Fluorescence
             If Display.imagetype = ImagetypeEnum.Brightfield Then Display.imagetype = ImagetypeEnum.EDF_Brightfield
 
             Dim ccMatrix As Single = Camera.CCMAtrix
-            ExitLive() : Camera.ResetMatrix()
+            Camera.ResetMatrix()
 
 
             ZEDOF.AcquireThreaded(True)
             'ZEDOF.Acquire()
             Dim bmp As New Bitmap(Camera.W, Camera.H, Imaging.PixelFormat.Format24bppRgb)
-            'byteToBitmap(ZEDOF.OutputBytes, bmp)
+            byteToBitmap(ZEDOF.OutputBytes, bmp)
 
             Display.ApplyBrightness(ZEDOF.OutputBytes, ccMatrix, bmp)
             PictureBox0.Image = bmp
             CheckBoxLED.Checked = False
-            GoLive()
+            'GoLive()
 
 
         End If
@@ -482,9 +482,10 @@ Public Class Form1
 
 
     Private Sub Button_Scan_Click(sender As Object, e As EventArgs) Handles Button_Scan.Click
-        If Scanning Then Scanning = False : Button_Scan.Text = "Scan" : Exit Sub
+        ExitLive()
+        If Scanning Then Scanning = False : Button_Scan.Text = "Scan" :GoLive: Exit Sub
         SaveFileDialog1.DefaultExt = ".tif"
-        If SaveFileDialog1.ShowDialog = DialogResult.Cancel Then Exit Sub
+        If SaveFileDialog1.ShowDialog = DialogResult.Cancel Then GoLive() : Exit Sub
         SaveFileDialog1.AddExtension = True
 
         Dim watch As Stopwatch
@@ -512,7 +513,7 @@ Public Class Form1
 
     Public Sub FastScan(X As Integer, y As Integer, overlap As Single, Address As String)
 
-        If Camera.busy Then ExitLive() : Camera.ResetMatrix()
+        Camera.ResetMatrix()
 
         'Camera.SetPolicyToSafe()
 
@@ -696,7 +697,7 @@ Public Class Form1
         'Camera.SetDataMode(Colortype.Grey)
         'Stage.SetAcceleration(Stage.Zaxe, Stage.Zacc)
         GoLive()
-        Display.AdjustBrightness()
+        'Display.AdjustBrightness()
 
 
     End Sub
@@ -872,8 +873,9 @@ Public Class Form1
     End Sub
 
     Private Sub Button6_Click(sender As Object, e As EventArgs) Handles Button6.Click
+        ExitLive()
         GetPreview()
-
+        GoLive()
     End Sub
 
     Public Sub GetPreview(Optional wait As Boolean = True)
@@ -962,7 +964,7 @@ Public Class Form1
     End Sub
 
     Private Sub Button12_Click(sender As Object, e As EventArgs) Handles Button12.Click
-
+        ExitLive()
         UpdateLED(False)
         LEDcontroller.SetRelays(PreviewLED, True)
 
@@ -972,7 +974,7 @@ Public Class Form1
         PictureBox_Preview.Image = Tracking.bmp.bmp
         LEDcontroller.SetRelays(PreviewLED, False)
         UpdateLED(CheckBoxLED.Checked)
-
+        GoLive()
     End Sub
 
 
@@ -1053,8 +1055,9 @@ Public Class Form1
 
     Private Sub TextBox13_KeyDown(sender As Object, e As KeyEventArgs) Handles TextBox_exposure.KeyDown
         If e.KeyCode = Keys.Return Then
+            ExitLive()
             ChangeExposure()
-
+            GoLive()
         End If
     End Sub
 
@@ -1070,10 +1073,7 @@ Public Class Form1
         End If
     End Sub
 
-    Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
-        'Display.MakeHistogram()
-        'Display.PlotHistogram()
-    End Sub
+
 
 
     Private Sub Button18_Click(sender As Object, e As EventArgs) Handles Button_Luigi.Click
@@ -1571,6 +1571,10 @@ Public Class Form1
     End Sub
 
     Private Sub PictureBox_Preview_Click(sender As Object, e As EventArgs) Handles PictureBox_Preview.Click
+
+    End Sub
+
+    Private Sub TextBox_exposure_TextChanged(sender As Object, e As EventArgs) Handles TextBox_exposure.TextChanged
 
     End Sub
 End Class

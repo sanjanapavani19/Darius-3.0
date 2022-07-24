@@ -56,9 +56,9 @@ Public Class ImageDisplay
 
         HistoChart.Series(0).Points.Clear()
 
-        For j = 0 To HistBin
-            HistoChart.Series(0).Points.AddXY(j + 1, Histogram(j))
-        Next
+            For j = 0 To HistBin
+                HistoChart.Series(0).Points.AddXY(j + 1, Histogram(j))
+            Next
 
 
     End Sub

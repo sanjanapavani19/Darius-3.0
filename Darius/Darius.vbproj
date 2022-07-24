@@ -208,6 +208,7 @@
     <Compile Include="PreviewWebcam.vb" />
     <Compile Include="QuickPhasor.vb" />
     <Compile Include="Relay.vb" />
+    <Compile Include="ScanClass.vb" />
     <Compile Include="Scanning.Designer.vb">
       <DependentUpon>Scanning.vb</DependentUpon>
     </Compile>

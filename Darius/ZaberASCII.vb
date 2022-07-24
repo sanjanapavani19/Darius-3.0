@@ -15,7 +15,7 @@ Public Class ZaberASCII
     Public Xaxe, Yaxe, Zaxe As Axis
 
     Public Sub New(FOVX As Single, FOVY As Single)
-        Dim com As Connection = Connection.OpenSerialPort("COM3")
+        Dim com As Connection = Connection.OpenSerialPort("COM4")
         Dim Devicelist = com.DetectDevices()
         Xaxe = Devicelist(1).GetAxis(1)
         Yaxe = Devicelist(2).GetAxis(1)

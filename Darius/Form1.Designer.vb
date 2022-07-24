@@ -24,11 +24,11 @@ Partial Class Form1
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Form1))
-        Dim ChartArea2 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
-        Dim Legend2 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
-        Dim Series4 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
-        Dim Series5 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
-        Dim Series6 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
+        Dim ChartArea3 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
+        Dim Legend3 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
+        Dim Series7 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
+        Dim Series8 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
+        Dim Series9 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
         Me.GroupBox3 = New System.Windows.Forms.GroupBox()
         Me.Button_Home = New System.Windows.Forms.Button()
         Me.Button_bottom = New System.Windows.Forms.Button()
@@ -1543,34 +1543,34 @@ Partial Class Form1
         'Chart1
         '
         Me.Chart1.BackColor = System.Drawing.Color.Transparent
-        ChartArea2.AxisX.LabelStyle.Enabled = False
-        ChartArea2.AxisX.MajorGrid.Enabled = False
-        ChartArea2.AxisX.MajorTickMark.Enabled = False
-        ChartArea2.AxisY.LabelStyle.Enabled = False
-        ChartArea2.AxisY.MajorGrid.Enabled = False
-        ChartArea2.BackColor = System.Drawing.Color.Transparent
-        ChartArea2.Name = "ChartArea1"
-        Me.Chart1.ChartAreas.Add(ChartArea2)
-        Legend2.Name = "Legend1"
-        Me.Chart1.Legends.Add(Legend2)
+        ChartArea3.AxisX.LabelStyle.Enabled = False
+        ChartArea3.AxisX.MajorGrid.Enabled = False
+        ChartArea3.AxisX.MajorTickMark.Enabled = False
+        ChartArea3.AxisY.LabelStyle.Enabled = False
+        ChartArea3.AxisY.MajorGrid.Enabled = False
+        ChartArea3.BackColor = System.Drawing.Color.Transparent
+        ChartArea3.Name = "ChartArea1"
+        Me.Chart1.ChartAreas.Add(ChartArea3)
+        Legend3.Name = "Legend1"
+        Me.Chart1.Legends.Add(Legend3)
         Me.Chart1.Location = New System.Drawing.Point(249, 262)
         Me.Chart1.Name = "Chart1"
-        Series4.ChartArea = "ChartArea1"
-        Series4.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Area
-        Series4.IsVisibleInLegend = False
-        Series4.Legend = "Legend1"
-        Series4.Name = "Series1"
-        Series5.ChartArea = "ChartArea1"
-        Series5.IsVisibleInLegend = False
-        Series5.Legend = "Legend1"
-        Series5.Name = "Series2"
-        Series6.ChartArea = "ChartArea1"
-        Series6.IsVisibleInLegend = False
-        Series6.Legend = "Legend1"
-        Series6.Name = "Series3"
-        Me.Chart1.Series.Add(Series4)
-        Me.Chart1.Series.Add(Series5)
-        Me.Chart1.Series.Add(Series6)
+        Series7.ChartArea = "ChartArea1"
+        Series7.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Area
+        Series7.IsVisibleInLegend = False
+        Series7.Legend = "Legend1"
+        Series7.Name = "Series1"
+        Series8.ChartArea = "ChartArea1"
+        Series8.IsVisibleInLegend = False
+        Series8.Legend = "Legend1"
+        Series8.Name = "Series2"
+        Series9.ChartArea = "ChartArea1"
+        Series9.IsVisibleInLegend = False
+        Series9.Legend = "Legend1"
+        Series9.Name = "Series3"
+        Me.Chart1.Series.Add(Series7)
+        Me.Chart1.Series.Add(Series8)
+        Me.Chart1.Series.Add(Series9)
         Me.Chart1.Size = New System.Drawing.Size(317, 122)
         Me.Chart1.TabIndex = 120
         Me.Chart1.Text = "Chart1"

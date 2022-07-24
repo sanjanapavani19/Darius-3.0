@@ -180,16 +180,12 @@
         Me.bytes = bytes
 
         For zi = 0 To Z - 1
-
             GetColorBytes(bytes(zi), GreenBytes, W / Scale, H / Scale)
             Deivative.AnalyzeX(GreenBytes, GreenEdgeBytes(zi))
             BLure.UpLoad(GreenEdgeBytes(zi))
             BLure.Process_FT_MTF()
             BLure.DownLoad(GreenEdgeBytes(zi))
-
         Next
-
-
 
     End Sub
     Public Function Wrapup() As Byte()
