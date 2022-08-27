@@ -110,8 +110,11 @@
     <Reference Include="BitMiracle.LibTiff.NET, Version=2.4.649.0, Culture=neutral, PublicKeyToken=53879b3e20e7a7d6, processorArchitecture=MSIL">
       <HintPath>..\packages\BitMiracle.LibTiff.NET.2.4.649\lib\net40\BitMiracle.LibTiff.NET.dll</HintPath>
     </Reference>
-    <Reference Include="Google.Protobuf, Version=3.19.4.0, Culture=neutral, PublicKeyToken=a7d26565bac4d604, processorArchitecture=MSIL">
-      <HintPath>..\packages\Google.Protobuf.3.19.4\lib\net45\Google.Protobuf.dll</HintPath>
+    <Reference Include="Emgu.CV.Platform.NetStandard, Version=4.5.2.4673, Culture=neutral, PublicKeyToken=7281126722ab4438, processorArchitecture=MSIL">
+      <HintPath>..\packages\Emgu.CV.4.5.2.4673\lib\netstandard2.0\Emgu.CV.Platform.NetStandard.dll</HintPath>
+    </Reference>
+    <Reference Include="Google.Protobuf, Version=3.20.1.0, Culture=neutral, PublicKeyToken=a7d26565bac4d604, processorArchitecture=MSIL">
+      <HintPath>..\packages\Google.Protobuf.3.20.1\lib\net45\Google.Protobuf.dll</HintPath>
     </Reference>
     <Reference Include="MathNet.Numerics, Version=4.15.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MathNet.Numerics.4.15.0\lib\net461\MathNet.Numerics.dll</HintPath>
@@ -124,9 +127,19 @@
     <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
     </Reference>
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Drawing.Common, Version=6.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Drawing.Common.6.0.0\lib\net461\System.Drawing.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Drawing.Design" />
+    <Reference Include="System.Drawing.Primitives, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Drawing.Primitives.4.3.0\lib\net45\System.Drawing.Primitives.dll</HintPath>
+      <Private>True</Private>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Memory, Version=4.0.1.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Memory.4.5.4\lib\net461\System.Memory.dll</HintPath>
     </Reference>
@@ -134,8 +147,18 @@
     <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
     </Reference>
+    <Reference Include="System.Runtime, Version=4.1.1.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.4.3.1\lib\net462\System.Runtime.dll</HintPath>
+      <Private>True</Private>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.6.0.0\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.InteropServices.RuntimeInformation, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.InteropServices.RuntimeInformation.4.3.0\lib\net45\System.Runtime.InteropServices.RuntimeInformation.dll</HintPath>
+      <Private>True</Private>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Windows.Forms" />
@@ -153,8 +176,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>bin\x64\Debug\xiApi.NETX64.dll</HintPath>
     </Reference>
-    <Reference Include="Zaber.Motion, Version=2.10.0.0, Culture=neutral, PublicKeyToken=65af8649611d1afa, processorArchitecture=MSIL">
-      <HintPath>..\packages\Zaber.Motion.2.10.0\lib\net45\Zaber.Motion.dll</HintPath>
+    <Reference Include="Zaber.Motion, Version=2.14.5.0, Culture=neutral, PublicKeyToken=65af8649611d1afa, processorArchitecture=MSIL">
+      <HintPath>..\packages\Zaber.Motion.2.14.5\lib\net45\Zaber.Motion.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -171,7 +194,9 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AutoExposureFinder.vb" />
     <Compile Include="CentralDerivitavie.vb" />
+    <Compile Include="DehazeClass.vb" />
     <Compile Include="Dover.vb" />
     <Compile Include="ExtendedDepth5.vb" />
     <Compile Include="Fast Bitmaps.vb" />
@@ -185,7 +210,6 @@
       <DependentUpon>Form1.vb</DependentUpon>
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="ImageCapture.vb" />
     <Compile Include="ImageDisplay.vb" />
     <Compile Include="ImageDisplayXiq.vb" />
     <Compile Include="LibTiff.vb" />
@@ -208,7 +232,7 @@
     <Compile Include="PreviewWebcam.vb" />
     <Compile Include="QuickPhasor.vb" />
     <Compile Include="Relay.vb" />
-    <Compile Include="ScanClass.vb" />
+    <Compile Include="ScanUnit.vb" />
     <Compile Include="Scanning.Designer.vb">
       <DependentUpon>Scanning.vb</DependentUpon>
     </Compile>
@@ -219,6 +243,7 @@
     <Compile Include="Shared.vb" />
     <Compile Include="StackImage.vb" />
     <Compile Include="Pyramids.vb" />
+    <Compile Include="test.vb" />
     <Compile Include="Toggle.Designer.vb">
       <DependentUpon>Toggle.vb</DependentUpon>
     </Compile>
@@ -283,12 +308,6 @@
     <Content Include="SCI Version.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\IMSLs\IMSLs.csproj">
-      <Project>{8b2e38d5-6577-4229-89e4-d1cc9b8fc3c8}</Project>
-      <Name>IMSLs</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.8">
       <Visible>False</Visible>
       <ProductName>Microsoft .NET Framework 4.8 %28x86 and x64%29</ProductName>
@@ -300,12 +319,18 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MVStitchintLibrary\MVStitchintLibrary.csproj">
+      <Project>{58aed2c9-4842-4fa7-b9d0-ffdd1e6098b5}</Project>
+      <Name>MVStitchintLibrary</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
-  <Import Project="..\packages\Zaber.Motion.2.10.0\build\net45\Zaber.Motion.targets" Condition="Exists('..\packages\Zaber.Motion.2.10.0\build\net45\Zaber.Motion.targets')" />
+  <Import Project="..\packages\Zaber.Motion.2.14.5\build\net45\Zaber.Motion.targets" Condition="Exists('..\packages\Zaber.Motion.2.14.5\build\net45\Zaber.Motion.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Zaber.Motion.2.10.0\build\net45\Zaber.Motion.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Zaber.Motion.2.10.0\build\net45\Zaber.Motion.targets'))" />
+    <Error Condition="!Exists('..\packages\Zaber.Motion.2.14.5\build\net45\Zaber.Motion.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Zaber.Motion.2.14.5\build\net45\Zaber.Motion.targets'))" />
   </Target>
 </Project>

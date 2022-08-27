@@ -15,11 +15,14 @@ Public Class ZaberASCII
     Public Xaxe, Yaxe, Zaxe As Axis
 
     Public Sub New(FOVX As Single, FOVY As Single)
-        Dim com As Connection = Connection.OpenSerialPort("COM4")
+        Library.SetDeviceDbSource(DeviceDbSourceType.File, "c:\temp\devices-public.sqlite")
+        Dim com As Connection = Connection.OpenSerialPort("COM3")
+        Dim ComZ As Connection = Connection.OpenSerialPort("COM7")
         Dim Devicelist = com.DetectDevices()
-        Xaxe = Devicelist(1).GetAxis(1)
-        Yaxe = Devicelist(2).GetAxis(1)
-        Zaxe = Devicelist(0).GetAxis(1)
+        Xaxe = Devicelist(0).GetAxis(1)
+        Yaxe = Devicelist(1).GetAxis(1)
+        Dim DeviceListZ = ComZ.DetectDevices
+        Zaxe = DeviceListZ(0).GetAxis(1)
         Me.FOVX = FOVX
         Me.FOVY = FOVY
         Home()
@@ -36,19 +39,28 @@ Public Class ZaberASCII
         Setting.Sett("FOVY", FOVY)
     End Sub
     Public Sub Home()
+
+
         Zaxe.Home()
         Xaxe.Home()
         Yaxe.Home()
-        SetAcceleration(Zaxe, 1)
-        SetSpeed(Zaxe, 100)
+
+        SetAcceleration(Zaxe, 2)
+        SetSpeed(Zaxe, 800)
+        SetSpeed(Xaxe, 26)
+        SetAcceleration(Yaxe, 2)
+        SetSpeed(Yaxe, 100)
+
         MoveAbsolute(Zaxe, Setting.Gett("Focus"), False)
         MoveAbsolute(Xaxe, 34, False)
+
+
     End Sub
-    Public Sub MoveRelative(ByRef Axe As Axis, R As Single, Optional update As Boolean = True)
+    Public Sub MoveRelative(ByRef Axe As Axis, R As Single, Optional update As Boolean = True, Optional Waituntilidle As Boolean = True)
 
         Try
 
-            Axe.MoveRelative(R, Units.Length_Millimetres)
+            Axe.MoveRelative(R, Units.Length_Millimetres, Waituntilidle)
             If update Then
                 UpdatePositions()
                 Tracking.Update()
@@ -58,9 +70,11 @@ Public Class ZaberASCII
         End Try
 
     End Sub
-
-    Public Sub MoveRelativeAsync(ByRef Axe As Axis, R As Single, Optional update As Boolean = True)
-        Axe.MoveRelativeAsync(R, Units.Length_Millimetres)
+    Public Sub WaitUntilIdle(ByRef Axe As Axis)
+        Axe.WaitUntilIdle()
+    End Sub
+    Public Sub MoveRelativeAsync(ByRef Axe As Axis, R As Single, Optional update As Boolean = True, Optional Waituntilidle As Boolean = True)
+        Axe.MoveRelativeAsync(R, Units.Length_Millimetres, Waituntilidle)
         If update Then
             UpdatePositions()
             Tracking.Update()
@@ -68,9 +82,9 @@ Public Class ZaberASCII
 
         End If
     End Sub
-    Public Sub MoveAbsolute(ByRef Axe As Axis, A As Single, Optional update As Boolean = True)
+    Public Sub MoveAbsolute(ByRef Axe As Axis, A As Single, Optional update As Boolean = True, Optional Waituntilidle As Boolean = True)
         Try
-            Axe.MoveAbsolute(A, Units.Length_Millimetres)
+            Axe.MoveAbsolute(A, Units.Length_Millimetres, Waituntilidle)
             If update Then
                 UpdatePositions()
                 Tracking.Update()
@@ -81,10 +95,10 @@ Public Class ZaberASCII
 
     End Sub
 
-    Public Sub MoveAbsoluteAsync(ByRef Axe As Axis, A As Single, Optional update As Boolean = True)
+    Public Sub MoveAbsoluteAsync(ByRef Axe As Axis, A As Single, Optional update As Boolean = True, Optional Waituntilidle As Boolean = True)
         Try
 
-            Axe.MoveAbsoluteAsync(A, Units.Length_Millimetres)
+            Axe.MoveAbsoluteAsync(A, Units.Length_Millimetres, Waituntilidle)
             If update Then
                 UpdatePositions()
                 Tracking.Update()
@@ -105,7 +119,7 @@ Public Class ZaberASCII
 
     End Sub
 
-    Public Sub SetAcceleration(ByRef Axe As Axis, A As Integer)
+    Public Sub SetAcceleration(ByRef Axe As Axis, A As Single)
         Axe.Settings.Set("accel", A, Units.Acceleration_MetresPerSecondSquared)
     End Sub
 
@@ -159,14 +173,14 @@ Public Class ZaberASCII
 
     End Sub
 
-    Public Sub CalibrateZoffset(AutoFocusrange As Single)
-        Stage.MoveRelative(Stage.Zaxe, -AutoFocusrange / 2)
-        Dim ZZ As Single = Stage.GetPosition(Stage.Zaxe)
-        Setting.Sett("ZOFFSET", ZZ)
-        'StorePosition(Stage.Zaxe, 1)
-        Stage.MoveRelative(Stage.Zaxe, AutoFocusrange / 2)
-        ZZ = Stage.GetPosition(Stage.Zaxe)
-        Setting.Sett("Focus", ZZ)
+    Public Sub CalibrateZoffset()
+        'Stage.MoveRelative(Stage.Zaxe, -AutoFocusrange / 2)
+        'Dim ZZ As Single = Stage.GetPosition(Stage.Zaxe)
+        'Setting.Sett("ZOFFSET", ZZ)
+        ''StorePosition(Stage.Zaxe, 1)
+        'Stage.MoveRelative(Stage.Zaxe, AutoFocusrange / 2)
+
+        Setting.Sett("Focus", Stage.GetPosition(Stage.Zaxe))
         'StorePosition(Stage.Zaxe, 2)
     End Sub
 

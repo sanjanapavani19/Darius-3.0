@@ -15,7 +15,7 @@ Public Class FastBMP
     Public height As Integer
     Public bytes() As Byte
     Public byteCopy() As Byte
-    Public Greyimage() As Single
+    Public Greyimage() As Byte
     Public GR As Graphics
     Public stride As Integer
     Public offset As Integer
@@ -49,7 +49,7 @@ Public Class FastBMP
         height = b.Height
 
         bmp = New Bitmap(width, height, format)
-        GR = Graphics.FromImage(bmp)
+        If format <> Imaging.PixelFormat.Format8bppIndexed Then GR = Graphics.FromImage(bmp)
 
         Dim bmpData As BitmapData = b.LockBits(New Rectangle(0, 0, b.Width, b.Height), ImageLockMode.ReadWrite, b.PixelFormat)
         stride = bmpData.Stride
@@ -183,7 +183,7 @@ Public Class FastBMP
         bytes(index + 2) = byteR
 
     End Sub
-    Public Function GetGraysacleArray() As Single()
+    Public Function GetGraysacleArray() As Byte()
         Dim p As Integer = 0
         Dim i As Integer
         For y = 0 To height - 1
@@ -235,6 +235,7 @@ Module Bitmaps
         End If
         Return bmp
     End Function
+
 
 
     Public Function BitmapToBytes(bmp As Bitmap, ByRef bytes() As Byte) As Integer

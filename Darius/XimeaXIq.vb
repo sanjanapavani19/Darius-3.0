@@ -11,6 +11,7 @@ Public Class XimeaXIq
     Public status As Boolean
     Public FFsetup As Boolean
     Public Wbinned, Hbinned As Integer
+    Public FF() As Single
     Public ready As Boolean
     Public busy As Boolean
     Public gain As Single
@@ -53,7 +54,7 @@ Public Class XimeaXIq
             cam.SetParam(PRM.OUTPUT_DATA_BIT_DEPTH, BIT_DEPTH.BPP_8)
 
             cam.SetParam(PRM.HORIZONTAL_FLIP, 0)
-            cam.SetParam(PRM.VERTICAL_FLIP, 1)
+            cam.SetParam(PRM.VERTICAL_FLIP, 0)
 
             OriginalW = cam.GetParamInt(PRM.WIDTH)
             OriginalH = cam.GetParamInt(PRM.HEIGHT)
@@ -62,13 +63,15 @@ Public Class XimeaXIq
             ReDim Bytes(W * H * 3 - 1)
             timeout = 50
 
-            cam.SetParam(PRM.SHARPNESS, 4)
+            cam.SetParam(PRM.SHARPNESS, 0)
             gain = Setting.Gett("Gain")
             setGain(gain)
             SetColorGain(Setting.Gett("GainR"), Setting.Gett("GainG"), Setting.Gett("GainB"))
-            setGammaY(1)
-            setGammaC(1)
+            setGammaY(Setting.Gett("GAMMAY"))
+            setGammaC(Setting.Gett("GAMMAC"))
             exp = Setting.Gett("exposureb")
+
+            cam.SetParam(PRM.CC_MATRIX_23, 0)
             Dim val As Integer
             cam.GetParam(PRM.EXPOSURE, Val)
 
@@ -200,7 +203,7 @@ Public Class XimeaXIq
         cam.SetParam(PRM.TRG_SOFTWARE, 1)
     End Sub
     Public Sub SetFlatField(filename As String, bfilename As String)
-        Exit Sub
+
         Try
             SetDataMode(Colortype.RGB)
             cam.SetParam(PRM.FFC_FLAT_FIELD_FILE_NAME, filename)
@@ -212,11 +215,15 @@ Public Class XimeaXIq
             FFsetup = False
         End Try
 
+
+
     End Sub
 
 
     Public Sub Flatfield(value As Integer)
         cam.SetParam(PRM.FFC, value)
+
+
     End Sub
     Public Sub capture_binned(ByRef framein)
         Try
@@ -270,10 +277,12 @@ Public Class XimeaXIq
 
     Public Sub setGammaY(G As Single)
         cam.SetParam(PRM.GAMMAY, G)
+        Setting.Sett("GAMMAY", G)
     End Sub
 
     Public Sub setGammaC(G As Single)
         cam.SetParam(PRM.GAMMAC, G)
+        Setting.Sett("GAMMAC", G)
     End Sub
 
     Public Sub SetExposure(ex As Single, save As Boolean)
@@ -289,7 +298,7 @@ Public Class XimeaXIq
         'Sets exposure time in microseconds.
         If exp = 0 Then MsgBox("Richard : Please Enter a valid value for exposure time." + vbCrLf + "Expsure is fixed!") : Exit Sub
         cam.SetParam(PRM.EXPOSURE, exp * 1000)
-        timeout = exp * 100000
+        timeout = exp * 8000
 
     End Sub
 

@@ -19,6 +19,7 @@
     Dim Range As Single
     Dim Scale As Integer
     Dim Zstart As Single
+    Public WrapUpDone As Boolean
     Public OutputBytes() As Byte
 
     Public Sub New(W As Integer, H As Integer, Range As Single, Stepsize As Single, scale As Integer)
@@ -93,22 +94,25 @@
         zc = zi
     End Sub
 
-    Public Sub Acquire(retrn As Boolean, Optional WithWrapup As Boolean = True)
-
+    Public Sub Acquire(retrn As Boolean, direction As Integer)
+        WrapUpDone = False
         ticks = (Camera.exp * Stopwatch.Frequency / 1000)
         Zstart = Stage.Z
         'MakeDelay()
+        Me.direction = direction
         If retrn Then direction = 1
         Array.Clear(Imagecreated, 0, Z)
         Array.Clear(processDone, 0, Z)
 
         Dim Thread As New System.Threading.Thread(AddressOf ProcessThreaded)
+        '    Dim ThreadMove As New System.Threading.Thread(AddressOf MoveThreaded)
 
         Thread.Start()
 
         For loopZ = 0 To Z - 1
             Camera.Trigger()
             MakeDelay()
+
 
             Stage.MoveRelativeAsync(Stage.Zaxe, StepSize * direction, False)
             Camera.cam.GetImageByteArray(bytes(loopZ), Camera.timeout)
@@ -121,12 +125,12 @@
             ''Camera.TriggerOff()
             Imagecreated(loopZ) = 1
         Next
-        If retrn Then Stage.MoveRelativeAsync(Stage.Zaxe, -StepSize * Z, False) Else direction = direction * -1
+        If retrn Then Stage.MoveRelativeAsync(Stage.Zaxe, -StepSize * Z, False)
 
 
     End Sub
     Public Sub MoveThreaded()
-        Stage.MoveRelativeAsync(Stage.Zaxe, StepSize * direction, False)
+        Stage.MoveRelative(Stage.Zaxe, StepSize * direction, False)
     End Sub
     Public Sub ProcessThreaded()
 
@@ -181,6 +185,7 @@
             OutputBytes(j + 2) = bytes(index)(j + 2)
             i += 1
         Next
+        WrapUpDone = True
         Return OutputBytes
     End Function
     Public Sub Process()

@@ -157,6 +157,27 @@ Public Class FFTW_VB_Real
         done = False
     End Sub
 
+    Public Sub New(DimX As Integer, DimY As Integer, width As Single, grade As Integer)
+        nx = DimX
+        ny = DimY
+        nmax = nx * (ny + 2) - 1
+        ReDim fout(nx * (ny + 2) - 1)
+        ReDim fin(nx * ny - 1)
+        'pointers to the FFTW plan objects
+        hin_Forward = GCHandle.Alloc(fin, GCHandleType.Pinned)
+        hout_Forward = GCHandle.Alloc(fout, GCHandleType.Pinned)
+        fplan_Forward = dft_r2c_2d(nx, ny, hin_Forward.AddrOfPinnedObject(), hout_Forward.AddrOfPinnedObject(), 0)
+
+        ReDim fin_Backward(nx * (ny + 2) - 1)
+        ReDim fout_Backward(nx * ny - 1)
+
+        hin_Backward = GCHandle.Alloc(fin_Backward, GCHandleType.Pinned)
+        hout_Backward = GCHandle.Alloc(fout_Backward, GCHandleType.Pinned)
+        fplan_backward = dft_c2r_2d(nx, ny, hin_Backward.AddrOfPinnedObject(), hout_Backward.AddrOfPinnedObject(), 0)
+
+        MakeGaussianReal(width, MTF, grade)
+        done = False
+    End Sub
     Public Sub DFT2D_MTF(fin2D(,) As Single, ByRef Fout2D(,) As Single)
         done = False
         ReDim Fout2D(nx - 1, ny - 1)

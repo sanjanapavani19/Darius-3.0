@@ -1,6 +1,0 @@
-﻿
-Module ImageCapture
-
-
-
-End Module

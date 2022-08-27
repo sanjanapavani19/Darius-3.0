@@ -424,7 +424,7 @@ Public Class TrackingStructure
         XX = XX - Xmin
         YY = YY - Ymin
         P.X = Pbox.Width - XX * Pbox.Width / Xrange
-        P.Y = YY * Pbox.Height / Yrange
+        P.Y = Pbox.Height - YY * Pbox.Height / Yrange
 
         Return P
     End Function
@@ -447,7 +447,7 @@ Public Class TrackingStructure
     End Sub
     Public Function ConvertPixeltoCoordinateY(yy As Single) As Single
 
-        Y = yy * Yrange / Pbox.Height + Ymin
+        Y = Yrange - yy * Yrange / Pbox.Height + Ymin
 
         Return Y
         End Function

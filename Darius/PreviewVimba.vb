@@ -22,7 +22,7 @@ Public Class PreviewVimba
     Dim Deivative As CentralDerivitavie
     Dim BLure As FFTW_VB_Real
     Dim expFeature As Feature
-    Dim Preview_Z As Single
+    Public Preview_Z As Single
     Public Z As Integer
     Dim Zsteps As Single
     Dim Pbar As ProgressBar
@@ -32,9 +32,10 @@ Public Class PreviewVimba
     Dim C(), S() As Single
     Dim Flip As Mirror
     Dim Cropfilter As Crop
-    Public X0, Y0, W, H As Integer
+    Public X0, Y0, ROI_W, ROI_H As Integer
     Public GreyEdge()() As Single
     Public GreyEdge2D()(,) As Single
+    Public Scale As Single
 
     ' create video source
     Public Sub New(Z As Integer, Zsteps As Single, Pbar As ProgressBar)
@@ -47,21 +48,21 @@ Public Class PreviewVimba
 
         X0 = Setting.Gett("Preview_X")
         Y0 = Setting.Gett("Preview_Y")
-        W = Setting.Gett("Preview_W")
-        H = Setting.Gett("Preview_H")
-        R = New Rectangle(X0, Y0, W, H)
+        ROI_W = Setting.Gett("Preview_W")
+        ROI_H = Setting.Gett("Preview_H")
+        R = New Rectangle(X0, Y0, ROI_W, ROI_H)
 
-        mCamera.AcquireSingleImage(frame, 500)
+        mCamera.AcquireSingleImage(frame, 1000)
         frame.Fill(BmpVimba)
 
         Width = BmpVimba.Width
         Height = BmpVimba.Height
 
-        Flip = New Mirror(False, True)
+        Flip = New Mirror(True, True)
         Cropfilter = New Crop(R)
 
-        Deivative = New CentralDerivitavie(W, H)
-        BLure = New FFTW_VB_Real(H, W)
+        Deivative = New CentralDerivitavie(ROI_W, ROI_H)
+        BLure = New FFTW_VB_Real(ROI_H, ROI_W)
         BLure.MakeGaussianReal(0.008, BLure.MTF, 2)
         Preview_Z = Setting.Gett("Preview_Z")
         Me.Z = Z
@@ -74,23 +75,23 @@ Public Class PreviewVimba
         ReDim S(Z - 1)
         ReDim Zx(Z - 1)
         For zz = 0 To Z - 1
-            ReDim GreyEdge(zz)(W * H - 1)
-            ReDim GreyEdge2D(zz)(H - 1, W - 1)
-            C(zz) = Math.Cos(2 * Math.PI / Z * zz)
-            S(zz) = Math.Sin(2 * Math.PI / Z * zz)
+            ReDim GreyEdge(zz)(ROI_W * ROI_H - 1)
+            ReDim GreyEdge2D(zz)(ROI_H - 1, ROI_W - 1)
+            C(zz) = Math.Cos(2 * 2 * Math.PI / Z * zz)
+            S(zz) = Math.Sin(2 * 2 * Math.PI / Z * zz)
         Next
         load_colormap()
     End Sub
 
     Public Function Capture(exposure As Integer, focus As Integer) As Bitmap
 
-        mCamera.AcquireSingleImage(frame, 500)
+        mCamera.AcquireSingleImage(frame, 1000)
         frame.Fill(BmpVimba)
 
         Width = BmpVimba.Width
         Height = BmpVimba.Height
 
-        Bmp = CropFilter.Apply(BmpVimba)
+        Bmp = Cropfilter.Apply(BmpVimba)
         Flip.ApplyInPlace(Bmp)
 
         Return Bmp
@@ -107,6 +108,7 @@ Public Class PreviewVimba
         Height = BmpVimba.Height
 
         Bmp = Cropfilter.Apply(BmpVimba)
+
         Flip.ApplyInPlace(Bmp)
 
         Return Bmp
@@ -185,23 +187,65 @@ Public Class PreviewVimba
         expFeature.FloatValue = exp * 1000
 
     End Sub
+    Public Sub MovetoLoad()
+        Stage.SetSpeed(Stage.Yaxe, 20)
 
+        Stage.MoveAbsolute(Stage.Zaxe, 0)
+        Stage.MoveAbsolute(Stage.Yaxe, 25)
+        Stage.MoveAbsolute(Stage.Xaxe, 4)
+        Stage.SetSpeed(Stage.Yaxe, 100)
+    End Sub
     Public Sub MovetoPreview()
+        Stage.SetSpeed(Stage.Yaxe, 20)
         Stage.MoveAbsolute(Stage.Zaxe, Preview_Z)
-        Stage.MoveAbsolute(Stage.Yaxe, 7)
+        Stage.MoveAbsolute(Stage.Yaxe, 8.1)
         Stage.MoveAbsolute(Stage.Xaxe, 0)
 
+        Stage.SetSpeed(Stage.Yaxe, 100)
     End Sub
+    Public Function GetProfile(X As Integer, Y As Integer, CursorWidth As Integer, CursorHeight As Integer) As Single
+        X = X * Scale
+        Y = Y * Scale
+        CursorWidth = CursorWidth * Scale
+        CursorHeight = CursorHeight * Scale
+        Dim Profile(CursorWidth * CursorHeight - 1) As Single
+        Dim Focus As Single = Setting.Gett("Focus")
 
-    Public Sub EstimateProfile()
+        'MaxmapPhasor(i) = 762.45 * X * X - 2892.5 * X + 2747.6
+        'MaxmapPhasor(i) = MaxmapPhasor(i) + (Focus - Preview_Z)
+        Dim j As Integer = 0
+        For yy = 0 To CursorHeight - 1
+            For xx = 0 To CursorWidth - 1
+                Profile(j) = Zmap(X + xx, Y + yy)
+                j += 1
+            Next
+        Next
+
+        saveSinglePage32("c:\temp\Porfile.tif", Profile, CursorWidth, CursorHeight)
+        Array.Sort(Profile)
+        Dim Zstart As Single
+        Dim Z0 As Single = Profile(CursorWidth * CursorHeight / 3)
+        Zstart = -9.6247 * Z0 + 42.08
+        Zstart = Zstart + (Focus - Preview_Z) - 1
+        Return Zstart
+        'Console.WriteLine("Profile: " + Porfile(100).ToString)
+
+    End Function
+    Public Sub EstimateProfile(Optional Zofsset As Single = 0)
         Dim i As Integer
-        Dim BmpVimbaFast As New FastBMP(Width, Height, PixelFormat.Format24bppRgb)
+        Dim BmpVimbaFast As New FastBMP(ROI_W, ROI_H, PixelFormat.Format24bppRgb)
+        Dim Bmpgrey As New FastBMP(ROI_W, ROI_H, PixelFormat.Format8bppIndexed)
+        Dim BmpEdge As New Bitmap(ROI_W, ROI_H, PixelFormat.Format8bppIndexed)
+        Dim BmpEdgeColor As New Bitmap(ROI_W, ROI_H, PixelFormat.Format24bppRgb)
+        Dim Edge As New HomogenityEdgeDetector
+        Dim GR As Graphics
+        GR = Graphics.FromImage(BmpEdgeColor)
 
-        Dim Edge As HomogenityEdgeDetector
+        Dim Edgebytes(ROI_W * ROI_H * 3 - 1) As Byte
 
-
+        Dim Offset As Integer = 0
         Pbar.Value = 0
-        Stage.MoveAbsolute(Stage.Zaxe, Preview_Z - Z * Zsteps / 2, False)
+        Stage.MoveAbsolute(Stage.Zaxe, Preview_Z - Z * Zsteps / 2 + Zofsset, False)
         For zz = 0 To Z - 1
             Zx(zz) = zz * Zsteps + Preview_Z
 
@@ -209,76 +253,120 @@ Public Class PreviewVimba
 
 
             BmpVimbaFast = New FastBMP(Capture)
-            BmpVimbaFast.GetGraysacleArray()
 
-            Deivative.AnalyzeX(BmpVimbaFast.Greyimage, GreyEdge(zz))
-            BLure.UpLoad(GreyEdge(zz))
-            BLure.Process_FT_MTF()
-            BLure.DownLoad(GreyEdge(zz))
-            Buffer.BlockCopy(GreyEdge(zz), 0, GreyEdge2D(zz), 0, W * H * 4)
-            ' BmpVimbaFast.bmp.Save("c:\temp\images\" + zz.ToString("D4") + ".bmp")
-            'saveSinglePage32("c:\temp\" + zz.ToString("D4") + ".tif", GreyEdge(zz), Width, Height)
+
+            Bmpgrey.MakeFromBytes(BmpVimbaFast.GetGraysacleArray())
+
+            BmpEdge = Edge.Apply(Bmpgrey.bmp)
+            GR.DrawImageUnscaled(BmpEdge, 0, 0)
+            'BmpEdgeColor.Save("c:\temp\" + zz.ToString("D4") + ".bmp")
+            Offset = BitmapToBytes(BmpEdgeColor, Edgebytes) - ROI_W * 3
+
+            Dim k As Integer = 0
+            Dim j As Integer = 1
+
+            For yy = 0 To ROI_H - 1
+                For xx = 0 To ROI_W - 1
+
+                    GreyEdge(zz)(k) = Edgebytes(j)
+                    GreyEdge(zz)(k) = GreyEdge(zz)(k) / (Bmpgrey.bytes(k) + 1)
+
+                    k += 1
+                    j += 3
+                Next
+                j += Offset
+            Next
+
+
+            'BmpVimbaFast.GetGraysacleArray()
+
+            'Deivative.AnalyzeX(BmpVimbaFast.Greyimage, GreyEdge(zz))
+            'BLure.UpLoad(GreyEdge(zz))
+            'BLure.Process_FT_MTF()
+            'BLure.DownLoad(GreyEdge(zz))
+            'Buffer.BlockCopy(GreyEdge(zz), 0, GreyEdge2D(zz), 0, W * H * 4)
+            'BmpVimbaFast.bmp.Save("c:\temp\images\" + zz.ToString("D4") + ".bmp", ImageFormat.Bmp)
+            'saveSinglePage32("c:\temp\" + zz.ToString("D4") + ".tif", GreyEdge(zz), ROI_W, ROI_H)
             '  saveSinglePage32("c:\temp\" + zz.ToString("D4") + ".tif", GreyEdge2D(zz))
             Pbar.Increment(1)
             Application.DoEvents()
         Next
 
+        Pbar.Value = 0
+
+
 
         Dim max, maxZ As Single
-        ReDim MaxMap(W * H - 1)
-        Dim MaxmapPhasor(W * H - 1) As Single
-        Dim maxi As Integer = W * H - 1
+        ReDim MaxMap(ROI_W * ROI_H - 1)
+        Dim MaxmapPhasor(ROI_W * ROI_H - 1) As Single
+        Dim MaxmapPhasorRaw(ROI_W * ROI_H - 1) As Single
+        Dim maxi As Integer = ROI_W * ROI_H - 1
         Dim Cs, Ss As Single
+        Dim Cm As Single
+        Dim Intensity As Single = 0
+
+        Dim Focus As Single = Setting.Gett("Focus")
+
         For i = 0 To maxi
             max = 0
             Cs = 0
             Ss = 0
+            Cm = 0
+            Intensity = 0
             For Zi = 0 To Z - 1
                 If GreyEdge(Zi)(i) > max Then max = GreyEdge(Zi)(i) : maxZ = Zi : MaxMap(i) = maxZ
                 Cs += C(Zi) * GreyEdge(Zi)(i)
                 Ss += S(Zi) * GreyEdge(Zi)(i)
+                Cm += GreyEdge(Zi)(i) * Zi * Zsteps
+                Intensity += GreyEdge(Zi)(i)
             Next
-            MaxmapPhasor(i) = ((Math.Atan2(Ss, Cs))) / (Math.PI * 2) * Z * Zsteps + Preview_Z
-            If Ss < 0 Then
-                MaxmapPhasor(i) = (Math.PI * 2 + (Math.Atan2(Ss, Cs))) / (Math.PI * 2) * Z * Zsteps + Preview_Z
-            End If
+            'MaxmapPhasor(i) = ((Math.Atan2(Ss, Cs))) / (Math.PI * 2) * Z * Zsteps
+            'If Ss < 0 Then
+            '    MaxmapPhasor(i) = (Math.PI * 2 + (Math.Atan2(Ss, Cs))) / (Math.PI * 2) * Z * Zsteps
+            'End If
+            If Intensity = 0 Then Intensity = 1
+
+
+            MaxmapPhasor(i) = Cm / Intensity
+
+
         Next
-        Dim MAxmap2D(H - 1, W - 1) As Single
+        Dim MAxmap2D(ROI_H - 1, ROI_W - 1) As Single
 
-        ReDim Zmap(W - 1, H - 1)
-        Buffer.BlockCopy(MaxmapPhasor, 0, MAxmap2D, 0, W * H * 4)
+        ReDim Zmap(ROI_W - 1, ROI_H - 1)
+        Buffer.BlockCopy(MaxmapPhasor, 0, MAxmap2D, 0, ROI_W * ROI_H * 4)
 
 
-        For yy = 0 To H - 1
-            For xx = 0 To W - 1
+        For yy = 0 To ROI_H - 1
+            For xx = 0 To ROI_W - 1
                 Zmap(xx, yy) = MAxmap2D(yy, xx)
             Next
         Next
 
-        saveSinglePage32("c:\temp\maxmap2d.tif", MAxmap2D)
+        'saveSinglePage32("c:\temp\maxmap2d.tif", MAxmap2D)
 
-        ZmapBmp = New FastBMP(W, H, Imaging.PixelFormat.Format24bppRgb)
-
-
-        Dim p As Integer = 0
-        Dim r, g, b As Byte
-        For yy = 0 To H - 1
-            For xx = 0 To W - 1
-                r = rr((Zmap(xx, yy) - Preview_Z) / (Z * Zsteps) * 1000)
-                g = gg((Zmap(xx, yy) - Preview_Z) / (Z * Zsteps) * 1000)
-                b = bb((Zmap(xx, yy) - Preview_Z) / (Z * Zsteps) * 1000)
-                ZmapBmp.FillOriginalPixel(xx, yy, r, g, b)
-
-            Next
-
-        Next
-        ZmapBmp.MakeNewFromBytes()
+        'ZmapBmp = New FastBMP(ROI_W, ROI_H, Imaging.PixelFormat.Format24bppRgb)
 
 
-        saveSinglePage32("c:\temp\MaxMap.tif", MaxMap, W, H)
-        saveSinglePage32("c:\temp\MaxMapPhasor.tif", MaxmapPhasor, W, H)
+        'Dim p As Integer = 0
+        'Dim r, g, b As Byte
+        'For yy = 0 To ROI_H - 1
+        '    For xx = 0 To ROI_W - 1
+        '        r = rr((Zmap(xx, yy) - Preview_Z) / (Z * Zsteps) * 1000)
+        '        g = gg((Zmap(xx, yy) - Preview_Z) / (Z * Zsteps) * 1000)
+        '        b = bb((Zmap(xx, yy) - Preview_Z) / (Z * Zsteps) * 1000)
+        '        ZmapBmp.FillOriginalPixel(xx, yy, r, g, b)
+
+        '    Next
+
+        'Next
+        'ZmapBmp.MakeNewFromBytes()
+
+
+        saveSinglePage32("c:\temp\Zmap" + Zofsset.ToString + ".tif", Zmap)
+        'saveSinglePage32("c:\temp\MaxMapPhasor" + Preview_Z.ToString + ".tif", MaxmapPhasor, ROI_W, ROI_H)
+        'saveSinglePage32("c:\temp\MaxMapPhasorRaw" + Preview_Z.ToString + ".tif", MaxmapPhasorRaw, ROI_W, ROI_H)
         Pbar.Value = 0
     End Sub
-
 
 End Class

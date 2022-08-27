@@ -1,6 +1,7 @@
-﻿Imports System.Windows.Forms.DataVisualization.Charting
+﻿Imports System.Threading
+Imports System.Windows.Forms.DataVisualization.Charting
 Imports AForge.Imaging
-
+Imports MathNet.Numerics
 
 
 Public Class ImageDisplay
@@ -12,7 +13,7 @@ Public Class ImageDisplay
     Dim rawImage(Bucketsize)() As Byte
     Public zoom As Boolean
     Public BmpPreview(Bucketsize) As FastBMP
-
+    Public EmptyPreview As FastBMP
     Public f As Integer
     Public GainR, GainG, GainB As Single
     Public busy As Boolean
@@ -23,7 +24,9 @@ Public Class ImageDisplay
     Dim ImageSize As Integer
 
     Public imagetype As ImagetypeEnum
-    Public Histogram() As Integer
+
+
+    Public Histogram() As Single
 
     Public Sub New(W As Integer, H As Integer, ByRef HistoChart As Chart)
         Me.Width = W
@@ -37,10 +40,14 @@ Public Class ImageDisplay
             BmpPreview(i) = New FastBMP(W, H, Imaging.PixelFormat.Format24bppRgb)
             ReDim rawImage(i)(W * H * 3 - 1)
         Next
+
+
+
+        EmptyPreview = New FastBMP(W, H, Imaging.PixelFormat.Format24bppRgb)
         RequestIbIc = 2
 
         SetColorGain(Setting.Gett("GainR"), Setting.Gett("GainG"), Setting.Gett("GainB"), ImagetypeEnum.Brightfield)
-
+        ib = 0 : ic = 255
     End Sub
     Public Sub AdjustBrightness()
         Dim C As Integer
@@ -56,9 +63,9 @@ Public Class ImageDisplay
 
         HistoChart.Series(0).Points.Clear()
 
-            For j = 0 To HistBin
-                HistoChart.Series(0).Points.AddXY(j + 1, Histogram(j))
-            Next
+        For j = 0 To HistBin - 1
+            HistoChart.Series(0).Points.AddXY(j + 1, Histogram(j))
+        Next
 
 
     End Sub
@@ -70,7 +77,7 @@ Public Class ImageDisplay
         Buffer.BlockCopy(rawin, 0, rawImage(f), 0, rawin.GetLength(0))
 
         BmpPreview(f).MakeFromBytes(rawImage(f))
-        If RequestIbIc = 1 Then SetIbIc() : RequestIbIc = 2
+        If RequestIbIc = 1 Then SetIbIc(True) : RequestIbIc = 2
         '  PlotHistogram()
 
 
@@ -132,21 +139,58 @@ Public Class ImageDisplay
 
         Array.Clear(Histogram, 0, HistBin + 1)
         Try
-            For i = 0 To ImageSize - 1 Step 4
+            For i = 0 To ImageSize - 1 Step 8
                 Histogram(rawImage(f)(i) / Camera.CCMAtrix) += 1
             Next
         Catch ex As Exception
 
         End Try
+        Dim max As Single = Histogram.Max
 
+        For j = 0 To HistBin
+            Histogram(j) = Histogram(j) / max
+        Next
 
         ' We never have zero intensity  this make  it possible  to find the min on the SetIbIc using the min function
         Histogram(0) = Histogram(1)
     End Sub
-    Public Sub SetIbIc()
 
 
-        MakeHistogram()
+
+    Public Sub MakeHistogram(bytes As Byte())
+
+
+        Array.Clear(Histogram, 0, HistBin + 1)
+        Try
+            For i = 0 To ImageSize - 1 Step 8
+                Histogram(bytes(i) / Camera.CCMAtrix) += 1
+            Next
+        Catch ex As Exception
+
+        End Try
+        Dim max As Single = Histogram.Max
+
+        For j = 0 To HistBin - 1
+            Histogram(j) = Histogram(j) / max
+        Next
+
+        ' We never have zero intensity  this make  it possible  to find the min on the SetIbIc using the min function
+        Histogram(0) = Histogram(1)
+    End Sub
+
+
+    Public Sub SetIbIc(WithHistogram As Boolean)
+
+
+        If WithHistogram Then MakeHistogram()
+
+        CalculateIbIc()
+
+        Camera.SetMatrix(255 / ic)
+
+
+    End Sub
+    Sub CalculateIbIc()
         Dim Hmax As Integer = 0
         Dim HCum(HistBin) As Integer
         Dim HCumMax, HCumMin As Integer
@@ -176,9 +220,7 @@ Public Class ImageDisplay
 
         Camera.SetMatrix(255 / ic)
 
-
     End Sub
-
     Public Sub BayerInterpolate(rawimage As Byte(), ByRef bmp As Bitmap)
         Bayer = New Filters.BayerFilter
         Dim Pattern(1, 1) As Integer
