@@ -182,9 +182,9 @@ Public Class EO
         Linearregression()
     End Sub
     Public Sub Linearregression()
-        Dim p As Tuple(Of Double, Double) = Fit.Line(sx, sy)
-        b = p.Item1
-        a = p.Item2
+        'Dim p As Tuple(Of Double, Double) = Fit.Line(sx, sy)
+        'b = p.Item1
+        'a = p.Item2
     End Sub
     Public Sub ShowPosition()
         Form1.Label21.Text = EO_GetCommandPosition(handl, last_position)

@@ -7,6 +7,7 @@ Public Class ZaberASCII
     Public Elapsedtime As Long
     Dim Watch As New Stopwatch
     Public X, Y, Z As Single
+    Public Zfocous As Single
     Public Xacc, Yacc, Zacc As Single
     Public Xspeed, Yspeed, Zspeed As Single
     Public xp, yp As Single
@@ -15,8 +16,8 @@ Public Class ZaberASCII
     Public Xaxe, Yaxe, Zaxe As Axis
 
     Public Sub New(FOVX As Single, FOVY As Single)
-        Library.SetDeviceDbSource(DeviceDbSourceType.File, "c:\temp\devices-public.sqlite")
-        Dim com As Connection = Connection.OpenSerialPort("COM3")
+        Library.SetDeviceDbSource(DeviceDbSourceType.File, "devices-public.sqlite")
+        Dim com As Connection = Connection.OpenSerialPort("COM4")
         Dim ComZ As Connection = Connection.OpenSerialPort("COM7")
         Dim Devicelist = com.DetectDevices()
         Xaxe = Devicelist(0).GetAxis(1)
@@ -25,6 +26,7 @@ Public Class ZaberASCII
         Zaxe = DeviceListZ(0).GetAxis(1)
         Me.FOVX = FOVX
         Me.FOVY = FOVY
+        Zfocous = Setting.Gett("Focus")
         Home()
         'MoveAbsolute(Xaxe, 3.7, False)
         MoveAbsolute(Yaxe, 9.9, False)
@@ -48,8 +50,8 @@ Public Class ZaberASCII
         SetAcceleration(Zaxe, 2)
         SetSpeed(Zaxe, 800)
         SetSpeed(Xaxe, 26)
-        SetAcceleration(Yaxe, 2)
-        SetSpeed(Yaxe, 100)
+        SetAcceleration(Yaxe, 0.5)
+        SetSpeed(Yaxe, 80)
 
         MoveAbsolute(Zaxe, Setting.Gett("Focus"), False)
         MoveAbsolute(Xaxe, 34, False)
@@ -179,17 +181,18 @@ Public Class ZaberASCII
         'Setting.Sett("ZOFFSET", ZZ)
         ''StorePosition(Stage.Zaxe, 1)
         'Stage.MoveRelative(Stage.Zaxe, AutoFocusrange / 2)
+        Zfocous = Stage.GetPosition(Stage.Zaxe)
+        Setting.Sett("Focus", Zfocous)
 
-        Setting.Sett("Focus", Stage.GetPosition(Stage.Zaxe))
         'StorePosition(Stage.Zaxe, 2)
     End Sub
 
     Public Sub GoToFocus()
         Try
 
-            Dim ZZ As String = Setting.Gett("Focus")
 
-            MoveAbsolute(Zaxe, ZZ, True)
+
+            MoveAbsolute(Zaxe, Zfocous, True)
 
 
         Catch ex As Exception

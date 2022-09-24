@@ -113,11 +113,11 @@
     <Reference Include="Emgu.CV.Platform.NetStandard, Version=4.5.2.4673, Culture=neutral, PublicKeyToken=7281126722ab4438, processorArchitecture=MSIL">
       <HintPath>..\packages\Emgu.CV.4.5.2.4673\lib\netstandard2.0\Emgu.CV.Platform.NetStandard.dll</HintPath>
     </Reference>
-    <Reference Include="Google.Protobuf, Version=3.20.1.0, Culture=neutral, PublicKeyToken=a7d26565bac4d604, processorArchitecture=MSIL">
-      <HintPath>..\packages\Google.Protobuf.3.20.1\lib\net45\Google.Protobuf.dll</HintPath>
+    <Reference Include="Google.Protobuf, Version=3.21.5.0, Culture=neutral, PublicKeyToken=a7d26565bac4d604, processorArchitecture=MSIL">
+      <HintPath>..\packages\Google.Protobuf.3.21.5\lib\net45\Google.Protobuf.dll</HintPath>
     </Reference>
-    <Reference Include="MathNet.Numerics, Version=4.15.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MathNet.Numerics.4.15.0\lib\net461\MathNet.Numerics.dll</HintPath>
+    <Reference Include="MathNet.Numerics, Version=5.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MathNet.Numerics.5.0.0\lib\net48\MathNet.Numerics.dll</HintPath>
     </Reference>
     <Reference Include="PMDLibrary, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -140,8 +140,8 @@
       <Private>True</Private>
       <Private>True</Private>
     </Reference>
-    <Reference Include="System.Memory, Version=4.0.1.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Memory.4.5.4\lib\net461\System.Memory.dll</HintPath>
+    <Reference Include="System.Memory, Version=4.0.1.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Memory.4.5.5\lib\net461\System.Memory.dll</HintPath>
     </Reference>
     <Reference Include="System.Numerics" />
     <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
@@ -176,8 +176,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>bin\x64\Debug\xiApi.NETX64.dll</HintPath>
     </Reference>
-    <Reference Include="Zaber.Motion, Version=2.14.5.0, Culture=neutral, PublicKeyToken=65af8649611d1afa, processorArchitecture=MSIL">
-      <HintPath>..\packages\Zaber.Motion.2.14.5\lib\net45\Zaber.Motion.dll</HintPath>
+    <Reference Include="Zaber.Motion, Version=2.14.6.0, Culture=neutral, PublicKeyToken=65af8649611d1afa, processorArchitecture=MSIL">
+      <HintPath>..\packages\Zaber.Motion.2.14.6\lib\net45\Zaber.Motion.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -200,6 +200,7 @@
     <Compile Include="Dover.vb" />
     <Compile Include="ExtendedDepth5.vb" />
     <Compile Include="Fast Bitmaps.vb" />
+    <Compile Include="FastScan.vb" />
     <Compile Include="FFTW_VB.vb" />
     <Compile Include="FFTW_VB_Real.vb" />
     <Compile Include="FocusStructure.vb" />
@@ -243,6 +244,7 @@
     <Compile Include="Shared.vb" />
     <Compile Include="StackImage.vb" />
     <Compile Include="Pyramids.vb" />
+    <Compile Include="SuperScan.vb" />
     <Compile Include="test.vb" />
     <Compile Include="Toggle.Designer.vb">
       <DependentUpon>Toggle.vb</DependentUpon>
@@ -326,11 +328,11 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
-  <Import Project="..\packages\Zaber.Motion.2.14.5\build\net45\Zaber.Motion.targets" Condition="Exists('..\packages\Zaber.Motion.2.14.5\build\net45\Zaber.Motion.targets')" />
+  <Import Project="..\packages\Zaber.Motion.2.14.6\build\net45\Zaber.Motion.targets" Condition="Exists('..\packages\Zaber.Motion.2.14.6\build\net45\Zaber.Motion.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Zaber.Motion.2.14.5\build\net45\Zaber.Motion.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Zaber.Motion.2.14.5\build\net45\Zaber.Motion.targets'))" />
+    <Error Condition="!Exists('..\packages\Zaber.Motion.2.14.6\build\net45\Zaber.Motion.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Zaber.Motion.2.14.6\build\net45\Zaber.Motion.targets'))" />
   </Target>
 </Project>

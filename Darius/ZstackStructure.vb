@@ -1,26 +1,34 @@
 ﻿Public Class ZstackStructure
     Public W, H, Z As Integer
+    Public loopZ As Integer
     Dim Pattern2D(,), ScalingUpPattern(), ScalingDownPattern() As Integer
     Dim GreenBytes(), GreenEdgeBytes()() As Single
     Public MaxMapValue() As Single
     Public MaxMapPosition() As Single
-
+    Public ActivelyCapturing As Boolean = False
     Public MaxMap2D(,) As Single
     Dim BLure As FFTW_VB_Real
-    Dim bytes()() As Byte
+    Public bytes()() As Byte
+
     Dim zc As Integer
     Dim current As Long
     Dim ticks As Long
+    Public ImageBeingCaptured As Boolean
     Dim processDone() As Integer
-    Dim Imagecreated() As Integer
+    Public Imagecreated() As Integer
     Public direction As Integer
     Dim Deivative As CentralDerivitavie
     Dim StepSize As Single = 0.01
     Dim Range As Single
     Dim Scale As Integer
     Dim Zstart As Single
+    Dim myB As Integer
+    Public TimeStamp() As Single
+    Public TimeStampProcessed() As Single
     Public WrapUpDone As Boolean
     Public OutputBytes() As Byte
+    Dim watch As Stopwatch
+    Dim MoveThread As System.Threading.Thread
 
     Public Sub New(W As Integer, H As Integer, Range As Single, Stepsize As Single, scale As Integer)
         Me.W = W
@@ -30,10 +38,14 @@
         Me.StepSize = (Stepsize / 1000)
         Z = Int(Range / Stepsize)
 
+        ReDim TimeStamp(Z - 1)
+        ReDim TimeStampProcessed(Z - 1)
         ReDim GreenEdgeBytes(Z - 1)
         ReDim bytes(Z - 1)
         ReDim processDone(Z - 1)
         ReDim Imagecreated(Z - 1)
+        watch = New Stopwatch
+
         For zi = 0 To Z - 1
 
             ReDim GreenEdgeBytes(zi)(W / scale * H / scale - 1)
@@ -94,6 +106,50 @@
         zc = zi
     End Sub
 
+
+    Public Sub PrepareAcquire(retrn As Boolean, direction As Integer, myB As Integer)
+        WrapUpDone = False
+        Me.myB = myB
+        ticks = (Camera.exp * Stopwatch.Frequency / 1000)
+
+        Me.direction = direction
+        If retrn Then direction = 1
+        Array.Clear(Imagecreated, 0, Z)
+        Array.Clear(processDone, 0, Z)
+        Dim AcquireThread As New System.Threading.Thread(AddressOf AcquireSingle)
+        SuperScan.Activeb = myB
+        ActivelyCapturing = True
+        loopZ = -1
+        AcquireThread.Start()
+
+        Dim Thread As New System.Threading.Thread(AddressOf ProcessThreaded)
+        Thread.Start()
+
+
+
+        watch.Start()
+    End Sub
+    Public Sub AcquireSingle()
+
+
+
+
+        Do
+            Do
+
+            Loop Until ImageBeingCaptured
+            ImageBeingCaptured = False
+            MakeDelay()
+            Stage.MoveRelativeAsync(Stage.Zaxe, StepSize * direction, False)
+
+        Loop Until loopZ = Z - 1
+        ActivelyCapturing = False
+
+
+
+
+    End Sub
+
     Public Sub Acquire(retrn As Boolean, direction As Integer)
         WrapUpDone = False
         ticks = (Camera.exp * Stopwatch.Frequency / 1000)
@@ -110,7 +166,7 @@
         Thread.Start()
 
         For loopZ = 0 To Z - 1
-            Camera.Trigger()
+            Camera.SetTrigger()
             MakeDelay()
 
 

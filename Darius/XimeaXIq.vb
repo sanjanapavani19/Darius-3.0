@@ -50,7 +50,7 @@ Public Class XimeaXIq
             cam.SetParam(PRM.ACQ_TIMING_MODE, ACQ_TIMING_MODE.FREE_RUN)
 
 
-            cam.SetParam(PRM.TRG_SOURCE, TRG_SOURCE.SOFTWARE)
+            cam.SetParam(PRM.TRG_SOURCE, TRG_SOURCE.OFF)
             cam.SetParam(PRM.OUTPUT_DATA_BIT_DEPTH, BIT_DEPTH.BPP_8)
 
             cam.SetParam(PRM.HORIZONTAL_FLIP, 0)
@@ -160,7 +160,7 @@ Public Class XimeaXIq
 
     End Sub
     Public Sub Capture_Threaded()
-        Dim Thread1 As New System.Threading.Thread(AddressOf captureBmp)
+        Dim Thread1 As New System.Threading.Thread(AddressOf CaptureBmp)
         Thread1.Start()
 
 
@@ -179,27 +179,19 @@ Public Class XimeaXIq
         cam.SetParam(PRM.CC_MATRIX_22, CCMAtrix)
         Me.CCMAtrix = CCMAtrix
     End Sub
-    Public Sub capture()
-        Try
-            cam.SetParam(PRM.TRG_SOFTWARE, 1)
-            cam.GetImageByteArray(Bytes, timeout)
+    Public Sub capture(Optional Trigger As Boolean = False)
 
-        Catch ex As Exception
-
-        End Try
+        If Trigger Then cam.SetParam(PRM.TRG_SOFTWARE, 1)
+        cam.GetImageByteArray(Bytes, timeout)
 
     End Sub
-    Public Sub Capture(ByRef Bytesin)
-        Try
-            cam.SetParam(PRM.TRG_SOFTWARE, 1)
-            cam.GetImageByteArray(Bytesin, timeout)
+    Public Sub Capture(ByRef Bytes As Byte(), Optional Trigger As Boolean = False)
 
-        Catch ex As Exception
-
-        End Try
+        If Trigger Then cam.SetParam(PRM.TRG_SOFTWARE, 1)
+        cam.GetImageByteArray(Bytes, timeout)
 
     End Sub
-    Public Sub Trigger()
+    Public Sub SetTrigger()
         cam.SetParam(PRM.TRG_SOFTWARE, 1)
     End Sub
     Public Sub SetFlatField(filename As String, bfilename As String)
@@ -238,8 +230,8 @@ Public Class XimeaXIq
 
 
 
-    Public Function captureBmp() As Bitmap
-        cam.SetParam(PRM.TRG_SOFTWARE, 1)
+    Public Function CaptureBmp(Optional Trigger As Boolean = True) As Bitmap
+        If Trigger Then cam.SetParam(PRM.TRG_SOFTWARE, 1)
         cam.GetBitmap(BmpRef, timeout)
         Return BmpRef
     End Function

@@ -400,7 +400,7 @@ Public Class TrackingStructure
 
         Form1.ToolStripStatusLabel1.Text = "X: " + XX.ToString
         Form1.ToolStripStatusLabel2.Text = "Y: " + YY.ToString
-        Form1.ToolStripStatusLabel3.Text = "Z: " + ZZ.ToString
+        Form1.ToolStripStatusLabel3.Text = "Z: " + ((ZZ - Stage.Zfocous) * 1000).ToString
         ' Now conversion 
 
         X = ConvertCoordinatetoPixels(XX, YY).X

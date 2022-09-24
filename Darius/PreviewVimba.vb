@@ -191,9 +191,9 @@ Public Class PreviewVimba
         Stage.SetSpeed(Stage.Yaxe, 20)
 
         Stage.MoveAbsolute(Stage.Zaxe, 0)
-        Stage.MoveAbsolute(Stage.Yaxe, 25)
+        Stage.MoveAbsolute(Stage.Yaxe, 24)
         Stage.MoveAbsolute(Stage.Xaxe, 4)
-        Stage.SetSpeed(Stage.Yaxe, 100)
+        Stage.SetSpeed(Stage.Yaxe, 80)
     End Sub
     Public Sub MovetoPreview()
         Stage.SetSpeed(Stage.Yaxe, 20)
@@ -201,7 +201,7 @@ Public Class PreviewVimba
         Stage.MoveAbsolute(Stage.Yaxe, 8.1)
         Stage.MoveAbsolute(Stage.Xaxe, 0)
 
-        Stage.SetSpeed(Stage.Yaxe, 100)
+        Stage.SetSpeed(Stage.Yaxe, 80)
     End Sub
     Public Function GetProfile(X As Integer, Y As Integer, CursorWidth As Integer, CursorHeight As Integer) As Single
         X = X * Scale
@@ -253,13 +253,13 @@ Public Class PreviewVimba
 
 
             BmpVimbaFast = New FastBMP(Capture)
-
+            'BmpVimbaFast.bmp.Save("c:\temp\EDOF\" + zz.ToString("D4") + ".bmp")
 
             Bmpgrey.MakeFromBytes(BmpVimbaFast.GetGraysacleArray())
 
             BmpEdge = Edge.Apply(Bmpgrey.bmp)
             GR.DrawImageUnscaled(BmpEdge, 0, 0)
-            'BmpEdgeColor.Save("c:\temp\" + zz.ToString("D4") + ".bmp")
+            BmpEdgeColor.Save("c:\temp\EDOF" + zz.ToString("D4") + ".bmp")
             Offset = BitmapToBytes(BmpEdgeColor, Edgebytes) - ROI_W * 3
 
             Dim k As Integer = 0
@@ -363,7 +363,7 @@ Public Class PreviewVimba
         'ZmapBmp.MakeNewFromBytes()
 
 
-        saveSinglePage32("c:\temp\Zmap" + Zofsset.ToString + ".tif", Zmap)
+        'saveSinglePage32("c:\temp\Zmap" + Zofsset.ToString + ".tif", Zmap)
         'saveSinglePage32("c:\temp\MaxMapPhasor" + Preview_Z.ToString + ".tif", MaxmapPhasor, ROI_W, ROI_H)
         'saveSinglePage32("c:\temp\MaxMapPhasorRaw" + Preview_Z.ToString + ".tif", MaxmapPhasorRaw, ROI_W, ROI_H)
         Pbar.Value = 0

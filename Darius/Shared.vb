@@ -43,6 +43,7 @@ Module SharedResources
     Public Setting As New SettingStructure("Settings.xml")
     Public Camera As XimeaXIq
     Public Stage As ZaberASCII
+    Public Display As ImageDisplay
     Public Piezo As EO
     Public EDF As ExtendedDepth5
     Public rr(), gg(), bb() As Byte
@@ -53,7 +54,8 @@ Module SharedResources
     Public ZEDOF As ZstackStructure
     Public Zprofiler As ZstackStructure
     Public block As Boolean = False
-
+    Public ScanUnits() As ScanUnit
+    Public ScanBufferSize As Integer = 6
     Public Function factorial(ByVal n As Integer) As Integer
         If n <= 1 Then
             Return 1

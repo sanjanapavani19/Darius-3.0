@@ -142,9 +142,8 @@ Public Class Relay
             Dim arg1 As Long
             Dim arg2 As String = ""
             Dim dwFlag As Long
-
-            FT_GetNumDevices(arg1, arg2, dwFlag)
-            If FT_Open(1, lnghandle) <> FT_OK Then
+            Dim NumDevices As Long = FT_GetNumDevices(arg1, arg2, dwFlag)
+            If FT_Open(2, lnghandle) <> FT_OK Then
                 MsgBox("Error while opening")
                 Exit Sub
             Else

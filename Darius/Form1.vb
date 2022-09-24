@@ -11,7 +11,7 @@ Imports System.Drawing.Imaging
 
 Public Class Form1
 
-    Public Display As ImageDisplay
+
     Public LEDcontroller As Relay
     Dim IsDragging As Boolean
     Dim AutoFocus As FocusStructure
@@ -23,8 +23,7 @@ Public Class Form1
     Dim Scanning As Boolean
     Dim fileN As Integer
     Dim ScanOverlap As Integer = 100
-    Dim ScanUnits() As ScanUnit
-    Dim ScanBufferSize As Integer = 6
+
     Const WhiteLED = 2
     Const BlueLED = 1
     Const PreviewLED = 3
@@ -50,6 +49,7 @@ Public Class Form1
 
         LEDcontroller = New Relay
         LEDcontroller.SetRelays(WhiteLED, False)
+
         LEDcontroller.SetRelays(BlueLED, False)
         LEDcontroller.SetRelays(PreviewLED, False)
 
@@ -102,7 +102,7 @@ Public Class Form1
             ReDim ScanUnits(ScanBufferSize - 1)
 
             For b = 0 To ScanBufferSize - 1
-                ScanUnits(b) = New ScanUnit(Camera.W, Camera.H, TextBox21.Text, TextBox22.Text, TextBox23.Text)
+                ScanUnits(b) = New ScanUnit(Camera.W, Camera.H, TextBox21.Text, TextBox22.Text, TextBox23.Text, b)
             Next b
 
         End If
@@ -441,7 +441,7 @@ Public Class Form1
         ExitLive() : Camera.ResetMatrix()
         Thread.Sleep(500)
 
-        Dim bmp As New Bitmap(Camera.captureBmp)
+        Dim bmp As New Bitmap(Camera.CaptureBmp)
         UpdateLED(False)
 
         SaveFileDialog1.DefaultExt = ".jpg"
@@ -521,16 +521,25 @@ Public Class Form1
         TextBoxY.Text = Tracking.ROIY
 
     End Sub
+    Private Sub Button31_Click(sender As Object, e As EventArgs) Handles Button31.Click
+        ExitLive()
+        If Scanning Then Scanning = False : Button_Scan.Text = "Scan" : GoLive() : Exit Sub
 
+        SaveFileDialog1.DefaultExt = ".tif"
+        If SaveFileDialog1.ShowDialog = DialogResult.Cancel Then GoLive() : Exit Sub
+        SaveFileDialog1.AddExtension = True
+
+        Dim Address As String = SaveFileDialog1.FileName
+        FastScan2(TextBoxX.Text, TextBoxY.Text, ScanOverlap, Address)
+    End Sub
 
 
     Private Sub Button_Scan_Click(sender As Object, e As EventArgs) Handles Button_Scan.Click
 
-
         FastScan(TextBoxX.Text, TextBoxY.Text, ScanOverlap)
 
-
     End Sub
+
 
     Public Sub FastScan(X As Integer, Y As Integer, overlap As Integer)
 
@@ -542,6 +551,7 @@ Public Class Form1
         SaveFileDialog1.AddExtension = True
 
         Dim Address As String = SaveFileDialog1.FileName
+
         Dim watch As Stopwatch
         watch = New Stopwatch
 
@@ -1105,7 +1115,7 @@ Public Class Form1
             If i = 3 Then Stage.MoveRelative(Stage.Xaxe, Stage.FOVX)
 
 
-            BMParray(i) = New Bitmap(Camera.captureBmp)
+            BMParray(i) = New Bitmap(Camera.CaptureBmp)
 
             If i = 0 Then g.DrawImage(BMParray(i), New Point(0, 0))
             If i = 1 Then g.DrawImage(BMParray(i), New Point(Camera.W, 0))
@@ -1333,7 +1343,7 @@ Public Class Form1
         ExitLive()
         Pbar.Maximum = 200
         For i = 0 To 200
-            Camera.captureBmp()
+            Camera.CaptureBmp()
             Camera.BmpRef.Save("C:\temp\Laser line generator Triangulation\" + i.ToString + ".jpg")
             Stage.MoveRelative(Stage.Zaxe, 0.001)
             Pbar.Increment(1)
@@ -1499,7 +1509,7 @@ Public Class Form1
         Focusing = True
         ExitEDOf()
         Dim speed As Single
-        If System.Windows.Forms.Control.ModifierKeys = Keys.Control Then speed = 20 Else speed = 5
+        If System.Windows.Forms.Control.ModifierKeys = Keys.Control Then speed = 20 Else speed = 2
 
         'If XYZ.name = "NewPort" Then
         If e.Delta > 0 Then
@@ -1536,7 +1546,7 @@ Public Class Form1
 
     Private Sub Button29_Click(sender As Object, e As EventArgs) Handles Button29.Click
         ExitLive()
-        For i = 1 To 10
+        For i = 1 To 20
             Camera.capture()
         Next
 
@@ -1588,6 +1598,8 @@ Public Class Form1
             Camera.setGammaY(TextBoxGY.Text)
         End If
     End Sub
+
+
 End Class
 
 
