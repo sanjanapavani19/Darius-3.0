@@ -657,7 +657,7 @@ Module LibTiff
     End Sub
 
 
-    Public Function Read32(ByVal inputName As String) As Single(,)
+    Public Function ReadSinglePage32bit(ByVal inputName As String) As Single(,)
 
 
 

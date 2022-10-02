@@ -71,7 +71,7 @@ Public Class Form1
             TextBox_exposure.Text = Camera.exp
             'AutoFocus = New FocusStructure(2, 0.1, 4)
             Display = New ImageDisplay(Camera.W, Camera.H, Chart1)
-            Display.imagetype = ImagetypeEnum.Brightfield
+            Display.AcqusitionTyoe = AcqusitionTypeEnum.WhiteDwarf
         End If
 
         Stage = New ZaberASCII(Setting.Gett("FOVX"), Setting.Gett("FOVY"))
@@ -102,7 +102,7 @@ Public Class Form1
             ReDim ScanUnits(ScanBufferSize - 1)
 
             For b = 0 To ScanBufferSize - 1
-                ScanUnits(b) = New ScanUnit(Camera.W, Camera.H, TextBox21.Text, TextBox22.Text, TextBox23.Text, b)
+                ScanUnits(b) = New ZstackStructure(Camera.W, Camera.H, Setting.Gett("ZSTACRRANGE"), Setting.Gett("ZSTACKSTEPS"), Setting.Gett("ZSTACKSCALE"))
             Next b
 
         End If
@@ -174,13 +174,11 @@ Public Class Form1
 
         Camera.exp = Val(TextBox_exposure.Text)
 
-        Select Case Display.imagetype
-            Case ImagetypeEnum.Brightfield
+        Select Case Display.AcqusitionTyoe
+            Case AcqusitionTypeEnum.WhiteDwarf
                 Setting.Sett("EXPOSUREB", Camera.exp)
-            Case ImagetypeEnum.Fluorescence
+            Case AcqusitionTypeEnum.FiBi
                 Setting.Sett("EXPOSUREF", Camera.exp)
-            Case ImagetypeEnum.MUSE
-                Setting.Sett("EXPOSUREM", Camera.exp)
         End Select
         Setting.Sett("EXPOSURE", Camera.exp)
 
@@ -281,8 +279,8 @@ Public Class Form1
 
     Public Sub ExitEDOf()
 
-        If Display.imagetype = ImagetypeEnum.EDF_Brightfield Then TabControl1.SelectedIndex = 0
-        If Display.imagetype = ImagetypeEnum.EDF_Fluorescence Then TabControl1.SelectedIndex = 1
+        If Display.AcqusitionTyoe = AcqusitionTypeEnum.EDF_Brightfield Then TabControl1.SelectedIndex = 0
+        If Display.AcqusitionTyoe = AcqusitionTypeEnum.EDF_Fluorescence Then TabControl1.SelectedIndex = 1
     End Sub
 
     Private Sub Form1_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
@@ -323,7 +321,7 @@ Public Class Form1
     Private Sub TextBox_GainR_KeyDown(sender As Object, e As KeyEventArgs) Handles TextBox_GainR.KeyDown
         If e.KeyCode = Keys.Return Then
             Try
-                Display.SetColorGain(Val(TextBox_GainR.Text), Val(TextBox_GainG.Text), Val(TextBox_GainB.Text), Display.imagetype)
+                Display.SetColorGain(Val(TextBox_GainR.Text), Val(TextBox_GainG.Text), Val(TextBox_GainB.Text), Display.AcqusitionTyoe)
             Catch ex As Exception
 
             End Try
@@ -338,7 +336,7 @@ Public Class Form1
     Private Sub TextBox_GainG_KeyDown(sender As Object, e As KeyEventArgs) Handles TextBox_GainG.KeyDown
         If e.KeyCode = Keys.Return Then
             Try
-                Display.SetColorGain(Val(TextBox_GainR.Text), Val(TextBox_GainG.Text), Val(TextBox_GainB.Text), Display.imagetype)
+                Display.SetColorGain(Val(TextBox_GainR.Text), Val(TextBox_GainG.Text), Val(TextBox_GainB.Text), Display.AcqusitionTyoe)
             Catch ex As Exception
 
             End Try
@@ -351,7 +349,7 @@ Public Class Form1
     Private Sub TextBox_GainB_KeyDown(sender As Object, e As KeyEventArgs) Handles TextBox_GainB.KeyDown
         If e.KeyCode = Keys.Return Then
             Try
-                Display.SetColorGain(Val(TextBox_GainR.Text), Val(TextBox_GainG.Text), Val(TextBox_GainB.Text), Display.imagetype)
+                Display.SetColorGain(Val(TextBox_GainR.Text), Val(TextBox_GainG.Text), Val(TextBox_GainB.Text), Display.AcqusitionTyoe)
             Catch ex As Exception
 
             End Try
@@ -379,14 +377,14 @@ Public Class Form1
         If TabControl1.SelectedIndex = 0 Then
 
 
-            Display.imagetype = ImagetypeEnum.Brightfield
+            Display.AcqusitionTyoe = AcqusitionTypeEnum.WhiteDwarf
 
             Camera.SetFlatField("ff.tif", "dark.tif")
             TextBox_exposure.Text = Setting.Gett("Exposureb")
             TextBox_GainB.Text = Setting.Gett("GainB")
             TextBox_GainG.Text = Setting.Gett("GainG")
             TextBox_GainR.Text = Setting.Gett("GainR")
-            Display.SetColorGain(Setting.Gett("GainR"), Setting.Gett("GainG"), Setting.Gett("GainB"), ImagetypeEnum.Brightfield)
+            Display.SetColorGain(Setting.Gett("GainR"), Setting.Gett("GainG"), Setting.Gett("GainB"), AcqusitionTypeEnum.WhiteDwarf)
             UpdateLED(CheckBoxLED.Checked)
             ChangeExposure()
             GoLive()
@@ -394,13 +392,13 @@ Public Class Form1
 
         If TabControl1.SelectedIndex = 1 Then
 
-            Display.imagetype = ImagetypeEnum.Fluorescence
+            Display.AcqusitionTyoe = AcqusitionTypeEnum.FiBi
             Camera.SetFlatField("ff_FiBi.tif", "dark.tif")
             TextBox_exposure.Text = Setting.Gett("Exposuref")
             TextBox_GainB.Text = Setting.Gett("GainB_FiBi")
             TextBox_GainG.Text = Setting.Gett("GainG_FiBi")
             TextBox_GainR.Text = Setting.Gett("GainR_FiBi")
-            Display.SetColorGain(Setting.Gett("GainR_FiBi"), Setting.Gett("GainG_FiBi"), Setting.Gett("GainB_FiBi"), ImagetypeEnum.Fluorescence)
+            Display.SetColorGain(Setting.Gett("GainR_FiBi"), Setting.Gett("GainG_FiBi"), Setting.Gett("GainB_FiBi"), AcqusitionTypeEnum.FiBi)
             UpdateLED(CheckBoxLED.Checked)
             ChangeExposure()
             GoLive()
@@ -409,8 +407,8 @@ Public Class Form1
 
         If TabControl1.SelectedIndex = 2 Then
             ExitLive()
-            If Display.imagetype = ImagetypeEnum.Fluorescence Then Display.imagetype = ImagetypeEnum.EDF_Fluorescence
-            If Display.imagetype = ImagetypeEnum.Brightfield Then Display.imagetype = ImagetypeEnum.EDF_Brightfield
+            If Display.AcqusitionTyoe = AcqusitionTypeEnum.FiBi Then Display.AcqusitionTyoe = AcqusitionTypeEnum.EDF_Fluorescence
+            If Display.AcqusitionTyoe = AcqusitionTypeEnum.WhiteDwarf Then Display.AcqusitionTyoe = AcqusitionTypeEnum.EDF_Brightfield
 
             Dim ccMatrix As Single = Camera.CCMAtrix
             Camera.ResetMatrix()
@@ -448,8 +446,8 @@ Public Class Form1
         If SaveFileDialog1.ShowDialog() = DialogResult.Cancel Then Exit Sub
 
 
-        Select Case Display.imagetype
-            Case ImagetypeEnum.Brightfield, ImagetypeEnum.Fluorescence
+        Select Case Display.AcqusitionTyoe
+            Case AcqusitionTypeEnum.WhiteDwarf, AcqusitionTypeEnum.FiBi
 
                 bmp.Save(SaveFileDialog1.FileName)
 
@@ -460,7 +458,7 @@ Public Class Form1
                 fileN += 1
                 ListBox1.Items.Add(Path.GetFileName(SaveFileDialog1.FileName))
 
-            Case ImagetypeEnum.EDF_Fluorescence, ImagetypeEnum.EDF_Brightfield
+            Case AcqusitionTypeEnum.EDF_Fluorescence, AcqusitionTypeEnum.EDF_Brightfield
                 ReDim Preserve Filenames(fileN)
                 bmp = New Bitmap(Camera.W, Camera.H, Imaging.PixelFormat.Format24bppRgb)
                 byteToBitmap(ZEDOF.OutputBytes, bmp)
@@ -529,8 +527,7 @@ Public Class Form1
         If SaveFileDialog1.ShowDialog = DialogResult.Cancel Then GoLive() : Exit Sub
         SaveFileDialog1.AddExtension = True
 
-        Dim Address As String = SaveFileDialog1.FileName
-        FastScan2(TextBoxX.Text, TextBoxY.Text, ScanOverlap, Address)
+        FastScan2(TextBoxX.Text, TextBoxY.Text, ScanOverlap, Pbar, SaveFileDialog1.FileName, Display.AcqusitionTyoe)
     End Sub
 
 
@@ -565,11 +562,11 @@ Public Class Form1
 
 
 
-        Select Case Display.imagetype
-            Case ImagetypeEnum.Brightfield
+        Select Case Display.AcqusitionTyoe
+            Case AcqusitionTypeEnum.WhiteDwarf
                 Camera.SetFlatField("ff.tif", "dark.tif")
 
-            Case ImagetypeEnum.Fluorescence
+            Case AcqusitionTypeEnum.FiBi
                 Camera.SetFlatField("ff_FiBi.tif", "dark.tif")
 
         End Select
@@ -624,7 +621,7 @@ Public Class Form1
 
 
                 If b = ScanBufferSize Then b = 0
-                ScanUnits(b).Acquire(loop_x, loop_y, Hdirection, Vdirection, CheckBox2.Checked)
+                'ScanUnits(b).Acquire(loop_x, loop_y, Hdirection, Vdirection, CheckBox2.Checked)
                 b += 1
 
                 If loop_y < Y Then
@@ -658,7 +655,7 @@ Public Class Form1
         Stage.MoveAbsoluteAsync(Stage.Xaxe, cx)
         Stage.MoveAbsoluteAsync(Stage.Yaxe, cy)
         Stage.MoveAbsoluteAsync(Stage.Zaxe, cz)
-        ZEDOF.direction = 1
+        ZEDOF.Vdirection = 1
         Pbar.Value = 0
 
 
@@ -813,13 +810,12 @@ Public Class Form1
         '    Flatfield(i) = Flatfield(i)
         'Next
 
-        Select Case Display.imagetype
-            Case ImagetypeEnum.Brightfield
+        Select Case Display.AcqusitionTyoe
+            Case AcqusitionTypeEnum.WhiteDwarf
                 SaveSinglePageTiff16("ff.tif", Flatfield, Camera.W, Camera.H)
-            Case ImagetypeEnum.Fluorescence
+            Case AcqusitionTypeEnum.FiBi
                 SaveSinglePageTiff16("ff_FiBi.tif", Flatfield, Camera.W, Camera.H)
-            Case ImagetypeEnum.MUSE
-                SaveSinglePageTiff16("ff_MUSE.tif", Flatfield, Camera.W, Camera.H)
+
         End Select
 
 
@@ -829,15 +825,14 @@ Public Class Form1
 
 
 
-        Select Case Display.imagetype
-            Case ImagetypeEnum.Brightfield
+        Select Case Display.AcqusitionTyoe
+            Case AcqusitionTypeEnum.WhiteDwarf
                 Camera.SetFlatField("ff.tif", "dark.tif")
 
-            Case ImagetypeEnum.Fluorescence
+            Case AcqusitionTypeEnum.FiBi
                 Camera.SetFlatField("ff_FiBi.tif", "dark.tif")
 
-            Case ImagetypeEnum.MUSE
-                Camera.SetFlatField("ff_muse.tif", "dark.tif")
+
         End Select
         ' setting back the color gain 
 
@@ -898,14 +893,14 @@ Public Class Form1
 
         If Display IsNot Nothing Then
             If status Then
-                If Display.imagetype = ImagetypeEnum.Brightfield Then
+                If Display.AcqusitionTyoe = AcqusitionTypeEnum.WhiteDwarf Then
 
                     LEDcontroller.SetRelays(PreviewLED, False)
                     LEDcontroller.SetRelays(BlueLED, False)
                     LEDcontroller.SetRelays(WhiteLED, True)
                 End If
 
-                If Display.imagetype = ImagetypeEnum.Fluorescence Then
+                If Display.AcqusitionTyoe = AcqusitionTypeEnum.FiBi Then
                     LEDcontroller.SetRelays(PreviewLED, False)
                     LEDcontroller.SetRelays(BlueLED, True)
                     LEDcontroller.SetRelays(WhiteLED, False)
@@ -1384,11 +1379,11 @@ Public Class Form1
 
 
 
-        Select Case Display.imagetype
-            Case ImagetypeEnum.Brightfield
+        Select Case Display.AcqusitionTyoe
+            Case AcqusitionTypeEnum.WhiteDwarf
                 Camera.SetFlatField("ff.tif", "dark.tif")
 
-            Case ImagetypeEnum.Fluorescence
+            Case AcqusitionTypeEnum.FiBi
                 Camera.SetFlatField("ff_FiBi.tif", "dark.tif")
 
         End Select

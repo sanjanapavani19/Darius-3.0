@@ -23,7 +23,7 @@ Public Class ImageDisplay
     Dim HistoChart As Chart
     Dim ImageSize As Integer
 
-    Public imagetype As ImagetypeEnum
+    Public AcqusitionTyoe As AcqusitionTypeEnum
 
 
     Public Histogram() As Single
@@ -46,7 +46,7 @@ Public Class ImageDisplay
         EmptyPreview = New FastBMP(W, H, Imaging.PixelFormat.Format24bppRgb)
         RequestIbIc = 2
 
-        SetColorGain(Setting.Gett("GainR"), Setting.Gett("GainG"), Setting.Gett("GainB"), ImagetypeEnum.Brightfield)
+        SetColorGain(Setting.Gett("GainR"), Setting.Gett("GainG"), Setting.Gett("GainB"), AcqusitionTypeEnum.WhiteDwarf)
         ib = 0 : ic = 255
     End Sub
     Public Sub AdjustBrightness()
@@ -70,7 +70,7 @@ Public Class ImageDisplay
 
     End Sub
 
-    Public Function MakePreview(ByRef rawin As Byte(), Gained As Boolean) As Bitmap
+    Public Sub MakePreview(ByRef rawin As Byte(), Gained As Boolean)
         If RequestIbIc = 2 Then RequestIbIc = 3
         f += 1
         If f = Bucketsize - 1 Then f = 0
@@ -79,9 +79,7 @@ Public Class ImageDisplay
         BmpPreview(f).MakeFromBytes(rawImage(f))
         If RequestIbIc = 1 Then SetIbIc(True) : RequestIbIc = 2
         '  PlotHistogram()
-
-
-    End Function
+    End Sub
 
     Public Sub ApplyBrightness(rawin As Byte(), CCMAtrix As Single, ByRef bmp As Bitmap)
         Dim p As Integer
@@ -108,25 +106,21 @@ Public Class ImageDisplay
 
     End Sub
 
-    Public Sub SetColorGain(R As Single, G As Single, B As Single, Imagingtype As ImagetypeEnum)
+    Public Sub SetColorGain(R As Single, G As Single, B As Single, Imagingtype As AcqusitionTypeEnum)
         GainR = R
         GainB = B
         GainG = G
         Select Case Imagingtype
-            Case ImagetypeEnum.Brightfield, ImagetypeEnum.EDF_Brightfield
+            Case AcqusitionTypeEnum.WhiteDwarf, AcqusitionTypeEnum.EDF_Brightfield
                 Setting.Sett("GainB", B)
                 Setting.Sett("GainG", G)
                 Setting.Sett("GainR", R)
 
-            Case ImagetypeEnum.Fluorescence, ImagetypeEnum.EDF_Fluorescence
+            Case AcqusitionTypeEnum.FiBi, AcqusitionTypeEnum.EDF_Fluorescence
                 Setting.Sett("GainB_FiBi", B)
                 Setting.Sett("GainG_FiBi", G)
                 Setting.Sett("GainR_FiBi", R)
 
-            Case ImagetypeEnum.MUSE, ImagetypeEnum.EDF_MUSE
-                Setting.Sett("GainB_MUSE", B)
-                Setting.Sett("GainG_MUSE", G)
-                Setting.Sett("GainR_MUSE", R)
         End Select
 
         Camera.SetColorGain(R, G, B)
@@ -221,19 +215,7 @@ Public Class ImageDisplay
         Camera.SetMatrix(255 / ic)
 
     End Sub
-    Public Sub BayerInterpolate(rawimage As Byte(), ByRef bmp As Bitmap)
-        Bayer = New Filters.BayerFilter
-        Dim Pattern(1, 1) As Integer
-        Pattern = {{RGB.R, RGB.G}, {RGB.G, RGB.B}}
-        Bayer.BayerPattern = Pattern
-        Dim rawbitmap As New Bitmap(bmp.Width, bmp.Height, Imaging.PixelFormat.Format8bppIndexed)
 
-
-        byteToBitmap(rawimage, rawbitmap)
-        bmp = (Bayer.Apply(rawbitmap))
-
-
-    End Sub
 
 
 

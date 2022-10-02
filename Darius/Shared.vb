@@ -18,13 +18,11 @@ Public Enum SegmentationType
     Aforge
 End Enum
 
-Public Enum ImagetypeEnum
-    Brightfield
-    Fluorescence
-    MUSE
+Public Enum AcqusitionTypeEnum
+    WhiteDwarf
+    FiBi
     EDF_Fluorescence
     EDF_Brightfield
-    EDF_MUSE
 End Enum
 
 Public Structure ByteImage
@@ -54,8 +52,9 @@ Module SharedResources
     Public ZEDOF As ZstackStructure
     Public Zprofiler As ZstackStructure
     Public block As Boolean = False
-    Public ScanUnits() As ScanUnit
-    Public ScanBufferSize As Integer = 6
+    Public ScanUnits() As ZstackStructure
+    Public FlatField(,) As Single
+    Public ScanBufferSize As Integer = 10
     Public Function factorial(ByVal n As Integer) As Integer
         If n <= 1 Then
             Return 1

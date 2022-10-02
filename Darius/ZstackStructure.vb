@@ -1,4 +1,6 @@
-﻿Public Class ZstackStructure
+﻿Imports System.IO
+
+Public Class ZstackStructure
     Public W, H, Z As Integer
     Public loopZ As Integer
     Dim Pattern2D(,), ScalingUpPattern(), ScalingDownPattern() As Integer
@@ -9,14 +11,20 @@
     Public MaxMap2D(,) As Single
     Dim BLure As FFTW_VB_Real
     Public bytes()() As Byte
-
+    Dim X, Y As Integer
+    Dim bmp As Bitmap
+    Dim FileX, FileY As Integer
+    Dim Address As String
+    Dim Directory As String
+    Dim FileName As String
+    Public ready As Boolean = True
     Dim zc As Integer
     Dim current As Long
     Dim ticks As Long
     Public ImageBeingCaptured As Boolean
     Dim processDone() As Integer
     Public Imagecreated() As Integer
-    Public direction As Integer
+    Public Vdirection As Integer
     Dim Deivative As CentralDerivitavie
     Dim StepSize As Single = 0.01
     Dim Range As Single
@@ -27,6 +35,7 @@
     Public TimeStampProcessed() As Single
     Public WrapUpDone As Boolean
     Public OutputBytes() As Byte
+    Dim Dehaze As DehazeClass
     Dim watch As Stopwatch
     Dim MoveThread As System.Threading.Thread
 
@@ -51,21 +60,25 @@
             ReDim GreenEdgeBytes(zi)(W / scale * H / scale - 1)
             ReDim bytes(zi)(W * H * 3 - 1)
         Next
+        bmp = New Bitmap(W, H, Imaging.PixelFormat.Format24bppRgb)
         ReDim GreenBytes(W / scale * H / scale - 1)
         BLure = New FFTW_VB_Real(W / scale, H / scale)
         BLure.MakeGaussianReal(0.01, BLure.MTF, 2)
         Deivative = New CentralDerivitavie(W / scale, H / scale)
+
+        Dehaze = New DehazeClass(W, H, 0.008, 0.5)
+
 
         'For some stupid reason, the 2D rotates when it copied to a 1D array. It is wiered.... 
         ReDim Pattern2D(H - 1, W - 1)
         ReDim ScalingUpPattern(W * H - 1)
         ReDim ScalingDownPattern(W / scale * H / scale - 1)
         Dim j As Integer = 0
-        For y = 0 To H - 1 Step scale
-            For x = 0 To W - 1 Step scale
+        For Y = 0 To H - 1 Step scale
+            For X = 0 To W - 1 Step scale
 
-                For yb = y To y + 1
-                    For xb = x To x + 1
+                For yb = Y To Y + 1
+                    For xb = X To X + 1
                         Pattern2D(yb, xb) = j
                     Next
                 Next
@@ -89,7 +102,14 @@
         ReDim MaxMapPosition(W / scale * H / scale - 1)
 
         ReDim MaxMap2D(W / scale - 1, H / scale - 1)
-        direction = 1
+        Vdirection = 1
+    End Sub
+    Public Sub InputSettings(X As Integer, Y As Integer, Directory As String, Filename As String)
+        Me.X = X
+        Me.Y = Y
+        Me.Address = Address
+        Me.Directory = Directory
+        Me.FileName = Filename
     End Sub
     Public Sub Clear()
         ReDim GreenEdgeBytes(Z - 1)
@@ -107,31 +127,59 @@
     End Sub
 
 
-    Public Sub PrepareAcquire(retrn As Boolean, direction As Integer, myB As Integer)
+    Public Sub PrepareAcquire(loop_x As Integer, loop_y As Integer, Hdirection As Integer, Vdirection As Integer, retrn As Boolean, myB As Integer)
+
+        Do Until ready
+            Application.DoEvents()
+        Loop
+
+
+        ready = False
+        If Hdirection = 1 Then FileY = loop_y - 1 Else FileY = Y - loop_y
+        FileX = loop_x - 1
+        Dim SaveThread = New System.Threading.Thread(AddressOf Save)
+
         WrapUpDone = False
         Me.myB = myB
         ticks = (Camera.exp * Stopwatch.Frequency / 1000)
 
-        Me.direction = direction
-        If retrn Then direction = 1
+        Me.Vdirection = Vdirection
+        If retrn Then Vdirection = 1
         Array.Clear(Imagecreated, 0, Z)
         Array.Clear(processDone, 0, Z)
-        Dim AcquireThread As New System.Threading.Thread(AddressOf AcquireSingle)
+
         SuperScan.Activeb = myB
-        ActivelyCapturing = True
-        loopZ = -1
+
+        loopZ = 0
+        Dim AcquireThread As New System.Threading.Thread(AddressOf AcquireSingle)
         AcquireThread.Start()
 
         Dim Thread As New System.Threading.Thread(AddressOf ProcessThreaded)
         Thread.Start()
 
+        ActivelyCapturing = True
+
+        Do Until Not ActivelyCapturing
+
+        Loop
+        SaveThread.Start()
 
 
-        watch.Start()
     End Sub
+
+    Public Sub Save()
+        Do Until WrapUpDone
+            Application.DoEvents()
+        Loop
+        Dehaze.Apply(OutputBytes)
+        byteToBitmap(OutputBytes, bmp)
+        bmp.Save(Path.Combine(Directory, FileName + " Y" + FileY.ToString("D5") + " X" + FileX.ToString("D5") + ".bmp"))
+        'SaveJaggedArray(bytes, W, H, Path.Combine(Directory, FileName + " Y" + FileY.ToString("D5") + " X" + FileX.ToString("D5") + ".tif"))
+        ready = True
+        Application.DoEvents()
+    End Sub
+
     Public Sub AcquireSingle()
-
-
 
 
         Do
@@ -140,10 +188,10 @@
             Loop Until ImageBeingCaptured
             ImageBeingCaptured = False
             MakeDelay()
-            Stage.MoveRelativeAsync(Stage.Zaxe, StepSize * direction, False)
+            Stage.MoveRelativeAsync(Stage.Zaxe, StepSize * Vdirection, False)
 
         Loop Until loopZ = Z - 1
-        ActivelyCapturing = False
+
 
 
 
@@ -155,7 +203,7 @@
         ticks = (Camera.exp * Stopwatch.Frequency / 1000)
         Zstart = Stage.Z
         'MakeDelay()
-        Me.direction = direction
+        Me.Vdirection = direction
         If retrn Then direction = 1
         Array.Clear(Imagecreated, 0, Z)
         Array.Clear(processDone, 0, Z)
@@ -186,7 +234,7 @@
 
     End Sub
     Public Sub MoveThreaded()
-        Stage.MoveRelative(Stage.Zaxe, StepSize * direction, False)
+        Stage.MoveRelative(Stage.Zaxe, StepSize * Vdirection, False)
     End Sub
     Public Sub ProcessThreaded()
 
@@ -202,7 +250,7 @@
 
         For Zi = 0 To Z - 1
             Do Until Imagecreated(Zi) = 1
-                'Application.DoEvents()
+                Application.DoEvents()
             Loop
             GetColorBytes(bytes(Zi), GreenBytes, W / Scale, H / Scale)
             Deivative.AnalyzeX(GreenBytes, GreenEdgeBytes(Zi))
@@ -217,6 +265,7 @@
             processDone(Zi) = 1
         Next
         Wrapup()
+
     End Sub
 
     Public Function Wrapup() As Byte()
@@ -293,7 +342,7 @@
         Loop
 
 
-        If direction = 1 Then
+        If Vdirection = 1 Then
             i = 0
             For yy = 0 To Y - 1
                 For xx = 0 To X - 1
@@ -329,4 +378,5 @@
             BytesOut(i) = BytesIn(ScalingDownPattern(i))
         Next
     End Sub
+
 End Class

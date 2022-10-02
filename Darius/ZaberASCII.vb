@@ -47,7 +47,7 @@ Public Class ZaberASCII
         Xaxe.Home()
         Yaxe.Home()
 
-        SetAcceleration(Zaxe, 2)
+        SetAcceleration(Zaxe, 40)
         SetSpeed(Zaxe, 800)
         SetSpeed(Xaxe, 26)
         SetAcceleration(Yaxe, 0.5)

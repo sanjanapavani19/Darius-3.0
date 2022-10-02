@@ -212,7 +212,6 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="ImageDisplay.vb" />
-    <Compile Include="ImageDisplayXiq.vb" />
     <Compile Include="LibTiff.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
@@ -233,7 +232,6 @@
     <Compile Include="PreviewWebcam.vb" />
     <Compile Include="QuickPhasor.vb" />
     <Compile Include="Relay.vb" />
-    <Compile Include="ScanUnit.vb" />
     <Compile Include="Scanning.Designer.vb">
       <DependentUpon>Scanning.vb</DependentUpon>
     </Compile>

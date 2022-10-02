@@ -66,9 +66,9 @@
         j = 0
         For y = 0 To H - 1
             For x = 0 To W - 1
-                Rb(i) = (R(i) - Rb(i) * weight) / (1 - weight)
-                Gb(i) = (G(i) - Gb(i) * weight) / (1 - weight)
-                Bb(i) = (B(i) - Bb(i) * weight) / (1 - weight) + 40
+                Rb(i) = (R(i) - Rb(i) * weight) / (1 - weight) * FlatField(x, y)
+                Gb(i) = (G(i) - Gb(i) * weight) / (1 - weight) * FlatField(x, y)
+                Bb(i) = (B(i) - Bb(i) * weight) / (1 - weight) * FlatField(x, y) + 40
 
                 If Rb(i) > 255 Then Rb(i) = 255
                 If Gb(i) > 255 Then Gb(i) = 255

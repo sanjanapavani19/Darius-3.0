@@ -17,12 +17,21 @@ Module SuperScan
     Dim loop_x, loop_y As Integer
 
 
-    Public Sub FastScan2(X As Integer, Y As Integer, overlap As Integer, Address As String)
+    Public Sub FastScan2(X As Integer, Y As Integer, ScanOverlap As Integer, Pbar As ProgressBar, Address As String, AcqusitionType As AcqusitionTypeEnum)
         bmp = New Bitmap(Camera.W, Camera.H, Imaging.PixelFormat.Format24bppRgb)
         ReDim Bufferbytes(Camera.W * Camera.H * 3 - 1)
 
+        Select Case AcqusitionType
+            Case AcqusitionTypeEnum.WhiteDwarf
+                FlatField = ReadSinglePage32bit("ff.tif")
+            Case AcqusitionTypeEnum.FiBi
+                FlatField = ReadSinglePage32bit("ff_fibi.tif")
+        End Select
+
+
+
         watch = New Stopwatch
-        Activeb = -1
+        Activeb = 0
         Dim CrazyCameraThread As New System.Threading.Thread(AddressOf CrazyCamera)
         watch.Start()
         CrazyCameraThread.Start()
@@ -36,26 +45,11 @@ Module SuperScan
 
         Camera.ResetMatrix()
 
-        'Camera.SetPolicyToSafe()
-
-
-
-        'Select Case Display.imagetype
-        '    Case ImagetypeEnum.Brightfield
-        '        Camera.SetFlatField("ff.tif", "dark.tif")
-
-        '    Case ImagetypeEnum.Fluorescence
-        '        Camera.SetFlatField("ff_FiBi.tif", "dark.tif")
-
-        'End Select
         Camera.Flatfield(0)
 
-
-
-
         ' Creating overlap to enhance the stitching with ICE
-        Dim AdjustedStepX As Single = Stage.FOVX * (1 - overlap / Camera.W)
-        Dim AdjustedStepY As Single = Stage.FOVY * (1 - overlap / Camera.H)
+        Dim AdjustedStepX As Single = Stage.FOVX * (1 - ScanOverlap / Camera.W)
+        Dim AdjustedStepY As Single = Stage.FOVY * (1 - ScanOverlap / Camera.H)
 
         Dim cx, cy, cz As Single
         Stage.UpdatePositions()
@@ -106,8 +100,8 @@ Module SuperScan
 
                 If b = ScanBufferSize Then b = 0
 
-                ScanUnits(b).Acquire2(loop_x, loop_y, Hdirection, Vdirection, Form1.CheckBox2.Checked)
-                'Stage.WaitUntilIdle(Stage.Zaxe)
+                Stage.WaitUntilIdle(Stage.Zaxe)
+                ScanUnits(b).PrepareAcquire(loop_x, loop_y, Hdirection, Vdirection, False, b)
                 b += 1
 
                 If loop_y < Y Then
@@ -137,18 +131,18 @@ Module SuperScan
         Dim Alldone As Boolean = False
         Do Until Alldone = 0
             For b = 0 To ScanBufferSize - 1
-                Alldone *= ScanUnits(b).done
+                Alldone *= ScanUnits(b).ready
             Next
         Loop
 
         StopCrazyCamera = True
         Form1.Pbar.Maximum = 100
-        '  Stitcher.Process(Pbar, 2048 - ScanOverlap, 2048 - ScanOverlap, ScanOverlap, InputDirectory, OUTPUT)
+
 1:
         Stage.MoveAbsoluteAsync(Stage.Xaxe, cx)
         Stage.MoveAbsoluteAsync(Stage.Yaxe, cy)
         Stage.MoveAbsoluteAsync(Stage.Zaxe, cz)
-        ZEDOF.direction = 1
+        ZEDOF.Vdirection = 1
         Form1.Pbar.Value = 0
 
 
@@ -156,7 +150,7 @@ Module SuperScan
 
         MsgBox("Scanned in " + (watch.ElapsedMilliseconds / 1000).ToString + " s")
 
-
+        Stitcher.Process(Pbar, 2048 - ScanOverlap, 2048 - ScanOverlap, ScanOverlap, InputDirectory, OUTPUT)
 
         'ListBox1.Items.Add(Path.GetFileName(SaveFileDialog1.FileName))
         'ReDim Preserve Filenames(fileN)
@@ -185,20 +179,28 @@ Module SuperScan
             Captured = False
 
 
-            If ScanUnits(Activeb).Zscan.ActivelyCapturing And ScanUnits(Activeb).Zscan.loopZ < ScanUnits(Activeb).Zscan.Z - 1 Then
+            If ScanUnits(Activeb).ActivelyCapturing Then
 
-                ScanUnits(Activeb).Zscan.ImageBeingCaptured = True
-                ScanUnits(Activeb).Zscan.loopZ += 1
-                Camera.Capture(ScanUnits(Activeb).Zscan.bytes(ScanUnits(Activeb).Zscan.loopZ))
-                ScanUnits(Activeb).Zscan.Imagecreated(ScanUnits(Activeb).Zscan.loopZ) = 1
+
+                ScanUnits(Activeb).ImageBeingCaptured = True
+                Camera.Capture(ScanUnits(Activeb).bytes(ScanUnits(Activeb).loopZ))
+                ScanUnits(Activeb).Imagecreated(ScanUnits(Activeb).loopZ) = 1
                 Captured = True
+
+                If ScanUnits(Activeb).loopZ < ScanUnits(Activeb).Z - 1 Then
+                    ScanUnits(Activeb).loopZ += 1
+                Else
+                    ScanUnits(Activeb).ActivelyCapturing = False
+                End If
 
                 'MonitorloopZ(j) = ScanUnits(Activeb).Zscan.loopZ
                 'MonitorActiveb(j) = Activeb
                 'MonitorTimeStamp(j) = watch.ElapsedMilliseconds
             End If
 
-            If Captured = False Then Camera.Capture(Bufferbytes)
+            If Captured = False Then
+                Camera.Capture(Bufferbytes)
+            End If
 
             'Next
 
