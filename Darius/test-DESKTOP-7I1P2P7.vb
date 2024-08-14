@@ -194,7 +194,7 @@ Public Class test
 
 
         'saveSinglePage32("c:\temp\MaxMap.tif", MaxMap, W, H)
-        SaveSinglePage32("c:\temp\PhasorMAp.tif", MaxmapPhasor, W, H)
+        saveSinglePage32("c:\temp\PhasorMAp.tif", MaxmapPhasor, W, H)
         Pbar.Value = 0
 
     End Sub

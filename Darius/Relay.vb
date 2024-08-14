@@ -76,63 +76,9 @@ Public Class Relay
     Public status As Boolean
     Dim lnghandle As Long
 
+    Dim ThorlabsLED As LEDStructure
 
-
-
-    Public Sub SetRelays(ByVal RelayN As Integer, State As Boolean)
-        'Open the first device
-        If status = False Then Exit Sub
-        Dim temp As Long
-
-        If (State = True) Then
-            If RelayN = 1 Then temp = 1
-            If RelayN = 2 Then temp = 2
-            If RelayN = 3 Then temp = 4
-            If RelayN = 4 Then temp = 8
-            If RelayN = 5 Then temp = 16
-            If RelayN = 6 Then temp = 32
-            If RelayN = 7 Then temp = 64
-            If RelayN = 8 Then temp = 128
-            If RelayN = 255 Then temp = 255
-            RelState = RelState Or temp
-        End If
-
-        If (State = False) Then
-            If RelayN = 1 Then temp = 254
-            If RelayN = 2 Then temp = 253
-            If RelayN = 3 Then temp = 251
-            If RelayN = 4 Then temp = 247
-            If RelayN = 5 Then temp = 239
-            If RelayN = 6 Then temp = 223
-            If RelayN = 7 Then temp = 191
-            If RelayN = 8 Then temp = 127
-            If RelayN = 0 Then temp = 0
-            RelState = RelState And temp
-        End If
-
-        'MsgBox (Str(RelState) + "," + Str(temp))
-
-
-        Dim strWriteBuffer As String = " "
-        Mid(strWriteBuffer, 1, 1) = Chr(RelState)
-        Dim lngBytesWritten As Integer = 0
-        If FT_Write(lnghandle, strWriteBuffer, Len(strWriteBuffer), lngBytesWritten) <> FT_OK Then
-            '  Form1.logWinOutput("Write Failed")
-            Exit Sub
-        Else
-            'Form1.logWinOutput("Write OK")
-        End If
-
-
-
-
-    End Sub
-    Public Sub relay_Terminate()
-        FT_Close(lnghandle)
-    End Sub
-
-
-    Public Sub New()
+    Public Sub New(port As Integer)
 
 
         status = False
@@ -143,7 +89,8 @@ Public Class Relay
             Dim arg2 As String = ""
             Dim dwFlag As Long
             Dim NumDevices As Long = FT_GetNumDevices(arg1, arg2, dwFlag)
-            If FT_Open(2, lnghandle) <> FT_OK Then
+            Dim List As Long = FT_ListDevices(arg1, arg2, dwFlag)
+            If FT_Open(port, lnghandle) <> FT_OK Then
                 MsgBox("Error while opening")
                 Exit Sub
             Else
@@ -169,7 +116,78 @@ Public Class Relay
 
         End Try
 
+        ThorlabsLED = New LEDStructure
+        ThorlabsLED.SetLEDCurrent(0.5)
+
     End Sub
+
+
+    Public Sub SetRelays(ByVal RelayN As Integer, State As Boolean)
+
+        If RelayN = 1 Then
+            'Open the first device
+            If status = False Then Exit Sub
+            Dim temp As Long
+
+            If (State = True) Then
+                If RelayN = 1 Then temp = 1
+                If RelayN = 2 Then temp = 2
+                If RelayN = 3 Then temp = 4
+                If RelayN = 4 Then temp = 8
+                If RelayN = 5 Then temp = 16
+                If RelayN = 6 Then temp = 32
+                If RelayN = 7 Then temp = 64
+                If RelayN = 8 Then temp = 128
+                If RelayN = 255 Then temp = 255
+                RelState = RelState Or temp
+            End If
+
+            If (State = False) Then
+                If RelayN = 1 Then temp = 254
+                If RelayN = 2 Then temp = 253
+                If RelayN = 3 Then temp = 251
+                If RelayN = 4 Then temp = 247
+                If RelayN = 5 Then temp = 239
+                If RelayN = 6 Then temp = 223
+                If RelayN = 7 Then temp = 191
+                If RelayN = 8 Then temp = 127
+                If RelayN = 0 Then temp = 0
+                RelState = RelState And temp
+            End If
+
+            'MsgBox (Str(RelState) + "," + Str(temp))
+
+
+            Dim strWriteBuffer As String = " "
+            Mid(strWriteBuffer, 1, 1) = Chr(RelState)
+            Dim lngBytesWritten As Integer = 0
+            If FT_Write(lnghandle, strWriteBuffer, Len(strWriteBuffer), lngBytesWritten) <> FT_OK Then
+                '  Form1.logWinOutput("Write Failed")
+                Exit Sub
+            Else
+                'Form1.logWinOutput("Write OK")
+            End If
+        Else
+            If State Then
+                If RelayN = BlueLED_RichardMode Then ThorlabsLED.SetLEDCurrent(0.1) : ThorlabsLED.TurnOn()
+                If RelayN = BlueLED Then ThorlabsLED.SetLEDCurrent(0.9) : ThorlabsLED.TurnOn()
+
+            Else
+                ThorlabsLED.TurnOff()
+            End If
+
+
+
+        End If
+
+
+
+    End Sub
+    Public Sub relay_Terminate()
+        FT_Close(lnghandle)
+    End Sub
+
+
 
     Public Sub LED_ON()
         SetRelays(1, True)

@@ -15,29 +15,23 @@ Public Class ZaberASCII
     Public SweptZ As Single
     Public Xaxe, Yaxe, Zaxe As Axis
 
-
-    Public Sub New(FOVX As Single, FOVY As Single, comXYport As String)
-        ' Library.SetDeviceDbSource(DeviceDbSourceType.File, "devices-public.sqlite")
-
-
-
-
-        Dim com As Connection = Connection.OpenSerialPort(comXYport)
-
-
+    Public Sub New(FOVX As Single, FOVY As Single)
+        Library.SetDeviceDbSource(DeviceDbSourceType.File, "devices-public.sqlite")
+        Dim com As Connection = Connection.OpenSerialPort("COM4")
+        Dim ComZ As Connection = Connection.OpenSerialPort("COM7")
         Dim Devicelist = com.DetectDevices()
-        Xaxe = Devicelist(1).GetAxis(1)
-        Yaxe = Devicelist(0).GetAxis(1)
-        Zaxe = Devicelist(2).GetAxis(1)
-
-
+        Xaxe = Devicelist(0).GetAxis(1)
+        Yaxe = Devicelist(1).GetAxis(1)
+        Dim DeviceListZ = ComZ.DetectDevices
+        Zaxe = DeviceListZ(0).GetAxis(1)
         Me.FOVX = FOVX
         Me.FOVY = FOVY
         Zfocous = Setting.Gett("Focus")
-
         Home()
+        'MoveAbsolute(Xaxe, 3.7, False)
+        MoveAbsolute(Yaxe, 9.9, False)
+        'MoveAbsolute(Zaxe, 3, False)
 
-        '    GoToMiddle()
     End Sub
 
     Public Sub SetFOV(FOVX As Single, FOVY As Single)
@@ -49,28 +43,18 @@ Public Class ZaberASCII
     Public Sub Home()
 
 
-        Zspeed = Setting.Gett("Zspeed")
-        Zacc = Setting.Gett("Zacc")
-
-        Xspeed = Setting.Gett("Xspeed")
-        Xacc = Setting.Gett("Xacc")
-
-        Yspeed = Setting.Gett("Yspeed")
-        Yacc = Setting.Gett("Yacc")
-
-        SetAcceleration(Zaxe, Zacc)
-        SetSpeed(Zaxe, Zspeed)
-
-        SetAcceleration(Yaxe, Yacc)
-        SetSpeed(Yaxe, Yspeed)
-
-        SetAcceleration(Xaxe, Xacc)
-        SetSpeed(Xaxe, Xspeed)
-
         Zaxe.Home()
         Xaxe.Home()
         Yaxe.Home()
 
+        SetAcceleration(Zaxe, 2)
+        SetSpeed(Zaxe, 800)
+        SetSpeed(Xaxe, 26)
+        SetAcceleration(Yaxe, 0.5)
+        SetSpeed(Yaxe, 80)
+
+        MoveAbsolute(Zaxe, Setting.Gett("Focus"), False)
+        MoveAbsolute(Xaxe, 34, False)
 
 
     End Sub
@@ -89,16 +73,10 @@ Public Class ZaberASCII
 
     End Sub
     Public Sub WaitUntilIdle(ByRef Axe As Axis)
-        Try
-            Axe.WaitUntilIdle()
-        Catch ex As Exception
-
-        End Try
-
+        Axe.WaitUntilIdle()
     End Sub
     Public Sub MoveRelativeAsync(ByRef Axe As Axis, R As Single, Optional update As Boolean = True, Optional Waituntilidle As Boolean = True)
         Axe.MoveRelativeAsync(R, Units.Length_Millimetres, Waituntilidle)
-
         If update Then
             UpdatePositions()
             Tracking.Update()
@@ -133,7 +111,14 @@ Public Class ZaberASCII
 
     End Sub
     Public Sub SetSpeed(ByRef Axe As Axis, S As Single)
-        Axe.Settings.Set("maxspeed", S, Units.Velocity_MillimetresPerSecond)
+        Try
+
+            Axe.Settings.Set("maxspeed", S, Units.Velocity_MillimetresPerSecond)
+
+        Catch ex As Exception
+
+        End Try
+
     End Sub
 
     Public Sub SetAcceleration(ByRef Axe As Axis, A As Single)
@@ -159,15 +144,9 @@ Public Class ZaberASCII
         Z = Zaxe.GetPosition(Units.Length_Millimetres)
     End Sub
 
-    Public Sub GoToMiddle()
-        MoveAbsolute(Zaxe, Setting.Gett("Focus"), False)
-
-        Dim MiddleX, MIddleY As Single
-        MiddleX = Setting.Gett("Xrange") / 2 + Setting.Gett("Xmin")
-        MIddleY = Setting.Gett("Yrange") / 2 + Setting.Gett("Ymin")
-
-        MoveAbsoluteAsync(Xaxe, MiddleX, False)
-        MoveAbsolute(Yaxe, MIddleY, False)
+    Public Sub Go_Middle()
+        MoveAbsolute(Yaxe, 12.7)
+        MoveAbsolute(Xaxe, 38)
     End Sub
 
     Public Sub SetSweptZ(SweptZ As Single)

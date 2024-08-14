@@ -187,6 +187,6 @@ Public Class EO
         'a = p.Item2
     End Sub
     Public Sub ShowPosition()
-        Form1.Label21.Text = EO_GetCommandPosition(handl, last_position)
+        'Form1.Label21.Text = EO_GetCommandPosition(handl, last_position)
     End Sub
 End Class

@@ -1,0 +1,11 @@
+stuff to do:
+
+- reorganize the preview webcam for the move stuff
+so its all in one spot
+
+- figure out how to code on his account so then we can share code
+- or find a different more efficient way to do this
+
+- remove the settings feature, so users cannot access private settings
+- change this in the code
+- or make it password protected

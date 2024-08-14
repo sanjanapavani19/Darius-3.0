@@ -9,24 +9,13 @@ Public Class PreviewWebcam
     Dim V As AForge.Controls.VideoSourcePlayer
     Public Width, Height As Integer
     Public Bmp, bmpf, BmpLabel As Bitmap
-    Public ZmapBmp As FastBMP
     Public Exposure As Single
-    Public Preview_Z As Single
-    Public Z As Integer
     Public R As Rectangle
-    Public Scale As Single
-    Public GreyEdge()() As Single
-    Public GreyEdge2D()(,) As Single
-    Public Zx() As Single
-    Public Zmap(,) As Single
-    Public X0, Y0, ROI_W, ROI_H As Integer
-    Dim Cropfilter As Crop
-    Dim Flip As Mirror
     Dim videoDevices As New FilterInfoCollection(FilterCategory.VideoInputDevice)
     ' create video source
     Dim videoSource As New VideoCaptureDevice(videoDevices(0).MonikerString)
 
-    Public Sub New(Z As Integer, Zsteps As Single, Pbar As ProgressBar)
+    Public Sub New()
 
 
         videoSource.VideoResolution = videoSource.VideoCapabilities(1)
@@ -45,38 +34,13 @@ Public Class PreviewWebcam
         Dim Y As Integer = Setting.Gett("Preview_Y")
         Dim W As Integer = Setting.Gett("Preview_W")
         Dim H As Integer = Setting.Gett("Preview_H")
-        'Preview_Z = Setting.Gett("Preview_Z")
-
         R = New Rectangle(X, Y, W, H)
-        Flip = New Mirror(False, False)
-        Cropfilter = New Crop(R)
+
         '   videoSource.SetCameraProperty(CameraControlProperty.Exposure, Form1.Textbox_exposure.Text, CameraControlFlags.Manual)
         '   videoSource.SetCameraProperty(CameraControlProperty.Exposure, 10, CameraControlFlags.Manual)
         V.Start()
     End Sub
 
-    Public Sub SetExposure(exp As Single)
-        Dim flags As CameraControlFlags
-        Dim minVal, maxVal, stepSize, defaultVal, Gfocus As Integer
-        videoSource.SetCameraProperty(CameraControlProperty.Exposure, Exposure, flags)
-        videoSource.GetCameraPropertyRange(CameraControlProperty.Focus, minVal, maxVal, stepSize, defaultVal, flags)
-    End Sub
-    Public Sub MovetoLoad()
-
-
-        Stage.MoveAbsolute(Stage.Zaxe, Stage.Zfocous)
-        Stage.MoveAbsolute(Stage.Yaxe, 50.8)
-        Stage.MoveAbsolute(Stage.Xaxe, 0)
-
-    End Sub
-    Public Sub MovetoPreview()
-        'Stage.SetSpeed(Stage.Yaxe, 20)
-        Stage.MoveAbsolute(Stage.Zaxe, 20)
-        Stage.MoveAbsolute(Stage.Xaxe, 16.5)
-        Stage.MoveAbsolute(Stage.Yaxe, 0)
-
-        'Stage.SetSpeed(Stage.Yaxe, 50)
-    End Sub
     Public Function Capture(exposure As Integer, focus As Integer) As Bitmap
         Dim flags As CameraControlFlags
         Dim minVal, maxVal, stepSize, defaultVal, Gfocus As Integer
@@ -92,41 +56,54 @@ Public Class PreviewWebcam
 
 
 
-        Threading.Thread.Sleep(500)
+
         bmpf = New Bitmap(V.GetCurrentVideoFrame)
-
-        'Dim corners As New List(Of IntPoint)
-        'corners.Add(New IntPoint(Setting.Gett("PreviewX1"), Setting.Gett("PreviewY1")))
-        'corners.Add(New IntPoint(Setting.Gett("PreviewX2"), Setting.Gett("PreviewY2")))
-        'corners.Add(New IntPoint(Setting.Gett("PreviewX3"), Setting.Gett("PreviewY3")))
-        'corners.Add(New IntPoint(Setting.Gett("PreviewX4"), Setting.Gett("PreviewY4")))
+        Bmp = New Bitmap(Bmpf.width, Bmpf.height, System.Drawing.Imaging.PixelFormat.Format24bppRgb)
+        Bmp = bmpf.Clone(New Rectangle(0, 0, bmpf.Width, bmpf.Height), System.Drawing.Imaging.PixelFormat.Format24bppRgb)
 
 
-        'Dim Quad As New QuadrilateralTransformation(corners)
-        'Bmp = ConvertTo24bpp(Quad.Apply(bmpf))
+        Width = Bmp.Width
+        Height = Bmp.Height
+        'BmpTissue = New FastBMP(CInt(Width * 2 / 3), Height, Imaging.PixelFormat.Format32bppArgb)
 
-        Dim ro As RotateNearestNeighbor = New RotateNearestNeighbor(90)
+        'Dim Cropfilter As New Crop(New Rectangle(0, Height / 6, Width, Height * (2 / 3)))
+        'BmpTissue = New FastBMP(Cropfilter.Apply(Bmp))
 
-        Bmp = ConvertTo24bpp(bmpf)
-        Bmp = Cropfilter.Apply(Bmp)
-        Bmp = ro.Apply(Bmp)
+        'X = (1.4 / 5.5) * BmpTissue.width
+        'W = (2.5 / 5.5) * BmpTissue.width
+
+        'BmpTissue.GR.DrawRectangle(New Pen(Color.DarkBlue), New Rectangle(X, 0, W, W))
+
+        'Bmp.Save("D:\bmp.png")
+
+        'Dim Cropfilter As New Crop(New Rectangle(X, Y, W, H))
+
+        Dim X As Integer = Setting.Gett("Preview_X")
+        Dim Y As Integer = Setting.Gett("Preview_Y")
+        Dim W As Integer = Setting.Gett("Preview_W")
+        Dim H As Integer = Setting.Gett("Preview_H")
+        R = New Rectangle(X, Y, W, H)
+
+        Dim CropFilter As New Crop(R)
+        Bmp = CropFilter.Apply(Bmp)
+        'Dim crop As New Rectangle(X, Y, W, H)
+        'Dim croppedImage = New Bitmap(crop.Width, crop.Height, Bmp.PixelFormat)
+        'Using grp = Graphics.FromImage(croppedImage)
+        '    grp.DrawImage(Bmp, New Rectangle(crop.X, crop.Y, crop.Width, crop.Height), crop, GraphicsUnit.Pixel)
+        '    Bmp.Dispose()
+        '    Bmp = croppedImage
+        'End Using
+        'Bmp.Save("C:\test\bmptissue_cropped.png")
+        'Dim FlipFilter As New Mirror(True, True)
+        'Bmp = Cropfilter.Apply(Bmp)
+        'Dim bmpCropped As Bitmap = New Bitmap(Cropfilter.Apply(Bmp))
+        'Bmp = FlipFilter.Apply(Bmp)
+        'Bmp.Save("C:\temp\" & Now.ToString("R").Replace(":", " ") & ".jpg")
 
 
 
-        'Flip.ApplyInPlace(Bmp)
-        'Bmp.Save("c:\temp\tt.jpg")
         Return Bmp
 
-    End Function
-
-    Public Shared Function ConvertTo24bpp(ByVal img As Bitmap) As Bitmap
-        Dim bmp = New Bitmap(img.Width, img.Height, System.Drawing.Imaging.PixelFormat.Format24bppRgb)
-
-        Using gr = Graphics.FromImage(bmp)
-            gr.DrawImage(img, New Rectangle(0, 0, img.Width, img.Height))
-        End Using
-
-        Return bmp
     End Function
     Public Function CaptureWhole(exposure As Integer, focus As Integer) As Bitmap
         Dim flags As CameraControlFlags
@@ -138,9 +115,8 @@ Public Class PreviewWebcam
         videoSource.GetCameraPropertyRange(CameraControlProperty.Focus, minVal, maxVal, stepSize, defaultVal, flags)
         videoSource.GetCameraProperty(CameraControlProperty.Focus, Pfocus, flags)
         videoSource.SetCameraProperty(CameraControlProperty.Focus, focus, CameraControlFlags.Manual)
-        V.Start()
-        Threading.Thread.Sleep(500)
 
+        V.Start()
         Return V.GetCurrentVideoFrame
     End Function
     Public Function CaptureROI(exposure As Integer, focus As Integer) As Bitmap
@@ -164,11 +140,11 @@ Public Class PreviewWebcam
         Width = Bmp.Width
         Height = Bmp.Height
         'trying the quickPhasor
-        'Dim Phasor As New QuickPhasor(400, Width, Height)
-        'Phasor.MakeHistogram(Bmpf, True)
-        'Phasor.CreateMask(0, 175, 175)
+        Dim Phasor As New QuickPhasor(400, Width, Height)
+        Phasor.MakeHistogram(Bmpf, True)
+        Phasor.CreateMask(0, 175, 175)
         Dim segmented As New FastBMP(Bmp.Width, Bmp.Height, System.Drawing.Imaging.PixelFormat.Format24bppRgb)
-        'Phasor.Segment(Bmpf, segmented)
+        Phasor.Segment(Bmpf, segmented)
         ' now detecting the rectangle
         Dim blobCounter As New AForge.Imaging.BlobCounter
 
@@ -195,8 +171,8 @@ Public Class PreviewWebcam
 
 
         segmented.bmp.Save("C:\test\segmented.jpg")
-        'Phasor.Plot.bmp.Save("C:\test\PhasorPlot.png")
-        'Bmp.Save("C:\test\bmptissue.png")
+        Phasor.Plot.bmp.Save("C:\test\PhasorPlot.png")
+        Bmp.Save("C:\test\bmptissue.png")
 
         Return Bmp
         'Form1.PictureBox_Phasor.Image = Phasor.Plot.bmp
@@ -219,10 +195,6 @@ Public Class PreviewWebcam
         'videoSource.GetCameraProperty(CameraControlProperty.Exposure, Exposure, CameraControlFlags.Auto)
     End Sub
 
-    Public Function GetProfile(X As Integer, Y As Integer, CursorWidth As Integer, CursorHeight As Integer) As Single
 
-    End Function
-    Public Sub EstimateProfile(Optional Zofsset As Single = 0)
 
-    End Sub
 End Class
