@@ -50,7 +50,7 @@ Public Class XimeaXIq
             cam.SetParam(PRM.ACQ_TIMING_MODE, ACQ_TIMING_MODE.FREE_RUN)
 
 
-            cam.SetParam(PRM.TRG_SOURCE, TRG_SOURCE.SOFTWARE)
+            cam.SetParam(PRM.TRG_SOURCE, TRG_SOURCE.OFF)
             cam.SetParam(PRM.OUTPUT_DATA_BIT_DEPTH, BIT_DEPTH.BPP_8)
 
             cam.SetParam(PRM.HORIZONTAL_FLIP, 0)
@@ -63,7 +63,7 @@ Public Class XimeaXIq
             ReDim Bytes(W * H * 3 - 1)
             timeout = 50
 
-            cam.SetParam(PRM.SHARPNESS, 2)
+            cam.SetParam(PRM.SHARPNESS, 0)
             gain = Setting.Gett("Gain")
             setGain(gain)
             SetColorGain(Setting.Gett("GainR"), Setting.Gett("GainG"), Setting.Gett("GainB"))
@@ -71,7 +71,7 @@ Public Class XimeaXIq
             setGammaC(Setting.Gett("GAMMAC"))
             exp = Setting.Gett("exposureb")
 
-            'cam.SetParam(PRM.CC_MATRIX_23, 0)
+            cam.SetParam(PRM.CC_MATRIX_23, 0)
             Dim val As Integer
             cam.GetParam(PRM.EXPOSURE, Val)
 
@@ -179,41 +179,33 @@ Public Class XimeaXIq
         cam.SetParam(PRM.CC_MATRIX_22, CCMAtrix)
         Me.CCMAtrix = CCMAtrix
     End Sub
-    Public Sub capture(Optional Trigger As Boolean = True)
-        Try
-            If Trigger Then cam.SetParam(PRM.TRG_SOFTWARE, 1)
-            cam.GetImageByteArray(Bytes, timeout)
-        Catch ex As Exception
-
-        End Try
-
-
-    End Sub
-    Public Sub Capture(ByRef Bytes As Byte(), Optional Trigger As Boolean = True)
+    Public Sub capture(Optional Trigger As Boolean = False)
 
         If Trigger Then cam.SetParam(PRM.TRG_SOFTWARE, 1)
         cam.GetImageByteArray(Bytes, timeout)
 
     End Sub
-    Public Sub Trigg()
+    Public Sub Capture(ByRef Bytes As Byte(), Optional Trigger As Boolean = False)
+
+        If Trigger Then cam.SetParam(PRM.TRG_SOFTWARE, 1)
+        cam.GetImageByteArray(Bytes, timeout)
+
+    End Sub
+    Public Sub SetTrigger()
         cam.SetParam(PRM.TRG_SOFTWARE, 1)
     End Sub
-    Public Sub SetTrigger(mode As Boolean)
-        If mode = True Then cam.SetParam(PRM.TRG_SOURCE, TRG_SOURCE.SOFTWARE) Else cam.SetParam(PRM.TRG_SOURCE, TRG_SOURCE.OFF)
-    End Sub
-
     Public Sub SetFlatField(filename As String, bfilename As String)
 
-        'Try
-        '    SetDataMode(Colortype.RGB)
-        '    cam.SetParam(PRM.FFC_FLAT_FIELD_FILE_NAME, filename)
-        '    cam.SetParam(PRM.FFC_DARK_FIELD_FILE_NAME, bfilename)
-        '    cam.SetParam(PRM.FFC, 1)
-        '    FFsetup = True
-        'Catch ex As Exception
-        '    cam.SetParam(PRM.FFC, 0)
-        '    FFsetup = False
-        'End Try
+        Try
+            SetDataMode(Colortype.RGB)
+            cam.SetParam(PRM.FFC_FLAT_FIELD_FILE_NAME, filename)
+            cam.SetParam(PRM.FFC_DARK_FIELD_FILE_NAME, bfilename)
+            cam.SetParam(PRM.FFC, 1)
+            FFsetup = True
+        Catch ex As Exception
+            cam.SetParam(PRM.FFC, 0)
+            FFsetup = False
+        End Try
 
 
 
@@ -221,10 +213,22 @@ Public Class XimeaXIq
 
 
     Public Sub Flatfield(value As Integer)
-        'cam.SetParam(PRM.FFC, value)
+        cam.SetParam(PRM.FFC, value)
 
 
     End Sub
+    Public Sub capture_binned(ByRef framein)
+        Try
+            cam.SetParam(PRM.TRG_SOFTWARE, 1)
+            cam.GetImageByteArray(framein, timeout)
+
+        Catch ex As Exception
+
+        End Try
+
+    End Sub
+
+
 
     Public Function CaptureBmp(Optional Trigger As Boolean = True) As Bitmap
         If Trigger Then cam.SetParam(PRM.TRG_SOFTWARE, 1)

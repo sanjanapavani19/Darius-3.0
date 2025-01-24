@@ -1,6 +1,8 @@
-﻿Imports System.Windows.Forms.DataVisualization.Charting
-Imports Zaber.Motion.Ascii
-Imports Zaber.Motion
+﻿
+Public Enum CameraType
+    CCD
+    CMOS
+End Enum
 
 
 Public Enum Colortype
@@ -8,18 +10,23 @@ Public Enum Colortype
     Grey
 End Enum
 
-
-Public Enum AcqusitionTypes
-    Slide
-    FiBi
-    EDF_FiBi
-    EDF_Slide
+Public Enum SegmentationType
+    Unmixed
+    Kmeaans
+    Clustered
+    Gaussian
+    Aforge
 End Enum
 
-Public Enum Objectives
-    _10X
-    _20X
+Public Enum ImagetypeEnum
+    Brightfield
+    Fluorescence
+    MUSE
+    EDF_Fluorescence
+    EDF_Brightfield
+    EDF_MUSE
 End Enum
+
 Public Structure ByteImage
     Dim data As Byte()
     Dim Width As Integer
@@ -33,88 +40,22 @@ Public Structure ByteImage
     Dim AdjustedWidth, AdjustedHeight As Integer
 End Structure
 Module SharedResources
-
-    Public GammaY, GammaC As Single
-    Public DehazeRadius, DehazeWeight As Single
-    Public LEDcontroller As Relay
-
     Public Setting As New SettingStructure("Settings.xml")
-    Public Camera As XimeaXIC
+    Public Camera As XimeaXIq
     Public Stage As ZaberASCII
     Public Display As ImageDisplay
     Public Piezo As EO
     Public EDF As ExtendedDepth5
-    Public AutoFocus As FocusStructure
     Public rr(), gg(), bb() As Byte
     Public clrs(20) As Color
-    Public Preview As PreviewWebcam
+    Public Preview As PreviewVimba
     Public Triangle As TriangulationStructure
     Public Tracking As TrackingStructure
-
-    Public Zprofiler As ZstackContinuous
+    Public ZEDOF As ZstackStructure
+    Public Zprofiler As ZstackStructure
     Public block As Boolean = False
-    Public ScanUnits() As ZstackContinuous
-    Public Scanning As Boolean
-    Public FlatField()(,) As Single
-    Public FlatFieldB(), FlatFieldG(), FlatFieldR() As Single
-    Public ScanBufferSize As Integer = 10
-    Public Const BacklightWhiteLED = 2
-    Public Const BlueLED = 3
-    Public Const BlueLED_RichardMode = 4
-    Public Const PreviewLED = 1
-    Public ScanOverlap As Integer = 100
-    Public Dehaze As DehazeClass
-    Public CrazyCamera As CrazyCameraClass
-
-
-    Public Sub LoadObjects(ByRef Pbar As ProgressBar, ByRef chart1 As Chart)
-
-        'Dim PortIDs() As String = GetPortIDs()
-        'Dim PortNames() As String = GetPortNames()
-        '' Array.Sort(PortNames, PortIDs)
-        'Dim XYport As String
-        'Dim Zport As String
-        'Dim StainerStageport As String
-        'Dim LEDport As String
-        'Dim StainerPort As String
-        'For i = 0 To PortNames.Length - 1
-        '    If PortIDs(i) = Setting.Gett("PORTID_XY") Then XYport = PortNames(i)
-        '    If PortIDs(i) = Setting.Gett("PORTID_Z") Then Zport = PortNames(i)
-        '    If PortIDs(i) = Setting.Gett("PORTID_LED") Then LEDport = PortNames(i)
-        '    If PortIDs(i) = Setting.Gett("PORTID_Stainer") Then StainerPort = PortNames(i)
-        '    If PortIDs(i) = Setting.Gett("PORTID_STAINERSTAGE") Then StainerStageport = PortNames(i)
-        'Next
-
-        'ResetPorts()
-
-        LEDcontroller = New Relay(0)
-        LEDcontroller.SetRelays(PreviewLED, True)
-        LEDcontroller.SetRelays(PreviewLED, False)
-
-
-        Stage = New ZaberASCII(Setting.Gett("FOVX"), Setting.Gett("FOVY"), "com2")
-
-
-
-
-
-
-        Camera = New XimeaXIC(0, Setting.Gett("Gain"), Setting.Gett("GainR"), Setting.Gett("GainG"), Setting.Gett("GainB"), Setting.Gett("Exposure"), 2048, 2048)
-        Preview = New PreviewWebcam(380, 0.05, Pbar)
-
-        'Dehaze = New DehazeClass(Camera.W, Camera.H, DehazeRadius, DehazeWeight, GammaY)
-
-
-        '  Zprofiler = New ZstackContinuous(Camera.W, Camera.H, Setting.Gett("ZSTACRRANGE"), Setting.Gett("ZSTACKSTEPS"), 4, DehazeRadius, DehazeWeight, GammaY, Camera)
-        'AutoFocus = New FocusStructure(ZEDOF.Range, 0.1, 4)
-        Display = New ImageDisplay(Camera.W, Camera.H, chart1)
-        ReDim ScanUnits(ScanBufferSize - 1)
-
-    End Sub
-
-
-
-
+    Public ScanUnits() As ScanUnit
+    Public ScanBufferSize As Integer = 6
     Public Function factorial(ByVal n As Integer) As Integer
         If n <= 1 Then
             Return 1

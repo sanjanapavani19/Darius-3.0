@@ -1,5 +1,5 @@
 ﻿Imports System.Drawing.Imaging
-Imports Accord.Imaging.Converters
+
 
 Public Class FastBMP
 
@@ -159,9 +159,9 @@ Public Class FastBMP
 
     Public Sub GetPixel(x As Integer, y As Integer, ByRef byteR As Byte, ByRef byteG As Byte, ByRef byteB As Byte)
         Dim index As Integer = y * stride + x * 3
-        byteR = bytes(index)
+        byteR = bytes(index + 2)
         byteG = bytes(index + 1)
-        byteB = bytes(index + 2)
+        byteB = bytes(index)
 
     End Sub
 
@@ -178,9 +178,9 @@ Public Class FastBMP
 
     Public Sub FillOriginalPixel(x As Integer, y As Integer, byteR As Byte, byteG As Byte, byteB As Byte)
         Dim index As Integer = y * stride + x * 3
-        bytes(index) = byteB
+        bytes(index + 2) = byteB
         bytes(index + 1) = byteG
-        bytes(index + 2) = byteR
+        bytes(index) = byteR
 
     End Sub
     Public Function GetGraysacleArray() As Byte()

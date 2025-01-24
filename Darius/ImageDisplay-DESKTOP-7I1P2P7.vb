@@ -23,49 +23,32 @@ Public Class ImageDisplay
     Dim HistoChart As Chart
     Dim ImageSize As Integer
 
-    Public AcqusitionType As AcqusitionTypes
+    Public imagetype As ImagetypeEnum
 
 
     Public Histogram() As Single
 
-
     Public Sub New(W As Integer, H As Integer, ByRef HistoChart As Chart)
-        ' Validate parameters
-        If W <= 0 Or H <= 0 Then
-            Throw New ArgumentException("Width and height must be positive integers.")
-        End If
+        Me.Width = W
+        Me.Height = H
+        Me.HistoChart = HistoChart
+        ReDim Histogram(HistBin)
+        ' Get Raw Data
+        ImageSize = W * H * 3 - 1
+        ReDim rawImage(Bucketsize)
+        For i = 0 To Bucketsize - 1
+            BmpPreview(i) = New FastBMP(W, H, Imaging.PixelFormat.Format24bppRgb)
+            ReDim rawImage(i)(W * H * 3 - 1)
+        Next
 
-        If Bucketsize <= 0 Then
-            Throw New ArgumentException("Bucketsize must be a positive integer.")
-        End If
 
-        Try
-            ' Initialize properties
-            Me.Width = W
-            Me.Height = H
-            Me.HistoChart = HistoChart
-            ReDim Histogram(HistBin)
 
-            ' Get Raw Data
-            ImageSize = W * H * 3 - 1
-            ReDim rawImage(Bucketsize)
+        EmptyPreview = New FastBMP(W, H, Imaging.PixelFormat.Format24bppRgb)
+        RequestIbIc = 2
 
-            For i = 0 To Bucketsize - 1
-                ' Ensure parameters passed to FastBMP are valid
-                BmpPreview(i) = New FastBMP(W, H, Imaging.PixelFormat.Format24bppRgb)
-                ReDim rawImage(i)(W * H * 3 - 1)
-            Next
-
-            ' Initialize EmptyPreview
-            EmptyPreview = New FastBMP(W, H, Imaging.PixelFormat.Format24bppRgb)
-
-        Catch ex As Exception
-            ' Handle errors gracefully
-            MessageBox.Show($"Error initializing FastBMP: {ex.Message}", "Initialization Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-            Throw
-        End Try
+        SetColorGain(Setting.Gett("GainR"), Setting.Gett("GainG"), Setting.Gett("GainB"), ImagetypeEnum.Brightfield)
+        ib = 0 : ic = 255
     End Sub
-
     Public Sub AdjustBrightness()
         Dim C As Integer
         Do Until RequestIbIc = 3
@@ -87,7 +70,7 @@ Public Class ImageDisplay
 
     End Sub
 
-    Public Sub MakePreview(ByRef rawin As Byte(), Gained As Boolean)
+    Public Function MakePreview(ByRef rawin As Byte(), Gained As Boolean) As Bitmap
         If RequestIbIc = 2 Then RequestIbIc = 3
         f += 1
         If f = Bucketsize - 1 Then f = 0
@@ -96,7 +79,9 @@ Public Class ImageDisplay
         BmpPreview(f).MakeFromBytes(rawImage(f))
         If RequestIbIc = 1 Then SetIbIc(True) : RequestIbIc = 2
         '  PlotHistogram()
-    End Sub
+
+
+    End Function
 
     Public Sub ApplyBrightness(rawin As Byte(), CCMAtrix As Single, ByRef bmp As Bitmap)
         Dim p As Integer
@@ -123,24 +108,27 @@ Public Class ImageDisplay
 
     End Sub
 
-    Public Sub SetColorGain(R As Single, G As Single, B As Single, Imagingtype As AcqusitionTypes, Optional saving As Boolean = True)
+    Public Sub SetColorGain(R As Single, G As Single, B As Single, Imagingtype As ImagetypeEnum)
         GainR = R
         GainB = B
         GainG = G
-        If saving Then
-            Select Case Imagingtype
-                Case AcqusitionTypes.Slide, AcqusitionTypes.EDF_Slide
-                    Setting.Sett("GainB", B)
-                    Setting.Sett("GainG", G)
-                    Setting.Sett("GainR", R)
+        Select Case Imagingtype
+            Case ImagetypeEnum.Brightfield, ImagetypeEnum.EDF_Brightfield
+                Setting.Sett("GainB", B)
+                Setting.Sett("GainG", G)
+                Setting.Sett("GainR", R)
 
-                Case AcqusitionTypes.FiBi, AcqusitionTypes.EDF_FiBi
-                    Setting.Sett("GainB_FiBi", B)
-                    Setting.Sett("GainG_FiBi", G)
-                    Setting.Sett("GainR_FiBi", R)
+            Case ImagetypeEnum.Fluorescence, ImagetypeEnum.EDF_Fluorescence
+                Setting.Sett("GainB_FiBi", B)
+                Setting.Sett("GainG_FiBi", G)
+                Setting.Sett("GainR_FiBi", R)
 
-            End Select
-        End If
+            Case ImagetypeEnum.MUSE, ImagetypeEnum.EDF_MUSE
+                Setting.Sett("GainB_MUSE", B)
+                Setting.Sett("GainG_MUSE", G)
+                Setting.Sett("GainR_MUSE", R)
+        End Select
+
         Camera.SetColorGain(R, G, B)
     End Sub
 
@@ -233,7 +221,19 @@ Public Class ImageDisplay
         Camera.SetMatrix(255 / ic)
 
     End Sub
+    Public Sub BayerInterpolate(rawimage As Byte(), ByRef bmp As Bitmap)
+        Bayer = New Filters.BayerFilter
+        Dim Pattern(1, 1) As Integer
+        Pattern = {{RGB.R, RGB.G}, {RGB.G, RGB.B}}
+        Bayer.BayerPattern = Pattern
+        Dim rawbitmap As New Bitmap(bmp.Width, bmp.Height, Imaging.PixelFormat.Format8bppIndexed)
 
+
+        byteToBitmap(rawimage, rawbitmap)
+        bmp = (Bayer.Apply(rawbitmap))
+
+
+    End Sub
 
 
 

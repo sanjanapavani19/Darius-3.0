@@ -56,19 +56,19 @@ Public Class FocusStructure
     End Sub
 
     Public Sub Initialize()
-        Camera.StopAcqusition()
-        Camera.Flatfield(0)
-        exp = Camera.exp
-        Camera.SetDataMode(Colortype.Grey)
-        Camera.SetExposure(exp / bin, False)
-        Camera.ReSetROI()
-        Camera.SetBinning(bin)
-        ReDim BinnedImage(Nimg - 1)
+        'Camera.StopAcqusition()
+        'Camera.Flatfield(0)
+        'exp = Camera.exp
+        'Camera.SetDataMode(Colortype.Grey)
+        'Camera.SetExposure(exp / bin, False)
+        'Camera.ReSetROI()
+        'Camera.SetBinning(bin)
+        'ReDim BinnedImage(Nimg - 1)
 
 
-        Stage.SetAcceleration(Stage.Zaxe, Facceleration)
+        'Stage.SetAcceleration(Stage.Zaxe, Facceleration)
         '  Stage.SetSpeed(Stage.Zaxe, Fspeed)
-        Camera.StartAcqusition()
+        'Camera.StartAcqusition()
 
         'To use only integer steps 
         '      Range = Int(Range / Nimg * stage.ZMMtoSteps) * Nimg / stage.ZMMtoSteps
@@ -85,9 +85,10 @@ Public Class FocusStructure
             sy(s) = (s + 1) / 4
             Dim watch As New Stopwatch
             watch.Start()
-            Stage.MoveRelative(Stage.Zaxe, Range)
+            Stage.MoveRelative(Stage.Zaxe, Range, False, True)
             watch.Stop()
             Sx(s) = watch.ElapsedMilliseconds
+            Stage.WaitUntilIdle(Stage.Zaxe)
             Stage.MoveRelative(Stage.Zaxe, -Range)
             pbar.Value = s
             Application.DoEvents()
@@ -96,22 +97,22 @@ Public Class FocusStructure
         WriteS()
         '-------------------------------------Microsteps=--------------------------------------
 
-        For s = 0 To 19
-            Stage.SetSpeed(Stage.Zaxe, (s + 1) / 10)
-            MicroSy(s) = (s + 1) / 10
-            Dim watch As New Stopwatch
-            watch.Start()
-            Stage.MoveRelative(Stage.Zaxe, MicroRange)
-            watch.Stop()
-            MicroSx(s) = watch.ElapsedMilliseconds
-            Stage.MoveRelative(Stage.Zaxe, -MicroRange)
-            pbar.Value = s
-            Application.DoEvents()
-        Next
-        MicroSpline = Interpolate.Linear(MicroSx, MicroSy)
-        WriteS2()
+        'For s = 0 To 19
+        '    Stage.SetSpeed(Stage.Zaxe, (s + 1) / 10)
+        '    MicroSy(s) = (s + 1) / 10
+        '    Dim watch As New Stopwatch
+        '    watch.Start()
+        '    Stage.MoveRelative(Stage.Zaxe, MicroRange)
+        '    watch.Stop()
+        '    MicroSx(s) = watch.ElapsedMilliseconds
+        '    Stage.MoveRelative(Stage.Zaxe, -MicroRange)
+        '    pbar.Value = s
+        '    Application.DoEvents()
+        'Next
+        'MicroSpline = Interpolate.Linear(MicroSx, MicroSy)
+        'WriteS2()
         '----------------------------------Camera--------------------------------------------------
-        ReDim BinnedImage(0)(Camera.Wbinned * Camera.Hbinned - 1)
+        'ReDim BinnedImage(0)(Camera.Wbinned * Camera.Hbinned - 1)
         Dim tc As Integer = 0
         pbar.Maximum = 500
         For t = 1 To 500 Step 10
@@ -121,9 +122,9 @@ Public Class FocusStructure
             Dim watch As New Stopwatch
             watch.Start()
             For i = 1 To 5
-                Camera.Capture(BinnedImage(0))
+                Camera.capture()
                 'FT.FindCenterOfMass2(BinnedImage(0))
-                Stage.UpdateZPositions()
+                'Stage.UpdateZPositions()
             Next
             watch.Stop()
             ReDim Preserve Cy(tc)
@@ -342,17 +343,17 @@ Public Class FocusStructure
 
     Public Sub Release()
 
-        Camera.StopAcqusition()
-        Camera.SetExposure(exp, False)
-        Camera.SetDataMode(Colortype.RGB)
-        Camera.SetROI()
-        Camera.SetDataMode(Colortype.RGB)
+        'Camera.StopAcqusition()
+        'Camera.SetExposure(exp, False)
+        'Camera.SetDataMode(Colortype.RGB)
+        'Camera.SetROI()
+        'Camera.SetDataMode(Colortype.RGB)
 
-        If Camera.FFsetup Then Camera.Flatfield(1)
-        Stage.SetAcceleration(Stage.Zaxe, Stage.Zacc)
+        'If Camera.FFsetup Then Camera.Flatfield(1)
+        'Stage.SetAcceleration(Stage.Zaxe, Stage.Zacc)
         Stage.SetSpeed(Stage.Zaxe, Stage.Zspeed)
 
-        Camera.StartAcqusition()
+        'Camera.StartAcqusition()
     End Sub
 
 

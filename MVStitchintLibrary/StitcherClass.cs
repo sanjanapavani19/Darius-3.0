@@ -12,7 +12,6 @@ using MVStitchingLibrary;
 using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.CommandLine.DragonFruit;
-using System.Reflection;
 using System.Windows.Forms;
 
 namespace MVStitchintLibrary
@@ -39,25 +38,15 @@ namespace MVStitchintLibrary
         /// <param name="maxOffsetError">Maximum error in the estimated offset.</param>
         /// <param name="inputDirectory">Directory of input files. </param>
         /// <param name="outputSvs">Output file path for creating a SVS file</param>
-        /// <param name="objectiveMagnification">Specify the objective magnification</param>
-        /// <param name="resolution">Specify the resolution. The size in micrometers of one pixel</param>
-        /// <param name="outputTileSize">Output tile size. Recommended values: 256 or 512 pixels</param>
-        /// <param name="jpegQuality">jpeg quality for output SVS files. Recommended values: 70-90</param>
-        /// <param name="borderCropWidth">crops the image in all directions by borderCropWidth pixels</param>
-        /// <param name="autoClose">Automatically close the application after finishing the stitching process.</param>
-        /// <param name="skipStitchingUseEstimation">Skip the actual stitching process and use the provided estimated imageOffsetX and imageOffsetY values</param>
-        /// 
         public ProgressBar P;
-        public void Process(ref ProgressBar Pbar,int imageOffsetX, int imageOffsetY, int maxOffsetError, DirectoryInfo inputDirectory = null, string outputSvs = null,double objectiveMagnification = 10, double resolution = 0.5d, int outputTileSize = 256, int jpegQuality = 90, int borderCropWidth = 0, bool autoClose = true)
+        public void Process(ref ProgressBar Pbar,int imageOffsetX, int imageOffsetY, int maxOffsetError, DirectoryInfo inputDirectory = null, string outputSvs = null)
         {
-            Console.WriteLine("Stitching Library Version: " + Assembly.GetAssembly(typeof(MVStitchingLibrary.GridStitcherFactory)).GetName().Version);
             this.P = Pbar;
             if (imageOffsetX == 0 || imageOffsetY == 0 || maxOffsetError == 0)
             {
                 Console.WriteLine("The commandline parameters imageOffsetX, imageOffsetY, and maxOffsetError cannot be 0.\nPress any key to close the application");
                 Console.ReadKey();
                 return;
-                
             }
             if (inputDirectory == null || outputSvs == null)
             {
@@ -72,7 +61,6 @@ namespace MVStitchintLibrary
 
             Stopwatch sw = Stopwatch.StartNew();
             var imagedatabase = files.Select(f => new Tuple<string, Point>(f.FullName, GetLogicalIndexFromHistolixFullFilePath(f.FullName, 5))).ToList();
-            
             sw.Stop();
             Console.WriteLine("loading images from disk took: " + sw.ElapsedMilliseconds);
             #endregion
@@ -109,14 +97,12 @@ namespace MVStitchintLibrary
             parameters.EstimatedVerticalTranslation = imageOffsetY;
             parameters.MaximumErrorInEstimatedTranslations = maxOffsetError;
             parameters.OutputFilePathSVS = outputSvs;
-            parameters.ObjectiveMagnification = objectiveMagnification;
-            parameters.Resolution = resolution;
+            parameters.ObjectiveMagnification = 10;
+            parameters.Resolution = 1;
             parameters.InputImageSize = rawImageSize;
             parameters.LogicalGridSize = logicalGridSize;
-            parameters.JpegQualityValue = jpegQuality;
-            parameters.OutputTileSize = outputTileSize;
-            parameters.ShadingCompensation = ShadingCompensationMode.None;
-            parameters.BorderCropWidth = borderCropWidth;
+            parameters.JpegQualityValue = 90;
+            parameters.OutputTileSize = 256;
 
             IGridStitcher stitcher = GridStitcherFactory.CreateGridStitcher(parameters);
 
@@ -132,39 +118,38 @@ namespace MVStitchintLibrary
 
             //register for progress notifications
             stitcher.OnStitchingProgressChanged += Stitcher_OnStitchingProgressChanged;
-            
+
             var result = stitcher.ProcessAllImages();
+            
             Console.WriteLine("Stitching result: " + result.State);
             Console.WriteLine(result.ResultInformation);
 
-            if (!autoClose)
-            {
-                Console.WriteLine("Press any key to close the application.");
-                Console.ReadKey();
-            }
-
-           // Environment.Exit(result.State == StitchResultState.Success ? 0 : -1);
-
+            Console.WriteLine("Press any key to close the application.");
+            //Console.ReadKey();
         }
 
-        public  void Stitcher_OnStitchingProgressChanged(double progressInPercent, StitchResult result)
+        public void Stitcher_OnStitchingProgressChanged(double progressInPercent, StitchResult result)
         {
-           
             Console.WriteLine("Stitcher reported progress: " + progressInPercent.ToString("0.0") + "%");
-            P.Value = (int) progressInPercent;
+
+            // Ensure the progress is within the valid range before assigning
+            int progressValue = (int)progressInPercent;
+            if (progressValue < P.Minimum) progressValue = P.Minimum;
+            if (progressValue > P.Maximum) progressValue = P.Maximum;
+            P.Value = progressValue;
+
             bool finished = result != null;
             if (finished)
             {
-                Console.WriteLine("Stitching process is finshed.");
-                Console.WriteLine("result is: " + result.State);
-                Console.WriteLine("result info is: " + result.ResultInformation);
+                Console.WriteLine("Stitching process is finished.");
+                Console.WriteLine("Result is: " + result.State);
+                Console.WriteLine("Result info is: " + result.ResultInformation);
                 P.Value = 0;
             }
         }
 
         public static Point GetLogicalIndexFromHistolixFullFilePath(string filename, int posInfoDigits)
         {
-            
             filename = Path.GetFileNameWithoutExtension(filename);
             //x is the last digits
 
@@ -172,36 +157,6 @@ namespace MVStitchintLibrary
 
             string ypos = filename.Substring(filename.Length - 2 * (posInfoDigits + 1), posInfoDigits);
             return new Point(int.Parse(xpos), int.Parse(ypos));
-            //filename = Path.GetFileNameWithoutExtension(filename);
-
-            //var substrings = filename.Split('_');
-
-            //if (substrings.Length == 2)
-            //{
-            //    try
-            //    {
-            //        //assume histolix file pattern
-
-            //        //x is the last digits
-
-            //        string xpos = filename.Substring(filename.Length - posInfoDigits, posInfoDigits);
-
-            //        string ypos = filename.Substring(filename.Length - 2 * (posInfoDigits + 1), posInfoDigits);
-            //        return new Point(int.Parse(xpos), int.Parse(ypos));
-            //    }
-            //    catch (Exception)
-            //    {
-            //        //assume generic pattern ypos_xpos
-            //        return new Point(int.Parse(substrings[1]), int.Parse(substrings[0]));
-            //    }
-
-            //}
-            //else if (substrings.Length == 3)
-            //{
-            //    //assume generic pattern xpos_ypos_zlayer
-            //    return new Point(int.Parse(substrings[0]), int.Parse(substrings[1]));
-            //}
-            //return Point.Empty;
         }
     }
 }

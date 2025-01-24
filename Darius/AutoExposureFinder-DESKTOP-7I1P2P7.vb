@@ -7,7 +7,7 @@ Module AutoExposureFinder
     Dim nImagesCropped As Integer
     Dim Spline As Interpolation.LinearSpline
     Public AutoExposure As Single
-    Public Sub EstimateAutoExposure()
+    Public Sub SetAutoExposure()
         Dim CurrentExposure As Single = Camera.exp
         Dim ExpImage(nImages)() As Byte
         Dim i As Integer = 0
@@ -23,7 +23,7 @@ Module AutoExposureFinder
         Thread.Sleep(50)
 
         For i = 0 To nImages - 1
-            ExposureArray(i) = ExposureArray(i) * 10
+            ExposureArray(i) = ExposureArray(i)
             Camera.SetExposure(ExposureArray(i), False)
             Camera.Capture(ExpImage(i))
         Next
@@ -37,17 +37,17 @@ Module AutoExposureFinder
         Dim bmp As New Bitmap(Camera.W, Camera.H, Imaging.PixelFormat.Format24bppRgb)
 
         For i = 0 To nImages - 1
-            byteToBitmap(ExpImage(i), bmp)
-            bmp.Save("c:\temp\" + i.ToString + ".bmp", ImageFormat.Bmp)
+            '  byteToBitmap(ExpImage(i), bmp)
+            ' bmp.Save("c:\temp\" + i.ToString + ".bmp", ImageFormat.Bmp)
             Array.Sort(ExpImage(i))
-            Ix(i) = ExpImage(i)(MaxJ - 100)
+            Ix(i) = ExpImage(i)(MaxJ - 1000)
             IY(i) = ExposureArray(i)
             Console.WriteLine(Ix(i).ToString)
 
         Next
 
         For i = 0 To nImages - 1
-            If Ix(i) > 250 Then Exit For
+            If Ix(i) > 240 Then Exit For
         Next
         nImagesCropped = i
 
@@ -56,9 +56,9 @@ Module AutoExposureFinder
             IxCropped(i) = Ix(i)
             IYCropped(i) = IY(i)
         Next
-        If nImagesCropped >= 2 Then
+        If nImagesCropped > 2 Then
             Spline = Interpolate.Linear(IxCropped, IYCropped)
-            AutoExposure = Math.Round(Spline.Interpolate(250) * 100) / 100
+            AutoExposure = Math.Round(Spline.Interpolate(240) * 100) / 100
         Else
             MsgBox("Cannot Estimate Exposure") : AutoExposure = CurrentExposure
         End If
@@ -67,9 +67,9 @@ Module AutoExposureFinder
         Console.WriteLine("Auto Exposure: " + AutoExposure.ToString)
 
 
-        Form1.UpdateLED(True)
+        ' Form1.UpdateLED(True)
         Camera.SetExposure(AutoExposure, False)
-        Camera.CaptureBmp.Save("c:\temp\Autoexposure.bmp", Imaging.ImageFormat.Bmp)
-        Form1.UpdateLED(Form1.CheckBoxLED.Checked)
+        'Camera.captureBmp.Save("c:\temp\Autoexposure.bmp", Imaging.ImageFormat.Bmp)
+        'Form1.UpdateLED(Form1.CheckBoxLED.Checked)
     End Sub
 End Module

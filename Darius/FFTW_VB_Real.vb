@@ -228,7 +228,7 @@ Public Class FFTW_VB_Real
         Buffer.BlockCopy(fout_Backward, 0, foutX, 0, nx * ny * 4)
     End Sub
     Public Sub MakeGaussianReal(qc As Single, ByRef G() As Single, d As Integer)
-        Dim n As Single
+
         qc = qc * nx
 
         Dim LG(nx - 1, ny - 1) As Single

@@ -168,6 +168,12 @@ Public Class TrackingStructure
     Dim Xmin, Xmax, Ymin, Ymax, Xrange, Yrange As Single
     Public Scanned() As Button
 
+    Public Structure Points
+        Public X As Single
+        Public Y As Single
+        Public Z As Single
+    End Structure
+
     Public Sub New(ByRef Pb As PictureBox)
         UpdateCalibration()
 
@@ -400,7 +406,7 @@ Public Class TrackingStructure
 
         Form1.ToolStripStatusLabel1.Text = "X: " + XX.ToString
         Form1.ToolStripStatusLabel2.Text = "Y: " + YY.ToString
-        Form1.ToolStripStatusLabel3.Text = "Z: " + ((ZZ - Stage.Zfocous) * 1000).ToString
+        Form1.ToolStripStatusLabel3.Text = "Z: " + ZZ.ToString
         ' Now conversion 
 
         X = ConvertCoordinatetoPixels(XX, YY).X
@@ -419,19 +425,19 @@ Public Class TrackingStructure
         RecentY = Y
     End Sub
 
-    Private Function ConvertCoordinatetoPixels(XX As Single, YY As Single) As Point
-        Dim P As New Point
+    Private Function ConvertCoordinatetoPixels(XX As Single, YY As Single) As Points
+        Dim P As New Points
         XX = XX - Xmin
         YY = YY - Ymin
-        P.X = Pbox.Width - XX * Pbox.Width / Xrange
-        P.Y = Pbox.Height - YY * Pbox.Height / Yrange
+        P.X = XX * Pbox.Width / Xrange
+        P.Y = YY * Pbox.Height / Yrange
 
         Return P
     End Function
 
     Public Function ConvertPixeltoCoordinateX(XX As Single) As Single
 
-        X = Xrange - XX * Xrange / Pbox.Width + Xmin
+        X = XX * Xrange / Pbox.Width + Xmin
 
         Return X
     End Function
@@ -447,7 +453,7 @@ Public Class TrackingStructure
     End Sub
     Public Function ConvertPixeltoCoordinateY(yy As Single) As Single
 
-        Y = Yrange - yy * Yrange / Pbox.Height + Ymin
+        Y = yy * Yrange / Pbox.Height + Ymin
 
         Return Y
         End Function

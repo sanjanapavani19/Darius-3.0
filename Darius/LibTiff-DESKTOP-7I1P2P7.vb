@@ -77,7 +77,7 @@ Module LibTiff
     End Sub
 
 
-    Public Function ReadJaggedArray(ByVal inputName As String, ByRef image As Single()(,)) As Byte
+    Public Function ReadMultiJaggedArray(ByVal inputName As String, ByRef image As Single()(,)) As Byte
 
         Dim Depth As Integer = GetPages(inputName)
         Using img As Tiff = Tiff.Open(inputName, "r")
@@ -429,7 +429,7 @@ Module LibTiff
         End Using
 
     End Sub
-    Public Sub SaveSinglePage32(ByVal filename As String, frame() As Single, Width As Integer, Height As Integer)
+    Public Sub saveSinglePage32(ByVal filename As String, frame() As Single, Width As Integer, Height As Integer)
 
 
 
@@ -476,52 +476,6 @@ Module LibTiff
 
 
 
-
-
-    Public Sub Save_MultiTiff(ByVal Frame(,,) As Single, ByVal filename As String)
-
-        Dim width As Integer = Frame.GetUpperBound(0)
-        Dim height As Integer = Frame.GetUpperBound(1)
-        Dim numberOfPages As Integer = Frame.GetUpperBound(2)
-
-        Const samplesPerPixel As Integer = 1
-        Const bitsPerSample As Integer = 16
-
-        Dim samples As UShort() = New UShort(width - 1) {}
-
-        'Tiff.SetTagExtender(AddressOf TagExtender)
-
-        Using output As Tiff = Tiff.Open(filename, "w")
-
-
-            For page As Integer = 0 To numberOfPages
-                output.SetField(TiffTag.IMAGEWIDTH, width / samplesPerPixel)
-                output.SetField(TiffTag.SAMPLESPERPIXEL, samplesPerPixel)
-                output.SetField(TiffTag.BITSPERSAMPLE, bitsPerSample)
-
-                'output.SetField(TIFFTAG_COMMENT, muse.tag_comments.Length * 2, System.Text.Encoding.Unicode.GetBytes((muse.tag_comments)))
-                'output.SetField(TIFFTAG_TAG, muse.tag_comments.Length * 2, System.Text.Encoding.Unicode.GetBytes((muse.tag_comments)))
-
-                ' specify that it's a page within the multipage file
-                output.SetField(TiffTag.SUBFILETYPE, FileType.PAGE)
-                ' specify the page number
-                output.SetField(TiffTag.PAGENUMBER, page, numberOfPages)
-
-
-                For i As Integer = 0 To height - 1
-                    For j As Integer = 0 To width - 1
-                        samples(j) = Frame(j, i, page)
-                    Next
-
-                    Dim buf As Byte() = New Byte(samples.Length * 2 - 1) {}
-                    Buffer.BlockCopy(samples, 0, buf, 0, buf.Length)
-                    output.WriteScanline(buf, i)
-                Next
-
-                output.WriteDirectory()
-            Next
-        End Using
-    End Sub
     Public Sub saveSinglePage32(ByVal filename As String, frame(,) As Single)
         Dim width As Integer = frame.GetLength(0)
         Dim height As Integer = frame.GetLength(1)
@@ -568,16 +522,16 @@ Module LibTiff
     End Sub
 
 
-    Public Sub SaveJaggedArray(ByVal Frame()(,) As Single, ByVal filename As String)
+    Public Sub Save_MultiTiff(ByVal Frame(,,) As Single, ByVal filename As String)
 
-        Dim width As Integer = Frame(0).GetLength(0)
-        Dim height As Integer = Frame(0).GetLength(1)
-        Dim numberOfPages As Integer = Frame.GetUpperBound(0)
+        Dim width As Integer = Frame.GetUpperBound(0)
+        Dim height As Integer = Frame.GetUpperBound(1)
+        Dim numberOfPages As Integer = Frame.GetUpperBound(2)
 
         Const samplesPerPixel As Integer = 1
-        Const bitsPerSample As Integer = 32
+        Const bitsPerSample As Integer = 16
 
-        Dim samples As Single() = New Single(width - 1) {}
+        Dim samples As UShort() = New UShort(width - 1) {}
 
         'Tiff.SetTagExtender(AddressOf TagExtender)
 
@@ -588,7 +542,6 @@ Module LibTiff
                 output.SetField(TiffTag.IMAGEWIDTH, width / samplesPerPixel)
                 output.SetField(TiffTag.SAMPLESPERPIXEL, samplesPerPixel)
                 output.SetField(TiffTag.BITSPERSAMPLE, bitsPerSample)
-                output.SetField(TiffTag.SAMPLEFORMAT, SampleFormat.IEEEFP)
 
                 'output.SetField(TIFFTAG_COMMENT, muse.tag_comments.Length * 2, System.Text.Encoding.Unicode.GetBytes((muse.tag_comments)))
                 'output.SetField(TIFFTAG_TAG, muse.tag_comments.Length * 2, System.Text.Encoding.Unicode.GetBytes((muse.tag_comments)))
@@ -599,13 +552,58 @@ Module LibTiff
                 output.SetField(TiffTag.PAGENUMBER, page, numberOfPages)
 
 
+                For i As Integer = 0 To height - 1
+                    For j As Integer = 0 To width - 1
+                        samples(j) = Frame(j, i, page)
+                    Next
+
+                    Dim buf As Byte() = New Byte(samples.Length * 2 - 1) {}
+                    Buffer.BlockCopy(samples, 0, buf, 0, buf.Length)
+                    output.WriteScanline(buf, i)
+                Next
+
+                output.WriteDirectory()
+            Next
+        End Using
+    End Sub
+
+
+    Public Sub SaveJaggedArray(ByVal Frame()(,) As Single, ByVal filename As String)
+
+        Dim width As Integer = Frame(0).GetUpperBound(0)
+        Dim height As Integer = Frame(0).GetUpperBound(1)
+        Dim numberOfPages As Integer = Frame.GetUpperBound(0)
+
+        Const samplesPerPixel As Integer = 1
+        Const bitsPerSample As Integer = 16
+
+        Dim samples As UShort() = New UShort(width - 1) {}
+
+        'Tiff.SetTagExtender(AddressOf TagExtender)
+
+        Using output As Tiff = Tiff.Open(filename, "w")
+
+
+            For page As Integer = 0 To numberOfPages
+                output.SetField(TiffTag.IMAGEWIDTH, width / samplesPerPixel)
+                output.SetField(TiffTag.SAMPLESPERPIXEL, samplesPerPixel)
+                output.SetField(TiffTag.BITSPERSAMPLE, bitsPerSample)
+
+                'output.SetField(TIFFTAG_COMMENT, muse.tag_comments.Length * 2, System.Text.Encoding.Unicode.GetBytes((muse.tag_comments)))
+                'output.SetField(TIFFTAG_TAG, muse.tag_comments.Length * 2, System.Text.Encoding.Unicode.GetBytes((muse.tag_comments)))
+
+                ' specify that it's a page within the multipage file
+                output.SetField(TiffTag.SUBFILETYPE, FileType.PAGE)
+                ' specify the page number
+                output.SetField(TiffTag.PAGENUMBER, page, numberOfPages)
+
 
                 For i As Integer = 0 To height - 1
                     For j As Integer = 0 To width - 1
                         samples(j) = Frame(page)(j, i)
                     Next
 
-                    Dim buf As Byte() = New Byte(samples.Length * 4 - 1) {}
+                    Dim buf As Byte() = New Byte(samples.Length * 2 - 1) {}
                     Buffer.BlockCopy(samples, 0, buf, 0, buf.Length)
                     output.WriteScanline(buf, i)
                 Next
@@ -616,15 +614,15 @@ Module LibTiff
         End Using
     End Sub
 
-    Public Sub SaveJaggedArray(ByVal Frame()() As Single, width As Integer, height As Integer, ByVal filename As String)
+    Public Sub SaveJaggedArray(ByVal Frame()() As Byte, width As Integer, height As Integer, ByVal filename As String)
 
 
         Dim numberOfPages As Integer = Frame.GetUpperBound(0)
 
         Const samplesPerPixel As Integer = 1
-        Const bitsPerSample As Integer = 32
+        Const bitsPerSample As Integer = 8
 
-        Dim samples As Single() = New Single(width - 1) {}
+        Dim samples As Byte() = New Byte(width - 1) {}
 
         'Tiff.SetTagExtender(AddressOf TagExtender)
 
@@ -649,9 +647,8 @@ Module LibTiff
                     For j As Integer = 0 To width - 1
                         samples(j) = Frame(page)(j + i * width)
                     Next
-                    Dim buf As Byte() = New Byte(samples.Length * 4 - 1) {}
-                    Buffer.BlockCopy(samples, 0, buf, 0, buf.Length)
-                    output.WriteScanline(buf, i)
+
+                    output.WriteScanline(samples, i)
                 Next
 
                 output.WriteDirectory()
@@ -660,7 +657,7 @@ Module LibTiff
     End Sub
 
 
-    Public Function ReadSinglePage32bit(ByVal inputName As String) As Single(,)
+    Public Function Read32(ByVal inputName As String) As Single(,)
 
 
 

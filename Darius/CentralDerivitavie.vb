@@ -31,7 +31,8 @@
         fout(0) = 0
         fout(nMax + 1) = 0
         For j = 1 To nMax
-            T = (fin(j - 1) - fin(j + 1)) / (fin(j) + 1) * EdgeCropp(j)
+            'T = (fin(j - 1) - fin(j + 1)) / (fin(j) + 1) * EdgeCropp(j)
+            T = (fin(j - 1) - fin(j + 1)) * EdgeCropp(j)
             fout(j) = T * T
         Next
     End Sub
